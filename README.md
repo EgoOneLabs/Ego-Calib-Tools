@@ -1,8 +1,123 @@
-# 头环四相机标定采集辅助工具
+# Ego-Calib-Tools：头环采集辅助与相机标定工具
 
-> 新增：2UQ2 安卓双目采集配套工具（独立分支），见 [ego_stereo/README.zh-CN.md](ego_stereo/README.zh-CN.md)。现有四鱼眼操作流程保持原样。
+**面向Linux工作站的四鱼眼采集辅助、2UQ2双目相机标定与质量核查工具。**
 
+[English](README.en.md) · [双目完整操作与接手说明](ego_stereo/README.zh-CN.md) · [阶段证据](ego_stereo/STATUS-20261106.md) · [采集App](https://github.com/EgoOneLabs/Ego-Capture/tree/feat/android-capture-code16)
 
+本仓库有两条设备路线：已有Orange Pi四鱼眼预览/采集辅助，以及Android 2UQ2双目正式会话的工作站标定工具。二者输入、入口、运行端不同，不应交叉使用。官方Kalibr负责求解；本仓库负责准备数据、调用、证据归档和质量复核，不修改官方标定算法。
+
+> **项目状态：持续开发。** 当前双目工作保存在 `feat/ego-stereo-calibration` 分支，未合入main；原四鱼眼 `preview/`、`tools/` 和日常流程保留。四鱼眼辅助工具为v1.10.4；双目已完成真实媒体/BAG通路与一份历史DS固定参数核查，独立数据和完整质量验收仍待收尾。更新日期2026-11-06；不要将脚本成功、文件齐全或角点预览当作标定验收通过。
+
+## 功能概览与进度
+
+| 路线 / 功能 | 已做到哪里 | 已验证与未完成 |
+|---|---|---|
+| 四鱼眼实时辅助 | 四路预览、中继、设备/端口操作说明 | 保留已有工具；本轮未重做头环或Docker实测 |
+| 四鱼眼原生角点证据 | Kalibr探针、只读BAG证据扫描、摆板提示 | 可提供证据与操作辅助；不等于四路最终标定通过 |
+| 四鱼眼部署与日常采集 | 环境检查、SD卡/ROS录制/传输及Kalibr操作文档 | 按文档核对实际服务、IP、Topic及板尺寸 |
+| 双目媒体核查 | MKV/WAV完整解码与时间/来源核对 | 一条真实会话左右286帧及WAV读回通过 |
+| 双目BAG准备 | 同索引抽帧、mono8、纯相机ROS1 BAG写入/全读回 | 真实smoke的36对/72条消息通过；不是板精度验证 |
+| 双目官方Kalibr调用 | 模型/板配置、源码状态、日志、real/user/sys归档 | 封装已实现；新启动封装尚未在新真实板会话端到端执行 |
+| 历史DS结果管理 | YAML/TXT/PDF身份、参数与双目几何核对、候选profile | 已导入匹配结果；未激活，设备唯一编号未绑定 |
+| 固定参数质量核查 | 官方DS几何/AprilGrid检测；单眼/双向交叉重投影与覆盖 | 真实230/230对完成并复算；同数据一致性，不是独立验证 |
+| 相机—IMU联合标定 | 不作为本双目分支已完成功能 | 重复性、IMU时间与连续性仍未验收 |
+| 量产验收/设备自动绑定 | 尚未形成通用闭环 | 不支持用一份历史参数自动覆盖不同头环 |
+
+## 系统架构
+
+```mermaid
+flowchart TB
+    F["四鱼眼：Orange Pi / ROS图像"] --> V["preview中继、探针与只读证据"]
+    F --> B["SD卡ROS BAG及传输"]
+    S["双目：Android Ego-Capture正式会话"] --> M["media：媒体完整性与时间核对"]
+    M --> W["workflow：同索引左右帧与mono8 BAG"]
+    B --> K["工作站官方Kalibr"]
+    W --> K
+    K --> R["camchain YAML / 参数TXT / 报告PDF"]
+    R --> I["result_import：身份、参数与候选归档"]
+    I --> Q["quality：固定参数重投影与覆盖证据"]
+    Q --> A["人工复核、独立数据验证及设备关联"]
+```
+
+四鱼眼路线按既有文档使用Kalibr；新双目启动器只处理双目会话。相机准备/BAG/标定不是安卓App中的功能。固定参数验证只估计每帧板姿态，不重新优化内参/双目外参；文件校验不自动提升为质量通过。
+
+| 目录 / 文档 | 接手入口 |
+|---|---|
+| [`preview/`](preview/) | 四路预览、中继、原生探针及BAG扫描 |
+| [`tools/`](tools/) | 四鱼眼环境检查、镜像导出与报告打包 |
+| [四鱼眼日常流程](docs/daily_workflow.zh-CN.txt) | 首次初始化、SD卡/ROS采集、传输和Kalibr操作 |
+| [`ego_stereo/media/`](ego_stereo/media/) | 双目媒体读回；显式选择ADB设备与会话 |
+| [`ego_stereo/workflow/`](ego_stereo/workflow/) | 相机图像准备、BAG写入/全读回、官方Kalibr调用 |
+| [`ego_stereo/result_import/`](ego_stereo/result_import/) | 已知历史DS结果身份与profile导入 |
+| [`ego_stereo/quality/`](ego_stereo/quality/) | 固定参数重投影、CSV、覆盖统计和示意图 |
+| [`ego_stereo/evidence/`](ego_stereo/evidence/) | 已复核匿名数值摘要，不含原录像、BAG和现场人物图像 |
+
+## 硬件与运行环境
+
+| 项目 | 当前配置 / 边界 |
+|---|---|
+| 执行端 | Linux工作站；四鱼眼采集端另为Orange Pi；双目采集端另为Android |
+| 工作站依赖 | Python3、FFmpeg/FFprobe、Docker、Git；不要求GPU |
+| Kalibr容器 | 既有kalibr / ROS Noetic / `/catkin_ws`，含OpenCV、NumPy、cv_bridge、rosbag与Kalibr绑定 |
+| 数据挂载 | 既有宿主数据目录绑定到容器`/data`；工具读取实际挂载并核对 |
+| 双目话题 | `/cam0/image_raw`、`/cam1/image_raw`，1920×1080 mono8；BAG不含IMU |
+| 四鱼眼话题 | `/fisheye/{left,right,bright,bleft}/image_raw/compressed`，按现场与日常文档核对 |
+| 历史标定板 | AprilGrid 6×6，黑色tag边长0.088m，间隙0.0264m，tagSpacing=0.3；新设备/新板需核对实物 |
+
+## 快速开始（Linux工作站）
+
+```bash
+git clone --branch feat/ego-stereo-calibration https://github.com/EgoOneLabs/Ego-Calib-Tools.git
+cd Ego-Calib-Tools
+```
+
+- **接手双目**：阅读[双目完整说明](ego_stereo/README.zh-CN.md)，按“媒体核查 → BAG准备/读回 → 仅新数据标定 → 结果/质量核查”执行；已有通过的同条数据无需重跑。
+- **接手四鱼眼**：阅读[日常流程](docs/daily_workflow.zh-CN.txt)和下方原部署说明。先确认ROS Master、相机服务、实际IP/Topic与挂载，不使用双目脚本代替四路录制。
+- 历史发布包/镜像链接属于原四鱼眼部署来源；GitHub自动打包的源码ZIP不含Docker镜像，也不含原始数据。
+
+## 已验证证据
+
+| 检查 | 已有结果 | 不能据此声称 |
+|---|---|---|
+| 旧四鱼眼仓库检查 | [`docs/VALIDATION.txt`](docs/VALIDATION.txt)记录Python/Bash语法检查 | 该检查未运行Docker或头环，不是所有设备标定通过 |
+| 双目真实媒体 | 左右286帧完整解码；48kHz双声道PCM16 WAV非全零 | 恒定30FPS、音视频/IMU硬件同步 |
+| 双目真实BAG通路 | 36对/72条mono8的像素、Header、时间全读回 | 该smoke短记录已通过板覆盖或精度验收 |
+| 历史DS三文件 | 模型、内参、双目变换与报告对应，基线约89.271mm | 所有设备通用或已完成设备唯一绑定 |
+| 原230对固定参数验证 | 230/230共同检测；交叉RMS左0.818/右1.047px，P95左1.453/右1.678px | 独立留出数据泛化、全画幅精度或最终验收 |
+| 新工具本地测试 | workflow5、结果导入5、核心几何4，共14项通过 | 再次完成真实Kalibr优化或头环实测 |
+
+固定参数核查real/user/sys约66.381/51.352/15.042秒。逐角点CSV共100475行，已独立复算统计与覆盖。完整证据边界见[阶段记录](ego_stereo/STATUS-20261106.md)。不将“近零有符号均值”误读成误差为零。
+
+## 未解决问题与路线图
+
+| 优先级 | 问题 | 后续工作 / 停止条件 |
+|---|---|---|
+| 高 | 双目缺少独立数据验证 | 优先复用另一次已有板录制，固定参数检查一次；不是重新拟合或扫描模型 |
+| 高 | 边缘覆盖不足 | 右眼最右1/8无有效角点；先查已有素材能否覆盖，不直接宣布全画幅合格 |
+| 高 | 板尺度与设备唯一身份 | 核对实物板尺寸、左右顺序、头环唯一编号及候选版本，保留来源 |
+| 中 | 新Kalibr启动封装端到端 | 下一次真正需要标定的新输入时验证；不为新脚本重跑已完成标定 |
+| 中 | 质量验收准则 | 按实际用途约定误差、覆盖和独立数据要求；不自动给未经约定的“及格线” |
+| 中 | 四鱼眼运行依赖 | 每台头环核对ROS Master/相机服务/SD卡/Topic；camd直出模式不能假定ROS话题存在 |
+| 单独专项 | IMU、硬件同步与联合标定 | 保留未验收状态，与采集App协作处理，不阻塞纯相机主线 |
+
+## 同事接手检查清单
+
+1. 明确当前处理四鱼眼还是2UQ2双目，确认分支、输入设备、话题、板配置和容器挂载。
+2. 先读对应README与阶段记录，保留输入摘要、版本、容器源码状态、日志和real/user/sys。
+3. 双目`result_import`与`quality`当前锁定已知历史数据摘要，不是任意设备通用入口；不要删除摘要检查来“跑通”。
+4. 不修改官方Kalibr算法，不自动替换焦距/模型、不覆盖旧结果、不把候选参数设成已验收。
+5. 只对缺失证据做必要验证；新失败保留日志，先定位原因，不盲目重录或反复跑相同数据。
+6. 更新已实现/已验证/未解决表，保证后续接手者能区分脚本能力、真实执行结果和正式验收。
+
+## 许可证与贡献
+
+本轮未新增项目授权。维护者应确认顶层许可证及第三方依赖许可；使用Kalibr、UVC/图像组件或历史镜像时遵守各自许可证，不将第三方许可自动视为整个仓库的许可。欢迎针对输入契约、设备管理、时间与质量证据提出Issue/PR。
+
+---
+
+## 四鱼眼工具原有部署说明
+
+以下保留既有部署步骤与历史发布包说明，实际四鱼眼日常操作以已链接流程为准。
 
 日常采集与 Kalibr 操作流程：[打开内置 SD 卡版终版 Word 文档](docs/头环四鱼眼相机标定采集流程_内置SD卡版_日常快速启动版本终版.docx)；另有[纯文本版](docs/daily_workflow.zh-CN.txt)。
 [English](README.en.md) | [简体中文](README.md)
@@ -26,10 +141,10 @@
 
 | 要获取的东西 | 从哪里获取 | 用途 |
 |---|---|---|
-| `headband-calibration-tools` 仓库的 `main` 分支 | 本页的 **Code** 或下文克隆命令 | 最新中英文说明、`docs/` 日常流程、`preview/` 工具源码、`tools/` 检查脚本 |
+| `EgoOneLabs/Ego-Calib-Tools` 的当前开发分支 | 本页的 **Code** 或下文克隆命令 | 最新中英文说明、`docs/` 日常流程、`preview/` 工具源码、`tools/` 检查脚本 |
 | 完整包 `.tar` 和对应的 `.tar.sha256` | [v1.10.4 Release 的 Assets](https://github.com/BAAI-Ego/headband-calibration-tools/releases/tag/v1.10.4) | 获取约 1.5 GiB 的 Kalibr Docker 镜像并校验下载完整性 |
 
-两处内容都需要获取。GitHub 自动生成的 **Source code ZIP 不含 Docker 镜像**。本仓库为私有仓库，账号须有读取权限。以下按新工作站首次部署的顺序写，命令均在 **Linux 工作站** 执行，除非特别标注“头环终端”。每条注释说明紧跟的命令；按小节执行，遇到失败先停下处理。
+两处内容都需要获取。GitHub 自动生成的 **Source code ZIP 不含 Docker 镜像**。若仓库或历史发布包要求授权，账号须具备对应读取权限。以下按新工作站首次部署的顺序写，命令均在 **Linux 工作站** 执行，除非特别标注“头环终端”。每条注释说明紧跟的命令；按小节执行，遇到失败先停下处理。
 
 ## 第一步：准备工作站
 
@@ -46,7 +161,7 @@ sudo apt-get update
 sudo apt-get install -y git gh openssh-client python3 unzip rsync arp-scan netcat-openbsd
 ```
 
-## 第二步：克隆工具仓库的 main 分支
+## 第二步：克隆当前开发分支（包含原四鱼眼工具）
 
 首次在私有仓库使用 `gh` 时先登录。已有克隆目录时，先检查本地修改，勿覆盖。
 
@@ -68,16 +183,16 @@ gh auth login
 # 工作站：进入个人目录；下面的 clone 会创建新目录，已有目录时请先核对。
 cd "$HOME"
 # 工作站：克隆独立工具仓库的 main 分支。
-gh repo clone BAAI-Ego/headband-calibration-tools -- --branch main
+gh repo clone EgoOneLabs/Ego-Calib-Tools -- --branch feat/ego-stereo-calibration
 # 工作站：进入源码目录；后续工具命令从这里执行。
-cd "$HOME/headband-calibration-tools"
+cd "$HOME/Ego-Calib-Tools"
 # 工作站：确认当前分支为 main。
 git branch --show-current
 # 工作站：确认两份 README 都在仓库根目录。
 ls -l README.en.md README.md
 ```
 
-已有 `~/headband-calibration-tools` 时不要重复克隆；进入目录运行 `git status`，确认无本地修改后使用 `git pull --ff-only` 更新。
+已有 `~/Ego-Calib-Tools` 时不要重复克隆；进入目录运行 `git status`，确认无本地修改后使用 `git pull --ff-only` 更新。
 
 ## 第三步：下载并校验镜像附件
 
@@ -123,7 +238,7 @@ docker load -i environment/kalibr-environment.tar.gz
 # 工作站：检查导入后的镜像 ID 与平台。
 docker image inspect kalibr:noetic --format '{{.Id}} {{.Os}}/{{.Architecture}}'
 # 工作站：返回当前 main 的源码目录。
-cd "$HOME/headband-calibration-tools"
+cd "$HOME/Ego-Calib-Tools"
 # 工作站：运行不连接头环的本地依赖检查。
 bash tools/check_preview_environment.sh
 ```

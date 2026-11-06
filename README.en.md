@@ -1,8 +1,102 @@
-# Headband Calibration Tools
+# Ego-Calib-Tools: headband capture assistance and camera calibration
 
-> Added on this branch: 2UQ2 stereo tools for Android captures. See [ego_stereo/README.en.md](ego_stereo/README.en.md). Existing four-camera workflows are unchanged.
+**Linux workstation tools for existing four-fisheye capture assistance and Android 2UQ2 stereo calibration/validation.**
 
+[简体中文](README.md) · [Complete stereo guide](ego_stereo/README.en.md) · [Evidence/handoff](ego_stereo/STATUS-20261106.md) · [Recorder app](https://github.com/EgoOneLabs/Ego-Capture/tree/feat/android-capture-code16)
 
+> **Work in progress.** Stereo work lives on `feat/ego-stereo-calibration`, not merged into main. Existing v1.10.4 four-camera preview/tools/daily workflows are retained. Stereo media/BAG readback and a historical DS fixed-parameter audit are complete; independent-data and full quality acceptance are not. Updated 2026-11-06. A successful script or detected target is not calibration acceptance.
+
+## Features and progress
+
+| Track / feature | Implemented | Verified / remaining |
+|---|---|---|
+| Four-camera preview and relay | Existing tools and operator documentation | Not re-tested on hardware or Docker in this update |
+| Native target evidence | Kalibr probes and read-only BAG evidence scans | Assistance, not final four-camera calibration acceptance |
+| Four-camera deployment/daily workflow | SD-card/ROS capture, transfer and Kalibr instructions | Check actual services, ROS master, topics and physical board |
+| Stereo media validation | Full MKV/WAV decode and provenance/time checks | One real 286-frame-per-eye session checked |
+| Stereo BAG preparation | Same-index paired sampling, mono8, full write/readback | Real smoke case: 36 pairs / 72 messages checked |
+| Official Kalibr launcher | Config/source checks, logs and real/user/sys | Wrapper implemented; not run end-to-end on a new real target session |
+| Historical DS import | YAML/TXT/PDF association and candidate profile | Associated successfully; neither activated nor uniquely unit-bound |
+| Fixed-parameter audit | Mono/bidirectional cross-projection and coverage | 230/230 original pairs, independently recalculated CSV; not holdout validation |
+| Camera–IMU / production acceptance | Not completed by the stereo branch | Timing, continuity, repeatability and general device acceptance remain open |
+
+## Architecture
+
+```mermaid
+flowchart TB
+    F["Four fisheyes: Orange Pi ROS images"] --> V["Preview, native probes and evidence scans"]
+    F --> B["SD-card ROS BAG and transfer"]
+    S["Android Ego-Capture stereo export"] --> M["Media integrity and timestamp checks"]
+    M --> W["Paired mono8 images and stereo ROS1 BAG"]
+    B --> K["Official workstation Kalibr"]
+    W --> K
+    K --> R["YAML / TXT / PDF results"]
+    R --> I["Result association and candidate import"]
+    I --> Q["Fixed-parameter reprojection and coverage"]
+    Q --> A["Independent-data review and device association"]
+```
+
+The new launcher is stereo-only; existing four-camera calibration follows its own instructions. Kalibr algorithms are unchanged. The audit estimates per-frame target poses while keeping intrinsics and stereo extrinsics fixed. Calibration does not run in the Android app.
+
+## Source map and environment
+
+| Location | Responsibility |
+|---|---|
+| [`preview/`](preview/) | Existing four-camera relay, native probes and BAG scans |
+| [`tools/`](tools/) | Environment checks, image export and report packaging |
+| [Daily workflow](docs/daily_workflow.zh-CN.txt) | Four-camera initialization, SD-card/ROS recording, transfer and calibration |
+| [`ego_stereo/media/`](ego_stereo/media/) | Stereo media validation and explicitly selected ADB pull |
+| [`ego_stereo/workflow/`](ego_stereo/workflow/) | Image/BAG preparation and official Kalibr invocation |
+| [`ego_stereo/result_import/`](ego_stereo/result_import/) | Known DS result association and profile import |
+| [`ego_stereo/quality/`](ego_stereo/quality/) | Offline fixed-parameter residuals, CSV, coverage and illustrations |
+| [`ego_stereo/evidence/`](ego_stereo/evidence/) | Reviewed numeric summaries, no raw footage or scene images |
+
+Workstation: Linux, Python3, FFmpeg/FFprobe, Git and Docker; no GPU requirement. Existing `kalibr` container: ROS Noetic, `/catkin_ws`, NumPy/OpenCV/cv_bridge/rosbag/Kalibr bindings and verified host-data bind mount to `/data`.
+
+Stereo topics: `/cam0/image_raw`, `/cam1/image_raw`, 1920×1080 mono8, no IMU. Four-camera topics: `/fisheye/{left,right,bright,bleft}/image_raw/compressed`, verified against the actual headband. Historical AprilGrid: 6×6, 0.088m tags, 0.0264m gaps, spacing ratio 0.3; physical dimensions must be checked for new boards.
+
+## Quick start — Linux workstation
+
+```bash
+git clone --branch feat/ego-stereo-calibration https://github.com/EgoOneLabs/Ego-Calib-Tools.git
+cd Ego-Calib-Tools
+```
+
+Use the [stereo guide](ego_stereo/README.en.md) for media → camera-only BAG/readback → calibration only on new required input → quality review. For four cameras, use the [daily workflow](docs/daily_workflow.zh-CN.txt) and retained deployment guide below. Confirm ROS master/services instead of assuming camd direct recording publishes ROS topics. Source ZIPs do not contain the Docker image or input data.
+
+## Evidence and its limits
+
+| Check | Evidence | Does not establish |
+|---|---|---|
+| Existing four-camera static checks | [`docs/VALIDATION.txt`](docs/VALIDATION.txt): Python/Bash syntax; no Docker/device run | Device-level calibration success |
+| Real stereo media | 286 decoded frames per eye; nonzero 48kHz stereo PCM16 WAV | Constant 30FPS or hardware synchronization |
+| Native ROS smoke BAG | Full pixels/Header/time readback of 36 pairs / 72 messages | Target coverage or calibration quality |
+| Historical DS association | Matching YAML/TXT/PDF; baseline ~89.271mm | Applicability to all physical units |
+| Fixed-parameter audit | 230/230 common detections; cross RMS 0.818/1.047px; P95 1.453/1.678px | Independent-data generalization or full-frame acceptance |
+| New tool tests | 5 workflow + 5 importer + 4 geometry tests passed | A new real calibration run |
+
+Audit real/user/sys: ~66.381/51.352/15.042s. All 100475 CSV rows and coverage statistics were independently recalculated. The audited images were used for fitting; cam1's rightmost 1/8 has no retained target corners. Signed means near zero do not imply zero error.
+
+## Remaining work and handoff
+
+1. Reuse another existing target recording for one fixed-parameter independent-data check; do not refit or repeat model sweeps.
+2. Review missing edge coverage, physical target scale, left/right order and unique headband-to-parameter association before final acceptance.
+3. Exercise the new Kalibr launcher when a genuinely new calibration input is needed; do not rerun completed calibration only to test a wrapper.
+4. Agree application-specific quality/coverage criteria; no arbitrary automatic passing threshold is introduced.
+5. Preserve raw data, hashes, source/container versions, errors and real/user/sys. Do not remove identity guards to make known-data tools accept unrelated devices.
+6. Keep IMU continuity, hardware timing and camera–IMU repeatability explicitly open. They do not block pure-camera workflow work.
+
+The known DS importer/auditor are identity-locked historical tools, not universal per-device production acceptance. Update feature, evidence and open-issue tables when new results arrive. Do not modify official Kalibr algorithms or overwrite previous results.
+
+## Licensing and contribution
+
+This update does not change licensing. Maintainers should confirm the top-level project license and preserve applicable Kalibr/third-party/image licenses. Issues/PRs on input contracts, device management, timing and quality evidence are welcome.
+
+---
+
+## Retained four-camera deployment guide
+
+Existing deployment steps and historical release-image instructions follow. The linked daily workflow remains the operational reference.
 
 Daily collection and Kalibr operation guide (Chinese Word): [open the guide](docs/头环四鱼眼相机标定采集流程_内置SD卡版_日常快速启动版本终版.docx). A [plain-text copy](docs/daily_workflow.zh-CN.txt) is also available.
 [English](README.en.md) | [简体中文](README.md)
@@ -68,16 +162,16 @@ Then continue:
 # Workstation: enter your home directory; do not overwrite an existing clone.
 cd "$HOME"
 # Workstation: clone the main branch of the dedicated repository.
-gh repo clone BAAI-Ego/headband-calibration-tools -- --branch main
+gh repo clone EgoOneLabs/Ego-Calib-Tools -- --branch feat/ego-stereo-calibration
 # Workstation: enter the source directory.
-cd "$HOME/headband-calibration-tools"
+cd "$HOME/Ego-Calib-Tools"
 # Workstation: confirm the main branch.
 git branch --show-current
 # Workstation: check that both guides are in the repository root.
 ls -l README.en.md README.md
 ```
 
-If `~/headband-calibration-tools` already exists, inspect `git status` there and use `git pull --ff-only` only after confirming it has no local changes.
+If `~/Ego-Calib-Tools` already exists, inspect `git status` there and use `git pull --ff-only` only after confirming it has no local changes.
 
 ## Step 3: Download and verify the image assets
 
@@ -123,7 +217,7 @@ docker load -i environment/kalibr-environment.tar.gz
 # Workstation: confirm the imported image identity and platform.
 docker image inspect kalibr:noetic --format '{{.Id}} {{.Os}}/{{.Architecture}}'
 # Workstation: return to the current source repository.
-cd "$HOME/headband-calibration-tools"
+cd "$HOME/Ego-Calib-Tools"
 # Workstation: check local dependencies without connecting to the headband.
 bash tools/check_preview_environment.sh
 ```
