@@ -1,0 +1,7 @@
+{
+  "unit_tests_passed": 5,
+  "real_early_equi_bundle": "REJECTED_SHA256_MISMATCH",
+  "real_ds_bundle_imported": false,
+  "kalibr_rerun": false,
+  "calibration_quality_accepted": false
+}

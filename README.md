@@ -1,5 +1,8 @@
 # 头环四相机标定采集辅助工具
 
+> 新增：2UQ2 安卓双目采集配套工具（独立分支），见 [ego_stereo/README.zh-CN.md](ego_stereo/README.zh-CN.md)。现有四鱼眼操作流程保持原样。
+
+
 
 日常采集与 Kalibr 操作流程：[打开内置 SD 卡版终版 Word 文档](docs/头环四鱼眼相机标定采集流程_内置SD卡版_日常快速启动版本终版.docx)；另有[纯文本版](docs/daily_workflow.zh-CN.txt)。
 [English](README.en.md) | [简体中文](README.md)

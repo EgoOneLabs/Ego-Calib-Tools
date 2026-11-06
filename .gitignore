@@ -13,3 +13,16 @@ kalibr-environment*/
 environment/
 *.tar
 *.tar.gz
+
+# Stereo runtime outputs; never commit raw captures or personal credentials.
+__pycache__/
+*.py[cod]
+*.bag
+*.bag.active
+*.mkv
+*.mjpg
+*.wav
+*.apk
+*.keystore
+*.jks
+/ego_stereo/output/

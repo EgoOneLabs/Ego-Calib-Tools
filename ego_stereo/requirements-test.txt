@@ -1,0 +1,4 @@
+# Host-side tests only; real ROS/Kalibr dependencies come from the container.
+numpy>=1.21
+PyYAML>=6.0
+rosbags==0.10.11
