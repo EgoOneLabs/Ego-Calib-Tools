@@ -1,5 +1,8 @@
 # Headband Calibration Tools
 
+> Added on this branch: 2UQ2 stereo tools for Android captures. See [ego_stereo/README.en.md](ego_stereo/README.en.md). Existing four-camera workflows are unchanged.
+
+
 
 Daily collection and Kalibr operation guide (Chinese Word): [open the guide](docs/头环四鱼眼相机标定采集流程_内置SD卡版_日常快速启动版本终版.docx). A [plain-text copy](docs/daily_workflow.zh-CN.txt) is also available.
 [English](README.en.md) | [简体中文](README.md)

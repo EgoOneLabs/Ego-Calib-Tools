@@ -1,0 +1,10 @@
+{
+  "synthetic_integration_tests": 5,
+  "all_passed": true,
+  "bag_test_backend": "rosbags ROS1_NOETIC",
+  "container_native_rosbag_tested": false,
+  "kalibr_optimization_executed": false,
+  "real_media_status": "MEDIA_READBACK_PASS",
+  "shell_syntax_check": "PASS",
+  "calibration_quality_accepted": false
+}

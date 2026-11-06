@@ -1,0 +1,12 @@
+{
+  "status": "SYNTHETIC_VALIDATION_PASS",
+  "checks": {
+    "valid_mjpeg_pcm_session": "PASS",
+    "mismatched_stereo_timestamps": "REJECTED",
+    "truncated_wav": "REJECTED",
+    "truncated_mkv": "REJECTED",
+    "ffmpeg_vsync_compatibility": "PASS"
+  },
+  "real_phone_media_checked": false,
+  "calibration_performed": false
+}

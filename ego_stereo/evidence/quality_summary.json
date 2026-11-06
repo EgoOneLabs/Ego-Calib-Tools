@@ -1,0 +1,229 @@
+{
+  "status": "FIXED_PARAMETER_OBSERVATIONS_COMPLETE_REVIEW_PENDING",
+  "input_pairs": 230,
+  "detected_pairs_per_camera": [
+    230,
+    230
+  ],
+  "common_target_pairs": 230,
+  "residuals": {
+    "mono_cam0": {
+      "count": 29294,
+      "mean_xy_px": [
+        0.0010744468453004188,
+        -0.0035781201432733933
+      ],
+      "std_xy_px": [
+        0.5323699758709795,
+        0.5912894909365172
+      ],
+      "rms_l2_px": 0.7956475417423309,
+      "median_l2_px": 0.6418552074495962,
+      "p95_l2_px": 1.4054242938675574,
+      "max_l2_px": 3.415208813945673
+    },
+    "mono_cam1": {
+      "count": 25547,
+      "mean_xy_px": [
+        0.01667622720658133,
+        0.010845842084086897
+      ],
+      "std_xy_px": [
+        0.678861412275184,
+        0.7897730647383058
+      ],
+      "rms_l2_px": 1.041628551695253,
+      "median_l2_px": 0.9366770718746127,
+      "p95_l2_px": 1.6775818722292715,
+      "max_l2_px": 3.209105591507422
+    },
+    "cross_to_cam0": {
+      "count": 22817,
+      "mean_xy_px": [
+        0.02782841304612819,
+        -0.0003490936990293208
+      ],
+      "std_xy_px": [
+        0.5524530839361346,
+        0.6028394464785874
+      ],
+      "rms_l2_px": 0.8181652343018693,
+      "median_l2_px": 0.6525395896536693,
+      "p95_l2_px": 1.4531093894768952,
+      "max_l2_px": 3.8501123994916666
+    },
+    "cross_to_cam1": {
+      "count": 22817,
+      "mean_xy_px": [
+        -0.002822489571294981,
+        -0.014242527691375203
+      ],
+      "std_xy_px": [
+        0.695305934686372,
+        0.7821331706039145
+      ],
+      "rms_l2_px": 1.0466104602054411,
+      "median_l2_px": 0.9401444334013954,
+      "p95_l2_px": 1.6782415268749893,
+      "max_l2_px": 3.1014910027377938
+    }
+  },
+  "coverage": [
+    {
+      "grid_rows": 6,
+      "grid_cols": 8,
+      "counts": [
+        [
+          5,
+          133,
+          469,
+          671,
+          423,
+          149,
+          26,
+          0
+        ],
+        [
+          21,
+          486,
+          1966,
+          2836,
+          2237,
+          745,
+          188,
+          14
+        ],
+        [
+          34,
+          444,
+          1642,
+          2292,
+          2067,
+          951,
+          227,
+          10
+        ],
+        [
+          17,
+          392,
+          1736,
+          2391,
+          1989,
+          910,
+          160,
+          7
+        ],
+        [
+          6,
+          212,
+          739,
+          845,
+          841,
+          588,
+          79,
+          0
+        ],
+        [
+          1,
+          18,
+          44,
+          98,
+          109,
+          69,
+          7,
+          0
+        ]
+      ],
+      "cells_with_any_corner": 45,
+      "total_cells": 48,
+      "fraction_cells_with_any_corner": 0.9375,
+      "outside_image_count": 0,
+      "meaning": "Observed cells only; not area coverage, not a quality threshold"
+    },
+    {
+      "grid_rows": 6,
+      "grid_cols": 8,
+      "counts": [
+        [
+          1,
+          11,
+          155,
+          221,
+          161,
+          85,
+          16,
+          0
+        ],
+        [
+          83,
+          740,
+          1891,
+          1913,
+          1064,
+          447,
+          58,
+          0
+        ],
+        [
+          92,
+          765,
+          2190,
+          2189,
+          1175,
+          553,
+          73,
+          0
+        ],
+        [
+          72,
+          757,
+          1837,
+          2190,
+          1368,
+          542,
+          36,
+          0
+        ],
+        [
+          32,
+          515,
+          1313,
+          1216,
+          859,
+          403,
+          33,
+          0
+        ],
+        [
+          7,
+          85,
+          96,
+          122,
+          147,
+          33,
+          1,
+          0
+        ]
+      ],
+      "cells_with_any_corner": 42,
+      "total_cells": 48,
+      "fraction_cells_with_any_corner": 0.875,
+      "outside_image_count": 0,
+      "meaning": "Observed cells only; not area coverage, not a quality threshold"
+    }
+  ],
+  "timing_seconds": {
+    "real": 66.38119644499966,
+    "user": 51.351914,
+    "sys": 15.041777000000002
+  },
+  "intrinsics_optimized": false,
+  "stereo_extrinsics_optimized": false,
+  "independent_holdout": false,
+  "corner_outlier_filter": "Kalibr GridDetectorOptions.filterCornerOutliers=True; applies before these statistics",
+  "calibration_quality_accepted": false,
+  "hardware_sync_verified": false,
+  "physical_board_dimensions_verified": false,
+  "device_unit_association_verified": false,
+  "reference_method": "Official kalibr_camera_validator mono/cross-camera reprojection with fixed camera parameters; offline adapter, not official validator executable"
+}
