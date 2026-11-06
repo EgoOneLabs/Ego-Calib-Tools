@@ -21,3 +21,31 @@ Confirmed evidence: actual media readback; native ROS1 smoke BAG readback of 36 
 Remaining: independent-data validation, edge coverage, physical dimensions/unit association and hardware synchronization. The new Kalibr-launcher branch itself has not been exercised end-to-end on a new real target session. IMU continuity and camera–IMU repeatability are not accepted. Do not rerun completed calibration merely to populate a new wrapper.
 
 Tests are independent unittest suites under `workflow`, `result_import` and `quality`; see the Chinese guide. Test dependencies are in `requirements-test.txt`, while real calibration uses the existing container.
+
+## Architecture and output contract
+
+```mermaid
+flowchart TB
+    A["Exported stereo MKV / timestamps / metadata"] --> M["Full media/provenance checks"]
+    M --> P["Same-index sampling and mono8"]
+    P --> B["Camera-only BAG / complete readback"]
+    B --> K["Official Kalibr when new calibration is needed"]
+    K --> R["YAML / TXT / PDF"]
+    R --> I["Identity-checked candidate profile"]
+    I --> Q["Fixed-parameter residuals and coverage"]
+    Q --> H["Independent data / scale / device association / review"]
+```
+
+| Stage | Outputs / success meaning |
+|---|---|
+| Media | `media_check.json`; MEDIA_READBACK_PASS is integrity, not calibration acceptance |
+| Preparation | `left/`, `right/` PGM; `camera_manifest.json`, `camera.bag`, `bag_verification.json`; complete pixel/Header/time checks |
+| Calibration | `camera-camchain.yaml`, `camera-results-cam.txt`, `camera-report-cam.pdf`, source/config/log/timing; OUTPUTS_COMPLETE_REVIEW_PENDING does not approve quality |
+| Import | `camera_profile.json`, `original_results/`, provenance; quality/activation flags stay false |
+| Audit | `quality_summary.json`, `corner_residuals.csv`, coverage and projection images, log/archive; completion remains review-pending |
+
+Historical input is named `camera_4hz.bag`; newly prepared workflow input is `camera.bag`. Identical host callback timestamps do not establish exposure synchronization. Coverage-cell occupancy is not image-area coverage or a passing percentage. The audit fits only each frame's target pose, not intrinsics or stereo extrinsics.
+
+## Maintainer handoff
+
+Read the existing evidence before rerunning anything. Next, reuse a genuinely different existing target recording for one fixed-parameter check; confirm it is not a repackaging of the fitting images. Address missing edge observations, physical scale and unit/version association before claiming final quality. Exercise the new optimizer launcher when a new calibration is genuinely needed. Preserve logs, failed attempts and input hashes. Keep IMU timing/continuity and joint calibration as separate unfinished work. Generalizing known-data tools requires explicit inputs/provenance, not removal of SHA identity guards.
