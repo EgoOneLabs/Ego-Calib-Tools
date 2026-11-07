@@ -1,0 +1,24 @@
+{
+  "purpose": "Distributed stereo source/config/reference integrity; raw recordings are explicit external inputs",
+  "files": {
+    "configs/aprilgrid_6x6_88mm.yaml": "6e978757fdfc33286744ace0a547a6796bd0cfe8e23fa79020de96f74df040c3",
+    "media/check_session.py": "98ba2889711d33c77f77e642fcf9765fa766b96b4925bf9dd216b41a7f8495f2",
+    "media/pull_and_check.py": "9d51add07afbcae7608b19c1777935a3034561bfc5ed246a48eff74cd62bc0d6",
+    "quality/audit_core.py": "567be542221813835d6605564dc439a06204ce091c9ac0e5d250dce613764964",
+    "quality/audit_in_container.py": "edcb3e314e9c6b627806eab6a0ac8e5018c6de25f230473145fec114f69baa5d",
+    "quality/run_quality.py": "33fc8b43a418d6fdb51ffb65eb58957135147c9e8e4e14bb8c06f1ca2713ff05",
+    "quality/test_core.py": "6843af0ee58520aae274938d1a2303014a300066835949411b79dbfe33942829",
+    "reference/2uq2-ds-20261102/camera_4hz-camchain.yaml": "153ab87359e8efd07be55a3d5c4734911bfbd7b7277452eb91087c4976c97aaf",
+    "reference/2uq2-ds-20261102/camera_4hz-report-cam.pdf": "e4b7e8ee200298fe46c86db1ae30a6986362bf3313b4554c3c8fcd2b6555300b",
+    "reference/2uq2-ds-20261102/camera_4hz-results-cam.txt": "3a7e7aabb6f60de03695d7c8598ecd03c24ede22a04ca7b4b55b453420d60cf4",
+    "requirements-test.txt": "e8217534ab96dd3abbb1e2107dd881eb2274e8225c96e4784c9004eff9231eae",
+    "result_import/import_existing_calibration.py": "5f8468e73c90039d3fbbac1931f8331b7995186e3b929359271decce65ccc62d",
+    "result_import/test_import.py": "3114e577e82f0a39e113fec45f1111a62420a30eaff40d88ef67c06a152bcc8f",
+    "verify_checkout.py": "38060117a3c4f530006840a9edb7db01101b550339e73671514afc967ce60ca4",
+    "workflow/bag_writer.py": "fe51c49e40401258ebd7d0966ea251155a648ad290b5d9cb3ee1aacf333d49d2",
+    "workflow/camera_workflow.py": "797834516e227e6f6e63a9712d2d6c01eaa1ccf2cef61eac1e9d5ae82ca67cd2",
+    "workflow/check_session.py": "98ba2889711d33c77f77e642fcf9765fa766b96b4925bf9dd216b41a7f8495f2",
+    "workflow/prepare_camera.py": "d9b198e6e6e95ff8e4ff4538ec1c51fbaa7a596afe2c0713c45d395387fba724",
+    "workflow/test_workflow.py": "e5785c63d6ea7ea4a77e38872958b0a5b1792984bbee75f9d641ee2f2005a2d3"
+  }
+}

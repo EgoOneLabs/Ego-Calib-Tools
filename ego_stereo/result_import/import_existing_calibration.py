@@ -13,7 +13,7 @@ import sys
 import tarfile
 import tempfile
 
-DEFAULT_SOURCE = Path('/home/key/文档/kalibr/data/2uq2_camera_170451_v11_l4CPjq/model_eval_ds_camera/camera_4hz/ds-none_allviews_20261102T025830Z_0RCfrkJp')
+DEFAULT_SOURCE = Path(__file__).resolve().parents[1] / 'reference/2uq2-ds-20261102'
 EXPECTED_SHA = '153ab87359e8efd07be55a3d5c4734911bfbd7b7277452eb91087c4976c97aaf'
 FILES = ('camera_4hz-camchain.yaml', 'camera_4hz-report-cam.pdf', 'camera_4hz-results-cam.txt')
 
@@ -160,7 +160,7 @@ def import_result(source, output_root, expected_sha=EXPECTED_SHA, container='kal
 if __name__ == '__main__':
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--source', type=Path, default=DEFAULT_SOURCE)
-    p.add_argument('--output-root', type=Path, default=Path('/home/key/文档/kalibr/data/2uq2_camera_profiles'))
+    p.add_argument('--output-root', type=Path, required=True, help='Explicit local output parent; never write into bundled reference files')
     p.add_argument('--container', default='kalibr')
     a = p.parse_args()
     try:

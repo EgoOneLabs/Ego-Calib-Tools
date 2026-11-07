@@ -5,8 +5,7 @@ from pathlib import Path
 
 CAM_SHA='153ab87359e8efd07be55a3d5c4734911bfbd7b7277452eb91087c4976c97aaf'
 BAG_SHA='21dddddd7ee6dc05b8d4e72f3255d7dccb8b29e076f70892d06aeecf5f633580'
-BASE=Path('/home/key/文档/kalibr/data/2uq2_camera_170451_v11_l4CPjq')
-RESULT=BASE/'model_eval_ds_camera/camera_4hz/ds-none_allviews_20261102T025830Z_0RCfrkJp'
+RESULT=Path(__file__).resolve().parents[1]/'reference/2uq2-ds-20261102'
 
 
 def sha(path):
@@ -37,13 +36,13 @@ def inner(path,info,writable=False):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--bag',type=Path)
+    parser.add_argument('--bag',type=Path,required=True,help='Original 230-pair BAG; explicit local input, checked against BAG_SHA')
     parser.add_argument('--result',type=Path,default=RESULT)
-    parser.add_argument('--output-root',type=Path,default=Path('/home/key/文档/kalibr/data/2uq2_camera_quality'))
+    parser.add_argument('--output-root',type=Path,required=True,help='New output parent under a writable container bind mount')
     parser.add_argument('--container',default='kalibr')
     a=parser.parse_args();cam=a.result/'camera_4hz-camchain.yaml'
     require(cam.is_file() and sha(cam)==CAM_SHA,'DS YAML来源不匹配；停止，不自动改用其他参数')
-    candidates=[a.bag] if a.bag else ([BASE/'camera_4hz.bag'] if (BASE/'camera_4hz.bag').is_file() else sorted(BASE.rglob('camera_4hz.bag')))
+    candidates=[a.bag]
     require(candidates,'未找到原230对图像BAG；请提供 --bag 路径，无需重录')
     bag=None
     for candidate in candidates:
