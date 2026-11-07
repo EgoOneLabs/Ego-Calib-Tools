@@ -118,7 +118,7 @@ if __name__ == '__main__':
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--session', type=Path, required=True)
     p.add_argument('--media-report', type=Path, required=True)
-    p.add_argument('--output-root', type=Path, default=Path('/home/key/文档/kalibr/data/2uq2_camera'))
+    p.add_argument('--output-root', type=Path, required=True, help='Explicit local output parent')
     p.add_argument('--purpose', choices=['smoke', 'calibration'], required=True)
     p.add_argument('--sample-hz', type=float, default=4.0)
     a = p.parse_args()

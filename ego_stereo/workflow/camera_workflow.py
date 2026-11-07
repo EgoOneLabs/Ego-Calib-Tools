@@ -146,7 +146,7 @@ def main():
     prepare_parser = sub.add_parser('prepare', help='Prepare paired images and build/read back camera-only BAG')
     prepare_parser.add_argument('--session', type=Path, required=True)
     prepare_parser.add_argument('--media-report', type=Path, required=True)
-    prepare_parser.add_argument('--output-root', type=Path, default=Path('/home/key/文档/kalibr/data/2uq2_camera'))
+    prepare_parser.add_argument('--output-root', type=Path, required=True, help='Output parent under the container writable data bind mount')
     prepare_parser.add_argument('--purpose', choices=['smoke', 'calibration'], required=True)
     prepare_parser.add_argument('--sample-hz', type=float, default=4.0)
     prepare_parser.add_argument('--container', default='kalibr')

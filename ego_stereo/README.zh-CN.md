@@ -61,7 +61,8 @@ python3 ego_stereo/media/check_session.py \
 python3 ego_stereo/workflow/camera_workflow.py prepare \
   --session /实际/正式板会话 \
   --media-report /实际/媒体核验目录/media_check.json \
-  --purpose calibration
+  --purpose calibration \
+  --output-root /实际/容器可写挂载数据目录/2uq2_camera
 ```
 
 同索引选择左右图像，默认最多4Hz，保留真实时间，不补帧、不缩放；生成左右1920×1080 mono8，话题 `/cam0/image_raw`、`/cam1/image_raw`，不含IMU。BAG像素、Header与时间逐条全读回。
@@ -126,6 +127,32 @@ python3 ego_stereo/quality/run_quality.py --help
 同一数据只做缺失证据的必要验证；失败保留日志，不覆盖旧结果。新增通用设备支持时，应增加显式输入与来源链，而不是去掉历史SHA守卫。正式质量阈值应由实际用途约定，当前工具没有自动批准参数的功能。
 
 ## 本地测试
+
+### 仓库运行文件完整性（2026-11-07）
+
+```bash
+python3 ego_stereo/verify_checkout.py
+```
+
+历史 DS YAML、匹配 PDF/TXT 和摘要已随仓库保存在
+`reference/2uq2-ds-20261102/`，导入器默认从这里读取；标定板示例在
+`configs/aprilgrid_6x6_88mm.yaml`。不再要求先下载旧交付 ZIP 或读取作者的
+`/home/key/Downloads`。这些参数仍为特定历史设备的候选，未激活、未自动验收。
+
+所有拉取/准备/导入/核查入口现在要求显式 `--output-root`；固定参数核查还要求
+显式 `--bag`，保留已知历史来源 SHA 守卫。真实录制是运行输入，不是 App
+运行依赖；本次不包含真实工作场景 BAG，没有声称已发布其下载地址。
+
+```bash
+# 【每次修改】输出目录与原始BAG实际路径。
+python3 ego_stereo/result_import/import_existing_calibration.py \
+  --output-root /实际/新候选导入目录
+python3 ego_stereo/quality/run_quality.py \
+  --bag /实际/原230对图像/camera_4hz.bag \
+  --output-root /实际/容器可写挂载数据目录/quality
+```
+
+完整文件分类、外部工具与数据边界见 [本地文件说明](LOCAL_FILES.md)。
 
 宿主测试依赖见 `requirements-test.txt`；实际ROS/Kalibr依赖仍来自原容器。分别运行，避免同名模块跨目录串用：
 

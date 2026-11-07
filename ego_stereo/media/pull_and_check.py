@@ -11,7 +11,7 @@ import tempfile
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--output-root', type=Path, default=Path('/home/key/Downloads/EgoStereoIMU-test-data'))
+    p.add_argument('--output-root', type=Path, required=True, help='Explicit local parent for the pulled session and reports')
     p.add_argument('--serial', required=True, help='ADB serial from adb devices -l')
     p.add_argument('--remote-session', required=True, help='Absolute path of the selected exported phone session')
     a = p.parse_args()

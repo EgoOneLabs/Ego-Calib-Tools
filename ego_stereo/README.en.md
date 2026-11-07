@@ -48,4 +48,18 @@ Historical input is named `camera_4hz.bag`; newly prepared workflow input is `ca
 
 ## Maintainer handoff
 
+### Distributed runtime files (2026-11-07)
+
+Run `python3 ego_stereo/verify_checkout.py` after a fresh clone. Matching historical
+DS YAML/PDF/TXT files and checksums are included in `reference/2uq2-ds-20261102/`;
+the board-dimension example is in `configs/aprilgrid_6x6_88mm.yaml`. These remain
+unaccepted historical candidate parameters, not another unit's defaults.
+
+Pull, prepare, import and audit CLIs require an explicit `--output-root`.
+The historical audit also requires `--bag`; identity guards remain enforced.
+Add `--output-root /actual/writable/container/data/output` to prepare commands.
+Original scene recordings are separate local inputs and are not published by
+this change. No hidden author-specific path or old delivery ZIP is required.
+See [local file inventory](LOCAL_FILES.md) and the Chinese command reference.
+
 Read the existing evidence before rerunning anything. Next, reuse a genuinely different existing target recording for one fixed-parameter check; confirm it is not a repackaging of the fitting images. Address missing edge observations, physical scale and unit/version association before claiming final quality. Exercise the new optimizer launcher when a new calibration is genuinely needed. Preserve logs, failed attempts and input hashes. Keep IMU timing/continuity and joint calibration as separate unfinished work. Generalizing known-data tools requires explicit inputs/provenance, not removal of SHA identity guards.
