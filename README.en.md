@@ -1,5 +1,8 @@
 # Ego-Calib-Tools: headband capture assistance and camera calibration
 
+See the [colleague setup and file checklist](docs/COLLEAGUE_HANDOFF.zh-CN.md)
+for APK, source, SDK/NDK and Kalibr image handoff boundaries.
+
 **Linux workstation tools for existing four-fisheye capture assistance and Android 2UQ2 stereo calibration/validation.**
 
 [简体中文](README.md) · [Complete stereo guide](ego_stereo/README.en.md) · [Evidence/handoff](ego_stereo/STATUS-20261106.md) · [Recorder app](https://github.com/EgoOneLabs/Ego-Capture/tree/feat/android-capture-code16)
