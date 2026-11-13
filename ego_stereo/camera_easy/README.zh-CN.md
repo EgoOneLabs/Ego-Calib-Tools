@@ -86,3 +86,7 @@ python3 -m unittest discover -s . -p test_easy.py -v
 ```
 
 测试包含无损拆分、真实 ROS1 BAG 读写、尺寸换算、断流超时、输出 NaN 与缺失文件拒绝、HTTP 控制请求，以及用参考结果模拟 Kalibr 的成功/失败编排。模拟器不代表执行过真实 Kalibr。
+
+## 新机容器启动修复
+
+镜像自带 ENTRYPOINT 时，新建容器必须显式覆盖为 /bin/sleep，不能只添加 CMD sleep infinity。当前源码已修复，并检查启动状态。旧 camera-easy-v1 分卷内容未变，发生该故障的新机需使用 camera-fix.zip 继续安装；镜像和数据可复用。真实新机验证仍待完成。

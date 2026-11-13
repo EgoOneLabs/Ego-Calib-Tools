@@ -42,13 +42,18 @@ class Docker:
                     image = loaded[0]
             root = Path.home() / 'EgoStereoIMU' / 'calibration_data'
             root.mkdir(parents=True, exist_ok=True)
-            self.run('create', '--name', container,
+            # Image ENTRYPOINT may launch a non-interactive bash and ignore CMD.
+            # Run a persistent process directly, regardless of image defaults.
+            self.run('create', '--name', container, '--entrypoint', '/bin/sleep',
                      '--user', f'{os.getuid()}:{os.getgid()}',
-                     '--mount', f'type=bind,src={root.resolve()},dst=/data', image, 'sleep', 'infinity')
+                     '--mount', f'type=bind,src={root.resolve()},dst=/data', image, 'infinity')
         info = json.loads(self.run('inspect', container))[0]
         if not info['State']['Running']:
             self.run('start', container)
             info = json.loads(self.run('inspect', container))[0]
+        require(info['State']['Running'],
+                'Kalibr 容器启动后立即退出：' + container +
+                '。请检查镜像 ENTRYPOINT 与容器日志；新建容器需要 --entrypoint /bin/sleep。')
         mounts = [m for m in info.get('Mounts', []) if m.get('Type') == 'bind' and m.get('RW') and m['Destination'] == '/data']
         require(len(mounts) == 1, 'Kalibr 容器必须有可写的宿主数据目录 → /data 挂载')
         root = Path(mounts[0]['Source']).resolve()

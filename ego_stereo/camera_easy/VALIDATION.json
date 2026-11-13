@@ -1,7 +1,7 @@
 {
   "status": "LOCAL_SOFTWARE_TESTS_PASS_DEVICE_DOCKER_KALIBR_TRIAL_PENDING",
-  "tests_passed": 10,
-  "test_command": "python3 -m unittest discover -s ego_stereo/camera_easy -p test_easy.py -v",
+  "tests_passed": 13,
+  "test_command": "python3 -m unittest discover -s ego_stereo/camera_easy -p 'test_*.py' -v",
   "real_ros1_bag_io_tested": true,
   "real_full_3840x1080_pixel_split_tested": true,
   "kalibr_execution_test": "fixture/stub only; not actual optimization",
@@ -15,5 +15,6 @@
     "node --check"
   ],
   "algorithm_modifications": false,
-  "next_required_test": "existing Linux workstation + direct USB 2UQ2 + measured AprilGrid + actual camera trial"
+  "next_required_test": "existing Linux workstation + direct USB 2UQ2 + measured AprilGrid + actual camera trial",
+  "reported_first_install_failure": "User Ubuntu 22.04: inherited shell ENTRYPOINT caused new container to exit 0; corrected --entrypoint /bin/sleep and startup-state check. Repair awaits user machine verification."
 }
