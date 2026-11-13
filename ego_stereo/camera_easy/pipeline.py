@@ -68,9 +68,9 @@ def calculate(root, docker, container, data_root, info, stop, update, notify):
 umask 022
 cd "$1"
 echo "$$" > .kalibr.pid
-git -C /catkin_ws/src/kalibr rev-parse HEAD > kalibr_source_commit.txt
-git -C /catkin_ws/src/kalibr status --porcelain > kalibr_source_status.txt
-git -C /catkin_ws/src/kalibr diff > kalibr_source_changes.patch
+git -c safe.directory=/catkin_ws/src/kalibr -C /catkin_ws/src/kalibr rev-parse HEAD > kalibr_source_commit.txt
+git -c safe.directory=/catkin_ws/src/kalibr -C /catkin_ws/src/kalibr status --porcelain > kalibr_source_status.txt
+git -c safe.directory=/catkin_ws/src/kalibr -C /catkin_ws/src/kalibr diff > kalibr_source_changes.patch
 rosbag info camera.bag > bag_info.txt
 { time -p rosrun kalibr kalibr_calibrate_cameras --bag "$1/camera.bag" --target "$1/aprilgrid.yaml" --topics /cam0/image_raw /cam1/image_raw --models ds-none ds-none --dont-show-report; } 2>&1
 '''
