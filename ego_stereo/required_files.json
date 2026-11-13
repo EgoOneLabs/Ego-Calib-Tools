@@ -32,8 +32,8 @@
     "camera_easy/install.sh": "4197153e8b249375fa25777701309d8618de8ed7d5a658dddf92e4c844e3d4b1",
     "camera_easy/test_easy.py": "899c12864b9777fea487cf3331cd00d98687b5559e15f7da9ef3a61a8cef41e5",
     "camera_easy/VALIDATION.json": "ba4d90eada25436564ab40418e9760f4dc85f089a63b1c13d1cfa1738f09e910",
-    "camera_easy/build_installer.py": "5fb03017f6039bc61390d7d5a487651bf74f5dc3f24ac9201a3ac598a456f059",
-    "camera_easy/INSTALL_SIMPLE.zh-CN.md": "09a4944e734112015af27fb3be8c2fd0930174d90dc3934d8c1fc2ee94096d02",
-    "camera_easy/make_full.py": "c62a2695c9c5ca74f00bc08949020ef5f6c3271764a6d7240dd45273375c17c8"
+    "camera_easy/build_installer.py": "022e8dafa9ac5ba99a2a27300b94e79ab96182c4bb998105cd8cf27b8c4ece6b",
+    "camera_easy/INSTALL_SIMPLE.zh-CN.md": "b28888996021fcd35a9867bf06dca5ce3a7419da8a4dd3119965ca26fa95ea12",
+    "camera_easy/make_full.py": "5902f8ac8dfe0ff2435189ee96597310d537deef7e1bef34d71a4dfdd81f72d2"
   }
 }

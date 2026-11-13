@@ -27,7 +27,7 @@ tar -xzf "$TMP/payload.gz" -C "$TMP/content"
 (cd "$TMP/content" && sha256sum -c SHA256SUMS >/dev/null) || { echo "源码校验失败。"; exit 1; }
 rm -f "$TMP/payload.gz"
 if [[ "${1:-}" == --make-full ]]; then
-  python3 "$TMP/content/source/ego_stereo/camera_easy/make_full.py" --source "$TMP/content/source" --output "$PWD/camera-full"
+  python3 "$TMP/content/source/ego_stereo/camera_easy/make_full.py" --source "$TMP/content/source" --output "$PWD/camera-full" --archive-dir "$BASE" "${@:2}"
   exit 0
 fi
 if [[ "${1:-}" == --check ]]; then
@@ -56,10 +56,14 @@ def digest(path):
         for data in iter(lambda:stream.read(1024*1024),b''):h.update(data)
     return h.hexdigest()
 
-def build(repo, output, environment_image=None, source_snapshot=False):
+def build(repo, output, environment_image=None, source_snapshot=False, retain_run=True):
     repo, output = Path(repo).resolve(), Path(output).resolve()
     output.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory() as folder:
+    if environment_image:
+        needed=Path(environment_image).stat().st_size*2+512*1024**2
+        free=shutil.disk_usage(output).free
+        if free<needed:raise RuntimeError(f'打包磁盘空间不足：需要约 {needed/1024**3:.1f} GiB，可用 {free/1024**3:.1f} GiB。请用 --output 指定另一块磁盘。')
+    with tempfile.TemporaryDirectory(prefix='.camera-build-',dir=output) as folder:
         root = Path(folder)
         source = root / 'source'; source.mkdir()
         if source_snapshot:
@@ -83,11 +87,17 @@ def build(repo, output, environment_image=None, source_snapshot=False):
             for item in sorted(root.iterdir()):
                 if item!=payload:tar.add(item,arcname=item.name)
             if environment_image:tar.add(environment_image,arcname='environment/kalibr-environment.tar.gz')
-        with (output/'camera.run').open('wb') as stream:
-            stream.write(HEADER.replace('__PAYLOAD_SHA__',digest(payload)).encode())
-            with payload.open('rb') as data:shutil.copyfileobj(data,stream,1024*1024)
-        with zipfile.ZipFile(output/'camera.zip','w',zipfile.ZIP_STORED,allowZip64=True) as archive:
-            archive.write(output/'camera.run','camera.run')
+        header=HEADER.replace('__PAYLOAD_SHA__',digest(payload)).encode()
+        pending=root/'camera.zip.partial'
+        with zipfile.ZipFile(pending,'w',zipfile.ZIP_STORED,allowZip64=True) as archive:
+            with archive.open('camera.run','w',force_zip64=True) as stream:
+                stream.write(header)
+                with payload.open('rb') as data:shutil.copyfileobj(data,stream,1024*1024)
+        pending.replace(output/'camera.zip')
+        if retain_run:
+            with (output/'camera.run').open('wb') as stream:
+                stream.write(header)
+                with payload.open('rb') as data:shutil.copyfileobj(data,stream,1024*1024)
         (output/'camera.zip.sha256').write_text(digest(output/'camera.zip')+'  camera.zip\n')
         print(output/'camera.zip')
 
