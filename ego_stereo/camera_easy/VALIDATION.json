@@ -1,0 +1,19 @@
+{
+  "status": "LOCAL_SOFTWARE_TESTS_PASS_DEVICE_DOCKER_KALIBR_TRIAL_PENDING",
+  "tests_passed": 10,
+  "test_command": "python3 -m unittest discover -s ego_stereo/camera_easy -p test_easy.py -v",
+  "real_ros1_bag_io_tested": true,
+  "real_full_3840x1080_pixel_split_tested": true,
+  "kalibr_execution_test": "fixture/stub only; not actual optimization",
+  "uvc_camera_hardware_tested": false,
+  "real_docker_kalibr_executed_here": false,
+  "fresh_ubuntu_install_tested": false,
+  "graphical_browser_render_tested": false,
+  "host_syntax_checks": [
+    "Python compile",
+    "bash -n",
+    "node --check"
+  ],
+  "algorithm_modifications": false,
+  "next_required_test": "existing Linux workstation + direct USB 2UQ2 + measured AprilGrid + actual camera trial"
+}

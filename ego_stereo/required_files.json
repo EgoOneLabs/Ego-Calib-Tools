@@ -19,6 +19,18 @@
     "workflow/camera_workflow.py": "797834516e227e6f6e63a9712d2d6c01eaa1ccf2cef61eac1e9d5ae82ca67cd2",
     "workflow/check_session.py": "98ba2889711d33c77f77e642fcf9765fa766b96b4925bf9dd216b41a7f8495f2",
     "workflow/prepare_camera.py": "d9b198e6e6e95ff8e4ff4538ec1c51fbaa7a596afe2c0713c45d395387fba724",
-    "workflow/test_workflow.py": "e5785c63d6ea7ea4a77e38872958b0a5b1792984bbee75f9d641ee2f2005a2d3"
+    "workflow/test_workflow.py": "e5785c63d6ea7ea4a77e38872958b0a5b1792984bbee75f9d641ee2f2005a2d3",
+    "camera_easy/web.html": "277ca8ca50b1378a70827ca33450b1fa68602e4f72e12177fb4bf5e6becd634f",
+    "camera_easy/environment.py": "22548bb47c0e9c47cd35f45c8da0e70dd1fedbbaf306bae3f12a50d97762b84b",
+    "camera_easy/bag_writer.py": "fe51c49e40401258ebd7d0966ea251155a648ad290b5d9cb3ee1aacf333d49d2",
+    "camera_easy/app.py": "106f234a91cb38161785c06f18ee818923f4b4bcd95a3422c6e9f56ee609cdfc",
+    "camera_easy/README.zh-CN.md": "5393239761981504211551badc7484037be8c02bdc8f16c9c4af5657f7e5bb52",
+    "camera_easy/hardware.py": "4980356ba7e6125e806b2117d67de1455eba3dc7075a75b64712c2959a5c125d",
+    "camera_easy/pipeline.py": "ea94d8d1be7082efd2d88d3cca7abb9cd544e34378885e3513c8056308b569a4",
+    "camera_easy/start.sh": "69277fecc2c715a84251f592f3e71c2a7c1c2036872d1a9541b049d41f8085e7",
+    "camera_easy/core.py": "14a78bf92b7438298a0d5799877fce080eb3f941583bca8ce70f1508282a6c46",
+    "camera_easy/install.sh": "dc939312b3088eecade4d90ae07d8adf239bc0f0fc974819792e1c08cc19e46d",
+    "camera_easy/test_easy.py": "899c12864b9777fea487cf3331cd00d98687b5559e15f7da9ef3a61a8cef41e5",
+    "camera_easy/VALIDATION.json": "ba4d90eada25436564ab40418e9760f4dc85f089a63b1c13d1cfa1738f09e910"
   }
 }
