@@ -12,7 +12,27 @@ source /catkin_ws/devel/setup.bash
 export MPLBACKEND=Agg PYTHONUNBUFFERED=1
 unset DISPLAY KALIBR_MANUAL_FOCAL_LENGTH_INIT
 export HOME=/tmp/ego_camera_home MPLCONFIGDIR=/tmp/ego_camera_mpl
-mkdir -p "$HOME" "$MPLCONFIGDIR"
+export ROS_HOME="$HOME/.ros"
+mkdir -p "$HOME" "$MPLCONFIGDIR" "$ROS_HOME"
+'''
+
+
+# Copy the image's existing cache to the runtime user's ROS home, offline.
+ROS_CACHE_SETUP = r'''import os, shutil, sys
+from pathlib import Path
+source, target = Path(sys.argv[1]), Path(sys.argv[2])
+uid, gid = int(sys.argv[3]), int(sys.argv[4])
+for p in [target, *target.parents]:
+    if p.is_symlink():
+        raise SystemExit("ROS 缓存目录含符号链接，停止离线复制")
+if not (target / "index").is_file():
+    if not (source / "index").is_file():
+        raise SystemExit("镜像内缺少 rosdep 缓存索引，请维护者补齐环境镜像")
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(source, target, dirs_exist_ok=True)
+    for p in [target.parent, target.parent.parent, target.parent.parent.parent, target, *target.rglob("*")]:
+        if not p.is_symlink(): os.chown(p, uid, gid)
+print("rosdep 离线缓存可用")
 '''
 
 class Docker:
@@ -58,9 +78,14 @@ class Docker:
         require(len(mounts) == 1, 'Kalibr 容器必须有可写的宿主数据目录 → /data 挂载')
         root = Path(mounts[0]['Source']).resolve()
         require(root.is_dir() and os.access(root, os.W_OK), '当前 Linux 用户无法写入容器 /data 对应目录：' + str(root))
+        # Use container root only to read the cache baked into the image.
+        self.run('exec', '--user', '0', container, 'python3', '-c', ROS_CACHE_SETUP,
+                 '/root/.ros/rosdep/sources.cache',
+                 '/tmp/ego_camera_home/.ros/rosdep/sources.cache',
+                 str(os.getuid()), str(os.getgid()), timeout=90)
         shell = ROS_ENV + '''
-python3 -c 'import rosbag, rospy, sensor_msgs.msg, numpy'
-rosrun kalibr kalibr_calibrate_cameras --help >/dev/null
+python3 -c 'import rosbag, rospy, sensor_msgs.msg, numpy, cv_bridge, sm, aslam_cv, aslam_cameras_april, aslam_cv_backend, kalibr_common, kalibr_camera_calibration; from sm import PlotCollection; assert hasattr(aslam_cv_backend, "DoubleSphere"); print("Kalibr imports and ds-none model available")'
+rospack find kalibr >/dev/null
 '''
         self.run('exec', container, 'bash', '-c', shell, timeout=120)
         return container, root, info

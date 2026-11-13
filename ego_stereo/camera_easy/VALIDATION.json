@@ -1,6 +1,6 @@
 {
   "status": "LOCAL_SOFTWARE_TESTS_PASS_DEVICE_DOCKER_KALIBR_TRIAL_PENDING",
-  "tests_passed": 13,
+  "tests_passed": 16,
   "test_command": "python3 -m unittest discover -s ego_stereo/camera_easy -p 'test_*.py' -v",
   "real_ros1_bag_io_tested": true,
   "real_full_3840x1080_pixel_split_tested": true,
@@ -16,5 +16,6 @@
   ],
   "algorithm_modifications": false,
   "next_required_test": "existing Linux workstation + direct USB 2UQ2 + measured AprilGrid + actual camera trial",
-  "reported_first_install_failure": "User Ubuntu 22.04: inherited shell ENTRYPOINT caused new container to exit 0; corrected --entrypoint /bin/sleep and startup-state check. Repair awaits user machine verification."
+  "reported_first_install_failure": "User Ubuntu 22.04: inherited shell ENTRYPOINT caused new container to exit 0; corrected --entrypoint /bin/sleep and startup-state check. Repair awaits user machine verification.",
+  "runtime_ros_cache_fix": "Copy baked root rosdep cache offline to runtime ROS_HOME; preflight imports actual Kalibr modules and verifies ds-none instead of testing help exit status."
 }

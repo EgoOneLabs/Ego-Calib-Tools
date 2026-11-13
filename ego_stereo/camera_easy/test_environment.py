@@ -1,10 +1,13 @@
 """Container startup regression: shell ENTRYPOINT must not swallow the keepalive."""
 import json
+import os
+import subprocess
+import sys
 from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
-from environment import Docker
+from environment import Docker, ROS_CACHE_SETUP
 
 class FakeDocker(Docker):
     def __init__(self, root, existing=False, dies=False):
@@ -43,5 +46,30 @@ class EnvironmentTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d, patch('environment.Path.home',return_value=Path(d)):
             f=FakeDocker(Path(d),dies=True)
             with self.assertRaisesRegex(ValueError,'启动后立即退出'): f.prepare()
+
+
+    def test_preflight_imports_real_modules_instead_of_help_exit_code(self):
+        with tempfile.TemporaryDirectory() as d, patch('environment.Path.home',return_value=Path(d)):
+            f=FakeDocker(Path(d));f.prepare()
+            shell=[a for a in f.commands if a[0]=='exec' and 'bash' in a][-1][-1]
+            self.assertIn('aslam_cv_backend',shell)
+            self.assertIn('DoubleSphere',shell)
+            self.assertIn('rospack find kalibr',shell)
+            self.assertNotIn('--help',shell)
+    def test_offline_cache_copy_and_ownership(self):
+        with tempfile.TemporaryDirectory() as d:
+            src=Path(d)/'src';src.mkdir();(src/'index').write_text('fixture');(src/'a.pickle').write_bytes(b'abc')
+            dst=Path(d)/'home/.ros/rosdep/sources.cache'
+            command=[sys.executable,'-c',ROS_CACHE_SETUP,str(src),str(dst),str(os.getuid()),str(os.getgid())]
+            subprocess.run(command,check=True,capture_output=True)
+            self.assertEqual((dst/'a.pickle').read_bytes(),b'abc')
+            (dst/'a.pickle').write_bytes(b'preserve')
+            subprocess.run(command,check=True,capture_output=True)
+            self.assertEqual((dst/'a.pickle').read_bytes(),b'preserve')
+    def test_missing_cache_does_not_attempt_network(self):
+        with tempfile.TemporaryDirectory() as d:
+            command=[sys.executable,'-c',ROS_CACHE_SETUP,d,str(Path(d)/'home/.ros/rosdep/sources.cache'),str(os.getuid()),str(os.getgid())]
+            r=subprocess.run(command,capture_output=True,text=True)
+            self.assertNotEqual(r.returncode,0);self.assertIn('缓存索引',r.stderr)
 
 if __name__=='__main__':unittest.main()
