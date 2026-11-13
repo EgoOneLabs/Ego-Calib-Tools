@@ -23,3 +23,15 @@ unzip -oq camera.zip camera.run && bash camera.run --make-full
 ```
 
 自动导出本机 Kalibr 镜像，生成当前目录下 `camera-full/camera.zip`。这是给新用户的完整版，内置环境镜像；之后新用户仍只执行上面的普通安装命令。此打包步骤不是让每位新用户执行的。完整包可能很大，分发前需要确认托管平台单文件大小限制。
+
+## 打包磁盘与已有镜像
+
+打包入口优先复用已下载的 Kalibr 环境包，避免重复导出。正式生成 ZIP 前先检查可用空间；中间文件写在输出磁盘，不再占用默认 /tmp 大空间，也不再额外生成一份大型 camera.run。
+
+维护者可指定另一块磁盘和原有镜像：
+
+```bash
+bash camera.run --make-full --output "/另一块磁盘/camera-full" --image-archive "/已有镜像/kalibr-environment.tar.gz"
+```
+
+原始镜像包和采集数据保持不变；本次生成 ZIP 的失败临时文件会自动清理。没有压缩包可复用时，导出前按 Docker 镜像大小保守预留空间。
