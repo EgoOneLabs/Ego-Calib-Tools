@@ -34,9 +34,14 @@ if [[ "${1:-}" == --check ]]; then
   echo "安装包校验通过，未安装软件、未改变系统环境。"
   exit 0
 fi
+if [[ "${1:-}" == --environment-package ]]; then
+  [[ -f "${2:-}" ]] || { echo "找不到已下载的完整环境包"; exit 1; }
+  python3 "$TMP/content/source/ego_stereo/camera_easy/extract_environment.py" "$2" "$TMP/content/environment/kalibr-environment.tar.gz"
+  shift 2
+fi
 [[ "$EUID" -ne 0 ]] || { echo "请使用普通用户运行 bash camera.run，按提示输入 sudo 密码。"; exit 1; }
 mkdir -p "$HOME/.local/share/ego-camera/releases"
-DEST="$(mktemp -d "$HOME/.local/share/ego-camera/releases/v1.1_XXXXXXXX")"
+DEST="$(mktemp -d "$HOME/.local/share/ego-camera/releases/v1.2_XXXXXXXX")"
 cp -a "$TMP/content/source" "$DEST/"
 export EGO_CAMERA_ARCHIVE_DIR="$BASE"
 if [[ -s "$TMP/content/environment/kalibr-environment.tar.gz" ]]; then export EGO_CAMERA_ARCHIVE_DIR="$TMP/content"; fi

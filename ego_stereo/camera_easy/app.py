@@ -120,7 +120,7 @@ class App:
             while not self.stop.is_set():
                 raw = camera.read(self.stop)
                 now_ns = time.monotonic_ns()
-                frame = np.frombuffer(raw, dtype=np.uint8).reshape(HEIGHT, WIDTH)
+                frame = np.frombuffer(raw, dtype=np.uint8).reshape(HEIGHT, WIDTH, 3)
                 ok, encoded = cv2.imencode('.jpg', cv2.resize(frame, (1280, 360)), [cv2.IMWRITE_JPEG_QUALITY, 80])
                 require(ok, '预览编码失败')
                 with self.changed:
@@ -137,7 +137,8 @@ class App:
                     if self.state['stage'] == 'RECORDING':
                         if next_sample == 0: next_sample = now_ns
                         if now_ns >= next_sample:
-                            self.store.add(frame, int(anchor_unix + now_ns - anchor_mono))
+                            self.store.add(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY),
+                                           int(anchor_unix + now_ns - anchor_mono))
                             self.state['pairs'] = len(self.store.pairs)
                             period = int(1e9 / SAMPLE_HZ)
                             next_sample += ((now_ns - next_sample) // period + 1) * period

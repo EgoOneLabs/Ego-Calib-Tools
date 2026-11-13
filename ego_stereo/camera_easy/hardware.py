@@ -41,14 +41,14 @@ class Camera:
                         '-xerror', '-err_detect', 'explode', '-f', 'v4l2',
                         '-input_format', 'mjpeg', '-video_size', f'{WIDTH}x{HEIGHT}',
                         '-framerate', '60', '-i', device, '-an',
-                        '-vf', 'fps=10', '-pix_fmt', 'gray', '-f', 'rawvideo', 'pipe:1']
+                        '-vf', 'fps=10', '-pix_fmt', 'bgr24', '-f', 'rawvideo', 'pipe:1']
         self.process = subprocess.Popen(self.command, stdout=subprocess.PIPE, stderr=self.log, bufsize=0)
         os.set_blocking(self.process.stdout.fileno(), False)
         self.buffer = bytearray()
 
     def read(self, stop, timeout=8):
         deadline = time.monotonic() + timeout
-        size = WIDTH * HEIGHT
+        size = WIDTH * HEIGHT * 3
         fd = self.process.stdout.fileno()
         while len(self.buffer) < size:
             if stop.is_set():
