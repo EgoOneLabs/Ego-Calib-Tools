@@ -21,20 +21,20 @@
     "workflow/prepare_camera.py": "d9b198e6e6e95ff8e4ff4538ec1c51fbaa7a596afe2c0713c45d395387fba724",
     "workflow/test_workflow.py": "e5785c63d6ea7ea4a77e38872958b0a5b1792984bbee75f9d641ee2f2005a2d3",
     "camera_easy/web.html": "277ca8ca50b1378a70827ca33450b1fa68602e4f72e12177fb4bf5e6becd634f",
-    "camera_easy/environment.py": "a1f37d260d41fcbbbf7fcfdb5f2b9ce8c948e6f9f91cf794de40c9be235030a2",
+    "camera_easy/environment.py": "e95cef6cc29d67411d7d092c56cf378e8776aea90c08322d7ff22227b6db5341",
     "camera_easy/bag_writer.py": "fe51c49e40401258ebd7d0966ea251155a648ad290b5d9cb3ee1aacf333d49d2",
     "camera_easy/app.py": "106f234a91cb38161785c06f18ee818923f4b4bcd95a3422c6e9f56ee609cdfc",
-    "camera_easy/README.zh-CN.md": "0436b20d418c321d5d0a17545f6500c2cb2ccba468ed61d30cf43d31ceefc544",
+    "camera_easy/README.zh-CN.md": "6303973f8664720bad257aa67f69c3df32352bb50c628cc49bf758cc28daa245",
     "camera_easy/hardware.py": "4980356ba7e6125e806b2117d67de1455eba3dc7075a75b64712c2959a5c125d",
     "camera_easy/pipeline.py": "ea94d8d1be7082efd2d88d3cca7abb9cd544e34378885e3513c8056308b569a4",
     "camera_easy/start.sh": "69277fecc2c715a84251f592f3e71c2a7c1c2036872d1a9541b049d41f8085e7",
     "camera_easy/core.py": "14a78bf92b7438298a0d5799877fce080eb3f941583bca8ce70f1508282a6c46",
     "camera_easy/install.sh": "4197153e8b249375fa25777701309d8618de8ed7d5a658dddf92e4c844e3d4b1",
     "camera_easy/test_easy.py": "899c12864b9777fea487cf3331cd00d98687b5559e15f7da9ef3a61a8cef41e5",
-    "camera_easy/VALIDATION.json": "c32f6587593f69d3ae8995c0cfbca9dd54c9c63b2429dc4ae7538dbd05c013f9",
+    "camera_easy/VALIDATION.json": "59607dca0f88fb48f76d46d0174a0469be8420d7845a36506d8e6769e71e3dd7",
     "camera_easy/build_installer.py": "022e8dafa9ac5ba99a2a27300b94e79ab96182c4bb998105cd8cf27b8c4ece6b",
     "camera_easy/INSTALL_SIMPLE.zh-CN.md": "b28888996021fcd35a9867bf06dca5ce3a7419da8a4dd3119965ca26fa95ea12",
     "camera_easy/make_full.py": "5902f8ac8dfe0ff2435189ee96597310d537deef7e1bef34d71a4dfdd81f72d2",
-    "camera_easy/test_environment.py": "c69fd226c6e35a079a002a4da116fd0c5e0aebb78b1273925f5d6edeeb59c92b"
+    "camera_easy/test_environment.py": "f6f67bacf10252467cdb7ccea729ae113b6e1d93fd642092b6c45e9b747e0cec"
   }
 }

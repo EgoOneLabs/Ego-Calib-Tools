@@ -90,3 +90,5 @@ python3 -m unittest discover -s . -p test_easy.py -v
 ## 新机容器启动修复
 
 镜像自带 ENTRYPOINT 时，新建容器必须显式覆盖为 /bin/sleep，不能只添加 CMD sleep infinity。当前源码已修复，并检查启动状态。旧 camera-easy-v1 分卷内容未变，发生该故障的新机需使用 camera-fix.zip 继续安装；镜像和数据可复用。真实新机验证仍待完成。
+
+第二版修复补充：镜像内 root 用户的 rosdep 缓存离线复制给运行用户；环境检查改为实际模块导入、DoubleSphere 模型检查及包定位，不把 Kalibr --help 返回 2 误判为环境缺失。camera-fix-v2.zip 可兼容原始安装和第一版修复。
