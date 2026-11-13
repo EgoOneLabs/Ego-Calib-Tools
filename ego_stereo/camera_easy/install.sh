@@ -26,6 +26,13 @@ if ! "${D[@]}" container inspect kalibr >/dev/null 2>&1 &&
    ! "${D[@]}" container inspect ego-camera-kalibr >/dev/null 2>&1 &&
    ! "${D[@]}" image inspect kalibr:noetic >/dev/null 2>&1; then
   if [[ -z "$ARCHIVE" ]]; then
+    for BASE in "${EGO_CAMERA_ARCHIVE_DIR:-$PWD}" "$PWD" "$ROOT"; do
+      for NAME in kalibr-environment.tar.gz environment/kalibr-environment.tar.gz; do
+        if [[ -s "$BASE/$NAME" ]]; then ARCHIVE="$BASE/$NAME"; break 2; fi
+      done
+    done
+  fi
+  if [[ -z "$ARCHIVE" ]]; then
     echo "请选择已下载的 Kalibr 环境镜像 kalibr-environment.tar.gz。"
     ARCHIVE="$(zenity --file-selection --title='选择 Kalibr 环境镜像 kalibr-environment.tar.gz')" || exit 1
   fi
