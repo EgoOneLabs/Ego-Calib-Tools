@@ -37,7 +37,7 @@ class Docker:
                 require(archive and Path(archive).is_file(), '找不到 Kalibr 镜像。首次部署请运行 install.sh，选择 kalibr-environment.tar.gz；不能只安装 Docker 就开始标定。')
                 output = self.run('load', '-i', str(Path(archive).resolve()), timeout=1800)
                 if not self.exists('image', 'inspect', image):
-                    loaded = [s.split('Loaded image: ', 1)[1].strip() for s in output.splitlines() if 'Loaded image: ' in s]
+                    loaded = [s.split(': ', 1)[1].strip() for s in output.splitlines() if s.startswith(('Loaded image: ', 'Loaded image ID: '))]
                     require(len(loaded) == 1, '镜像导入完成，但标签不唯一，请用 --image 指定已导入的 Kalibr 镜像')
                     image = loaded[0]
             root = Path.home() / 'EgoStereoIMU' / 'calibration_data'

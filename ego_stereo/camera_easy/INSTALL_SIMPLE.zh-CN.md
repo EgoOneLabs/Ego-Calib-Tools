@@ -13,3 +13,13 @@ unzip -oq camera.zip camera.run && bash camera.run
 首次全新电脑仍需 Kalibr 环境镜像。已安装容器时自动复用；镜像与安装包放在同一目录时自动识别 `kalibr-environment.tar.gz`，无需输入其路径。当前小安装包没有内置大镜像，最终公开发布须提供完整包或配置经核对的自动下载入口。缺少镜像时仍会请求选择文件，不能宣称此时已实现全新电脑完全无人值守安装。
 
 开发检查（不修改系统）：`bash camera.run --check`。
+
+## 维护者生成完整安装包（原工作站只做一次）
+
+下载简化入口包后，在已经配置好 Kalibr 的原 Linux 工作站执行：
+
+```bash
+unzip -oq camera.zip camera.run && bash camera.run --make-full
+```
+
+自动导出本机 Kalibr 镜像，生成当前目录下 `camera-full/camera.zip`。这是给新用户的完整版，内置环境镜像；之后新用户仍只执行上面的普通安装命令。此打包步骤不是让每位新用户执行的。完整包可能很大，分发前需要确认托管平台单文件大小限制。
