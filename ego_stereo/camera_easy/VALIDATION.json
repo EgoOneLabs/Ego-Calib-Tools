@@ -1,6 +1,6 @@
 {
-  "status": "LOCAL_SOFTWARE_TESTS_PASS_DEVICE_DOCKER_KALIBR_TRIAL_PENDING",
-  "tests_passed": 17,
+  "status": "COLOR_SOFTWARE_CHECKS_PASS_HARDWARE_RETEST_PENDING",
+  "tests_passed": 19,
   "test_command": "python3 -m unittest discover -s ego_stereo/camera_easy -p 'test_*.py' -v",
   "real_ros1_bag_io_tested": true,
   "real_full_3840x1080_pixel_split_tested": true,
@@ -15,8 +15,20 @@
     "node --check"
   ],
   "algorithm_modifications": false,
-  "next_required_test": "existing Linux workstation + direct USB 2UQ2 + measured AprilGrid + actual camera trial",
-  "reported_first_install_failure": "User Ubuntu 22.04: inherited shell ENTRYPOINT caused new container to exit 0; corrected --entrypoint /bin/sleep and startup-state check. Repair awaits user machine verification.",
+  "next_required_test": "v1.2 color preview + complete browser capture/automatic calculation + restart on hardware",
+  "reported_first_install_failure": "ENTRYPOINT, runtime ROS cache and exact-path Git audit fixes incorporated; actual user machine optimization completed after manual repair.",
   "runtime_ros_cache_fix": "Copy baked root rosdep cache offline to runtime ROS_HOME; preflight imports actual Kalibr modules and verifies ds-none instead of testing help exit status.",
-  "git_audit_fix": "Use command-scoped safe.directory for exact Kalibr source path; actual Git ownership rejection and success tested without global config changes."
+  "git_audit_fix": "Use command-scoped safe.directory for exact Kalibr source path; actual Git ownership rejection and success tested without global config changes.",
+  "user_reported_ubuntu_2204_trial": {
+    "input_pairs": 170,
+    "used_pairs": 74,
+    "outputs": [
+      "YAML",
+      "PDF",
+      "TXT"
+    ],
+    "manual_retry": true,
+    "color_preview_tested": false,
+    "board_dimensions_confirmed": false
+  }
 }
