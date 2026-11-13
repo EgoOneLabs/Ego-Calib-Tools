@@ -14,6 +14,7 @@ import signal
 import subprocess
 import threading
 import time
+import tarfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import unquote, urlparse
 import webbrowser
@@ -23,10 +24,14 @@ from core import Board, FrameStore, WIDTH, HEIGHT, SAMPLE_HZ, device_id, require
 from environment import Docker
 from hardware import Camera, find_device
 from pipeline import calculate
+from imu_capture import capture as capture_imu
+from imu_analysis import analyze as analyze_imu
 
 ROOT = Path(__file__).resolve().parent
 DOWNLOADS = {'camera-camchain.yaml', 'camera-results-cam.txt', 'camera-report-cam.pdf',
-             'camera_easy_small_review.tar.gz', 'aprilgrid.yaml', 'calculation.json'}
+             'camera_easy_small_review.tar.gz', 'aprilgrid.yaml', 'calculation.json',
+             'imu_capture.json', 'imu-analysis.json', 'imu-results.txt', 'imu-report.pdf',
+             'imu-allan.csv', 'imu-candidate.yaml', 'imu_small_review.tar.gz', 'imu_error.txt'}
 
 def motion(elapsed, duration):
     fraction = elapsed / duration
@@ -47,6 +52,8 @@ class App:
         self.stop = threading.Event()
         self.end_capture = threading.Event()
         self.thread = None
+        self.imu_thread = None
+        self.imu_cancel = threading.Event()
         self.store = None
         self.run = None
         self.container = None
@@ -58,7 +65,8 @@ class App:
         self.logs = deque(maxlen=100)
         self.state = dict(stage='CHECKING', message='正在检查 Linux、Docker 和 Kalibr 环境…',
                           pairs=0, elapsed=0, duration=60, result=None, output='',
-                          board=asdict(Board()), device_id='2UQ2')
+                          board=asdict(Board()), device_id='2UQ2', mode='camera',
+                          samples=0, packets=0, errors=0, gaps=0, duplicates=0, warmup_remaining=0)
         self.config = Path.home() / '.config' / 'EgoStereoIMU' / 'camera_easy.json'
         if self.config.is_file():
             try:
@@ -96,6 +104,12 @@ class App:
 
     def boot(self):
         with self.lock:
+            if self.state['mode'] == 'imu' and self.state['stage'] in ('DONE', 'FAILED') and self.thread and self.thread.is_alive():
+                require(not self.imu_thread or not self.imu_thread.is_alive(), 'IMU 任务正在结束，请稍候')
+                require(time.monotonic_ns() - self.frame_ns < 2_000_000_000, '预览已断开，请关闭并重新启动工具')
+                self.run = None
+                self.state.update(stage='READY', message='设备已就绪，可以选择下一项标定。', output='', result=None, samples=0)
+                return
             require(not self.thread or not self.thread.is_alive(), '当前任务尚未结束，请等待')
             self.run = None
             self.state.update(stage='CHECKING', message='正在连接设备并检查标定环境…', output='', result=None, pairs=0, elapsed=0)
@@ -166,6 +180,7 @@ class App:
                 self.store = None
 
     def fail(self, error):
+        self.imu_cancel.set()
         with self.lock:
             if self.store and self.state['stage'] == 'RECORDING':
                 (self.run / 'capture_aborted.json').write_text(json.dumps(
@@ -174,6 +189,10 @@ class App:
         self.update('FAILED', str(error))
 
     def start(self, value):
+        mode = value.get('mode', 'camera')
+        require(mode in ('camera', 'imu'), 'Camera–IMU 尚未启用，需要先完成 IMU 与图像时间轴验证')
+        if mode == 'imu':
+            return self.start_imu(value)
         board = Board.parse(value['board'])
         ident = device_id(value['device_id'])
         seconds = float(value.get('seconds', 60))
@@ -195,23 +214,72 @@ class App:
             self.config.write_text(json.dumps(dict(board=asdict(board), device_id=ident), indent=2))
             self.end_capture.clear()
             self.started = time.monotonic()
-            self.state.update(stage='RECORDING', message=motion(0, seconds), pairs=0, duration=seconds,
+            self.state.update(stage='RECORDING', mode='camera', message=motion(0, seconds), pairs=0, duration=seconds,
                               elapsed=0, result=None, output=str(run), board=asdict(board), device_id=ident)
         self.persist()
 
+    def start_imu(self, value):
+        ident = device_id(value['device_id'])
+        seconds = float(value.get('imu_seconds', 7200))
+        require(seconds in (60, 7200, 10800), '请选择 60 秒检查、2 小时或 3 小时')
+        with self.lock:
+            require(self.state['stage'] == 'READY' and time.monotonic_ns()-self.frame_ns < 2_000_000_000,
+                    '请先等待设备连接和左右预览正常')
+            require(not self.imu_thread or not self.imu_thread.is_alive(), '已有 IMU 任务运行中')
+            parent = self.data_root / 'imu' / ident
+            parent.mkdir(parents=True, exist_ok=True)
+            require(shutil.disk_usage(parent).free > 3*1024**3, 'IMU 录制前请至少留出 3 GiB 空间')
+            self.run = parent / (datetime.now(timezone.utc).strftime('imu_%Y%m%dT%H%M%SZ_')+secrets.token_hex(4))
+            self.run.mkdir()
+            (self.run / 'hardware.json').write_text(json.dumps(self.hardware, ensure_ascii=False, indent=2))
+            self.end_capture.clear(); self.imu_cancel.clear()
+            self.state.update(stage='WARMING', mode='imu', device_id=ident, duration=seconds,
+                elapsed=0, samples=0, packets=0, errors=0, gaps=0, duplicates=0,
+                message='正在检查 IMU 读取，请保持头环静止。', result=None, output=str(self.run))
+            self.imu_thread = threading.Thread(target=self.imu_loop,
+                args=(self.run, seconds),name='imu-capture',daemon=True)
+            self.imu_thread.start()
+
+    def imu_loop(self, run, seconds):
+        try:
+            def notify(stage, values):
+                with self.lock:
+                    self.state.update(stage=stage, **values)
+                    self.state['message'] = ('预热中，请保持头环静止。剩余 '+str(values['warmup_remaining'])+' 秒。'
+                        if stage=='WARMING' else '正在记录 IMU。保持静止，不要碰桌面、拉线或移动头环。')
+                self.persist()
+            capture_imu(run,self.hardware['device'],seconds,0 if seconds==60 else 300,
+                        self.imu_cancel,self.end_capture,notify)
+            if self.imu_cancel.is_set(): raise InterruptedError('IMU 已停止，原始数据保留')
+            result = analyze_imu(run,self.imu_cancel,self.update)
+            with self.lock: self.state['result'] = result
+            self.update('DONE', 'IMU 数据检查和曲线已生成，请查看报告。'+('60 秒仅用于检查读取，不作为噪声标定验收。' if seconds==60 else '候选参数需复核后使用。'))
+        except Exception as error:
+            (run / 'imu_error.txt').write_text(str(error), encoding='utf-8')
+            with tarfile.open(run / 'imu_small_review.tar.gz', 'w:gz') as tar:
+                for name in ('imu_capture.json', 'imu_error.txt', 'hardware.json'):
+                    if (run / name).is_file():tar.add(run / name, arcname=name)
+            self.update('FAILED', str(error))
+
     def finish_early(self):
         with self.lock:
+            if self.state['mode'] == 'imu':
+                require(self.state['stage'] in ('WARMING','IMU_RECORDING'), '当前没有 IMU 采集任务')
+                self.end_capture.set()
+                return
             require(self.state['stage'] == 'RECORDING' and self.state['pairs'] >= 40,
                     '至少采集 40 对后才能提前结束；建议完成全部动作提示')
             self.end_capture.set()
 
     def close(self):
         self.stop.set()
+        self.imu_cancel.set()
         if self.run and self.container:
             inner = '/data/' + self.run.relative_to(self.data_root).as_posix()
             self.docker.kill_group(self.container, inner)
         with self.changed: self.changed.notify_all()
         if self.thread: self.thread.join(timeout=12)
+        if self.imu_thread: self.imu_thread.join(timeout=12)
 
 
 class Handler(BaseHTTPRequestHandler):

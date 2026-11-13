@@ -41,15 +41,15 @@ if [[ "${1:-}" == --environment-package ]]; then
 fi
 [[ "$EUID" -ne 0 ]] || { echo "请使用普通用户运行 bash camera.run，按提示输入 sudo 密码。"; exit 1; }
 mkdir -p "$HOME/.local/share/ego-camera/releases"
-DEST="$(mktemp -d "$HOME/.local/share/ego-camera/releases/v1.2_XXXXXXXX")"
+DEST="$(mktemp -d "$HOME/.local/share/ego-camera/releases/v1.3-dev_XXXXXXXX")"
 cp -a "$TMP/content/source" "$DEST/"
 export EGO_CAMERA_ARCHIVE_DIR="$BASE"
 if [[ -s "$TMP/content/environment/kalibr-environment.tar.gz" ]]; then export EGO_CAMERA_ARCHIVE_DIR="$TMP/content"; fi
-echo "开始安装双目相机标定工具。"
+echo "开始安装头环标定工具。"
 echo "系统依赖只需首次安装，按提示输入本机密码。"
 bash "$DEST/source/ego_stereo/camera_easy/install.sh" "$@"
 rm -rf -- "$TMP/content/environment"
-echo "安装完成，正在打开相机标定入口。以后从应用菜单打开“双目相机标定”。"
+echo "安装完成，正在打开相机标定入口。以后从应用菜单打开“头环标定工具”。"
 bash "$DEST/source/ego_stereo/camera_easy/start.sh"
 exit 0
 __EGO_PAYLOAD_BELOW__

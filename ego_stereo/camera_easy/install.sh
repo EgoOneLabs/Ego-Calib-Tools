@@ -7,7 +7,7 @@ source /etc/os-release
   echo "本安装入口面向 Ubuntu 22.04/24.04 桌面版；其他发行版请手动安装依赖。"; exit 1;
 }
 sudo apt-get update
-PACKAGES=(python3 python3-opencv python3-numpy python3-yaml ffmpeg v4l-utils xdg-utils zenity)
+PACKAGES=(python3 python3-opencv python3-numpy python3-yaml python3-matplotlib ffmpeg v4l-utils xdg-utils zenity)
 command -v docker >/dev/null || PACKAGES+=(docker.io)
 sudo apt-get install -y "${PACKAGES[@]}"
 sudo systemctl enable --now docker
@@ -47,10 +47,10 @@ import sys
 root = Path(sys.argv[1]).resolve()
 # Desktop Exec quotes must follow the desktop-entry quoting syntax.
 quoted = str(root / 'start.sh').replace('\\', '\\\\').replace('"', '\\"').replace('`', '\\`').replace('$', '\\$').replace('%', '%%')
-text = '[Desktop Entry]\nType=Application\nName=双目相机标定\nComment=固定头环、移动标定板，自动生成相机标定报告\nExec=/usr/bin/bash "' + quoted + '"\nTerminal=true\nIcon=camera-photo\nCategories=Science;Education;\n'
+text = '[Desktop Entry]\nType=Application\nName=头环标定工具\nComment=Camera、IMU 与 Camera–IMU 标定\nExec=/usr/bin/bash "' + quoted + '"\nTerminal=true\nIcon=camera-photo\nCategories=Science;Education;\n'
 apps = Path.home() / '.local/share/applications'; apps.mkdir(parents=True, exist_ok=True)
 (apps / 'ego-camera-calibration.desktop').write_text(text)
-print('已添加应用菜单入口：双目相机标定。也可直接运行 start.sh。')
+print('已添加应用菜单入口：头环标定工具。也可直接运行 start.sh。')
 PY
 printf '\n环境配置完成。请重新插拔头环；首次建议注销并登录，以生效 Docker/video 用户组。\n'
 printf '之后运行：bash "%s/start.sh"\n' "$ROOT"

@@ -1,6 +1,6 @@
 {
-  "status": "COLOR_SOFTWARE_CHECKS_PASS_HARDWARE_RETEST_PENDING",
-  "tests_passed": 19,
+  "status": "UNIFIED_IMU_SOFTWARE_TESTS_PASS_HARDWARE_TRIAL_PENDING",
+  "tests_passed": 27,
   "test_command": "python3 -m unittest discover -s ego_stereo/camera_easy -p 'test_*.py' -v",
   "real_ros1_bag_io_tested": true,
   "real_full_3840x1080_pixel_split_tested": true,
@@ -15,7 +15,7 @@
     "node --check"
   ],
   "algorithm_modifications": false,
-  "next_required_test": "v1.2 color preview + complete browser capture/automatic calculation + restart on hardware",
+  "next_required_test": "Actual 60 second UVC XU capture while color preview streams, then review imu_small_review.tar.gz before 2h recording",
   "reported_first_install_failure": "ENTRYPOINT, runtime ROS cache and exact-path Git audit fixes incorporated; actual user machine optimization completed after manual repair.",
   "runtime_ros_cache_fix": "Copy baked root rosdep cache offline to runtime ROS_HOME; preflight imports actual Kalibr modules and verifies ds-none instead of testing help exit status.",
   "git_audit_fix": "Use command-scoped safe.directory for exact Kalibr source path; actual Git ownership rejection and success tested without global config changes.",
@@ -30,5 +30,17 @@
     "manual_retry": true,
     "color_preview_tested": false,
     "board_dimensions_confirmed": false
-  }
+  },
+  "imu_hardware_tested": false,
+  "imu_software_tests": [
+    "packet parser endian/sign/wrap",
+    "ioctl structure x86_64 ABI layout",
+    "duplicates/gaps/counter reset",
+    "capture stop/error preservation",
+    "Allan exact contiguous-segment formula",
+    "white noise recovery and random walk fitting",
+    "synthetic 60 second CSV/PDF pipeline",
+    "mode validation and joint rejection"
+  ],
+  "graphical_browser_test_limitation": "Headless Chromium blocked by runtime socket permissions; HTML/JS syntax checked."
 }
