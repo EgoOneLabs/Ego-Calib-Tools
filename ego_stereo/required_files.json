@@ -26,15 +26,16 @@
     "camera_easy/app.py": "106f234a91cb38161785c06f18ee818923f4b4bcd95a3422c6e9f56ee609cdfc",
     "camera_easy/README.zh-CN.md": "6303973f8664720bad257aa67f69c3df32352bb50c628cc49bf758cc28daa245",
     "camera_easy/hardware.py": "4980356ba7e6125e806b2117d67de1455eba3dc7075a75b64712c2959a5c125d",
-    "camera_easy/pipeline.py": "ea94d8d1be7082efd2d88d3cca7abb9cd544e34378885e3513c8056308b569a4",
+    "camera_easy/pipeline.py": "42e472925878ed42237a218e8f5d78a48ed7ad967c18476498638b6091a7b39f",
     "camera_easy/start.sh": "69277fecc2c715a84251f592f3e71c2a7c1c2036872d1a9541b049d41f8085e7",
     "camera_easy/core.py": "14a78bf92b7438298a0d5799877fce080eb3f941583bca8ce70f1508282a6c46",
     "camera_easy/install.sh": "4197153e8b249375fa25777701309d8618de8ed7d5a658dddf92e4c844e3d4b1",
     "camera_easy/test_easy.py": "899c12864b9777fea487cf3331cd00d98687b5559e15f7da9ef3a61a8cef41e5",
-    "camera_easy/VALIDATION.json": "59607dca0f88fb48f76d46d0174a0469be8420d7845a36506d8e6769e71e3dd7",
+    "camera_easy/VALIDATION.json": "e89665f698247b0d1d1e1cebc76c875c8b9121966ca61400e73499071f7ab095",
     "camera_easy/build_installer.py": "022e8dafa9ac5ba99a2a27300b94e79ab96182c4bb998105cd8cf27b8c4ece6b",
     "camera_easy/INSTALL_SIMPLE.zh-CN.md": "b28888996021fcd35a9867bf06dca5ce3a7419da8a4dd3119965ca26fa95ea12",
     "camera_easy/make_full.py": "5902f8ac8dfe0ff2435189ee96597310d537deef7e1bef34d71a4dfdd81f72d2",
-    "camera_easy/test_environment.py": "f6f67bacf10252467cdb7ccea729ae113b6e1d93fd642092b6c45e9b747e0cec"
+    "camera_easy/test_environment.py": "f6f67bacf10252467cdb7ccea729ae113b6e1d93fd642092b6c45e9b747e0cec",
+    "camera_easy/test_git_audit.py": "74ebc1a81cd76256f97183ac550a567cfd8b01bf812400f8bf6e9503624c09fb"
   }
 }
