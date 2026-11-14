@@ -1,6 +1,6 @@
 {
   "status": "JOINT_RAW_CAPTURE_SOFTWARE_CHECKS_PASS_HARDWARE_PENDING",
-  "tests_passed": 50,
+  "tests_passed": 51,
   "test_command": "python3 -m unittest discover -s ego_stereo/camera_easy -p 'test_*.py' -v",
   "real_ros1_bag_io_tested": true,
   "real_full_3840x1080_pixel_split_tested": true,
@@ -82,5 +82,19 @@
   "legacy_model_max_relative_difference": 0,
   "experimental_weights_dynamic_validation_passed": false,
   "yaml_drop_node_event_tests_passed": true,
-  "yaml_drop_real_browser_tested": false
+  "yaml_drop_real_browser_tested": false,
+  "joint_fullframe_official_detector_user_machine": {
+    "input_pairs": 490,
+    "detected": [
+      488,
+      483
+    ],
+    "common_pairs": 483
+  },
+  "experimental_joint_bag_uploaded_subset_tested": {
+    "image_pairs": 6,
+    "imu_samples": 48160,
+    "backend": "rosbags",
+    "full_490_pair_bag_verified": false
+  }
 }

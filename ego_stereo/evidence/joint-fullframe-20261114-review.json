@@ -1,0 +1,153 @@
+{
+  "status": "ALL_FRAME_DETECTION_REVIEW_PENDING",
+  "input_pairs": 490,
+  "detected_pairs_per_camera": [
+    488,
+    483
+  ],
+  "common_pose_pairs": 483,
+  "corner_counts": [
+    61298,
+    53973
+  ],
+  "coverage_corner_counts": [
+    [
+      [
+        3,
+        97,
+        264,
+        311,
+        344,
+        237,
+        49,
+        0
+      ],
+      [
+        7,
+        309,
+        939,
+        2055,
+        2223,
+        1035,
+        179,
+        1
+      ],
+      [
+        6,
+        439,
+        1917,
+        6263,
+        6519,
+        2901,
+        369,
+        0
+      ],
+      [
+        1,
+        363,
+        1928,
+        6780,
+        7178,
+        2753,
+        325,
+        0
+      ],
+      [
+        0,
+        137,
+        1316,
+        5150,
+        5512,
+        1823,
+        204,
+        0
+      ],
+      [
+        0,
+        14,
+        135,
+        561,
+        475,
+        153,
+        23,
+        0
+      ]
+    ],
+    [
+      [
+        11,
+        125,
+        231,
+        303,
+        233,
+        176,
+        0,
+        0
+      ],
+      [
+        71,
+        387,
+        791,
+        1527,
+        1340,
+        598,
+        25,
+        0
+      ],
+      [
+        68,
+        709,
+        2853,
+        5892,
+        4537,
+        1367,
+        138,
+        0
+      ],
+      [
+        35,
+        813,
+        3087,
+        6253,
+        5069,
+        1294,
+        83,
+        0
+      ],
+      [
+        0,
+        439,
+        2473,
+        5380,
+        4532,
+        986,
+        38,
+        0
+      ],
+      [
+        0,
+        57,
+        476,
+        941,
+        527,
+        103,
+        5,
+        0
+      ]
+    ]
+  ],
+  "wall_seconds": 145.94059511099476,
+  "quality_accepted": false,
+  "hardware_sync_verified": false,
+  "joint_optimization_executed": false,
+  "note": "Official Kalibr detector bindings; original pixels verified against manifest. Detection and coverage are observations, not an accuracy acceptance threshold.",
+  "first_failed_pair_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ]
+}

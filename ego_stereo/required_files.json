@@ -31,7 +31,7 @@
     "camera_easy/core.py": "77b192fdd5ca460ee4ae2955d1d83939513aa662883e3445d811ba3169716760",
     "camera_easy/install.sh": "16e18ddd6f2011487a574741bded31ad08c34035ad6241902f210cab8cc937e4",
     "camera_easy/test_easy.py": "899c12864b9777fea487cf3331cd00d98687b5559e15f7da9ef3a61a8cef41e5",
-    "camera_easy/VALIDATION.json": "32e74225812f8a6f4495fd13af9ef30083da66b589e16d797f8e7b64c7d348dd",
+    "camera_easy/VALIDATION.json": "8c7257102d6ff9b914889fc5d01f9f47245349cf3eeb11990e495e22c1149c9b",
     "camera_easy/build_installer.py": "d60c40aa94c06479be4074b81d2eb40a6356507a2ee8774a48e01cf4480b9327",
     "camera_easy/INSTALL_SIMPLE.zh-CN.md": "253c3fd3afa4894e3836e346e4a0bec4df3de5669f3408fb065391957c2a0c8a",
     "camera_easy/make_full.py": "5902f8ac8dfe0ff2435189ee96597310d537deef7e1bef34d71a4dfdd81f72d2",
@@ -57,6 +57,8 @@
     "reference/2uq2-imu-experimental-20261103/imu_experimental.yaml": "0c8a355e5e0071db891adb205cb70d13c9adeceb0cb118bb14d1bba04d0f2a7d",
     "reference/2uq2-imu-experimental-20261103/fit_model.py": "6eaa10774e025bbe42936b666ae15f2320a20f6a93a6b3542f4204519a8981a5",
     "reference/2uq2-imu-experimental-20261103/model_fit.json": "9345a5f61cb3a5f0b6b059ca92e67e3f1fa1500b895a4c6b111dc18f70ab963e",
-    "camera_easy/test_yaml_drop.py": "8315e2f59209a06d88683903edc9357b71197f285bf4eac107c8395798d14bc6"
+    "camera_easy/test_yaml_drop.py": "8315e2f59209a06d88683903edc9357b71197f285bf4eac107c8395798d14bc6",
+    "camera_easy/joint_bag.py": "91d7ac18416dafeedac5572f545ed7ec14b126401d04916cdd5305418f6c15f1",
+    "camera_easy/test_joint_bag.py": "481b607ae66f842c4a6dd9870fe302ef559fe058f86345884f7d51ff4ee00db2"
   }
 }
