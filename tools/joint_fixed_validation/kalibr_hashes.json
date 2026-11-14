@@ -1,0 +1,5 @@
+{
+  "kalibr_calibrate_imu_camera": "80958e0ebef238698d2920a54b3c640973dd55780c8611c398259e1c0eca93ac",
+  "kalibr_imu_camera_calibration/IccCalibrator.py": "04346399f26101faa90e1b45b900cd70a74aa2db27caa931703bfe951bc1a1f2",
+  "kalibr_imu_camera_calibration/IccSensors.py": "1594682a604691bb2b0ef2fc3f1ee0afe149ac23a8c68158f7788af21a52d473"
+}

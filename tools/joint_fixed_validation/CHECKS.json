@@ -1,0 +1,20 @@
+{
+  "source": "/home/key/文档/kalibr/data/camera_imu/2UQ2/joint_experimental_input_t70cgnxk",
+  "candidate": "/home/key/文档/kalibr/data/camera_imu/2UQ2/joint_camera_updated_hDPklVhP/camera_imu-camchain-imucam.yaml",
+  "candidate_sha256": "69a75e55cf1648614e345689114c466895ba3fb3522066434dda71b8840c465c",
+  "source_sha256": {
+    "camera.yaml": "ff8dbe19a6ed4895cc2bb035ca98958941d7ad4bcb865345f2ad22be3d4a91c0",
+    "imu-experimental.yaml": "94869a9b8473658829caae888865cf89bdaad4f92ba949d892d06c92e6a49762",
+    "aprilgrid.yaml": "f741d6efa22602ac0c37af9332f2953030cdde3f28c94df25d02c9d1884158d8",
+    "experimental_time_model.json": "7d273a033fef052d6bb647d97bfc70317e0efaa23d6b877de755b9f31b2c2c91",
+    "bag_verification.json": "c903a4073d58d517b5901228b79760ad32efe1056876814a04689817d99b54b0",
+    "corner_check.json": "4061d443d1b9e39528c510c746725a7570fe5efed0563ecc22dbcad3bd10ce45",
+    "camera_imu_experimental.bag": "f7e9254e45e63ae6bd15a4266bb8f874a69275f7c51d1a0a19a6a1e317db517b"
+  },
+  "bundle_sha256": {
+    "run.py": "3eeb2cdffb86122f27c33f828f06242da33b80b2fba930300cbdf15644cbd383",
+    "fixed_check.py": "bb3461d75c49f9d3ef77fb976e691b7fd5bea69e99505b1aae07607f1185ea69",
+    "kalibr_hashes.json": "8761e2b699b6caa35ed169195913edb4d7f449bd5ea15077911c62a1f7e7fe72",
+    "README.zh-CN.md": "d012eb978de6651b363730e3e5985f71911b287ee5551bbb4eee98eee3c239e9"
+  }
+}
