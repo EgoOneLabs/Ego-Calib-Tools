@@ -1,0 +1,39 @@
+{
+  "source_review_sha256": "ca2817860b9e95cdde0840a8f7e3a401726f5dda10a7b32c5bcc1b58b32d015f",
+  "joint_capture": {
+    "status": "JOINT_CAPTURED_TIMING_REVIEW_PENDING",
+    "camera_pairs": 490,
+    "camera_mean_rate_hz": 8.163589062324029,
+    "imu_samples": 48160,
+    "imu_read_errors": 0,
+    "imu_gaps": 31,
+    "host_interval_overlap_seconds": 59.900124353,
+    "request_latency_p95_ms": 8.445586099999998,
+    "missing_or_pending": [
+      "Camera 相机参数 YAML",
+      "IMU 噪声参数 YAML",
+      "图像曝光与 IMU 逐样本时间轴尚待验证；主机接收时间不是硬件同步证明"
+    ],
+    "ready_for_official_solver": false,
+    "quality_accepted": false,
+    "raw_inputs": {
+      "camera_manifest.json": "59e49b61b090f2e976a2f4f562393fab60caf18c52a3074d1ed5095b6a83e284",
+      "imu_samples.csv": "6027784ba998febb0b9210d124054455df96289ba7060caa68e565d965e8b544",
+      "imu_packets.bin": "741eb7748f520653c7e0e4654a1e50ae3d6d43b4e568ecc34b9e77d86ada160c",
+      "imu_requests.csv": "7164cfce4ab4f56d77c603fca742552f4085defb1c5bd79f25cdac4274ec6198",
+      "joint_clock.json": "ce74da5925d76d2882721b5b651dddc8e4002465f16ef2467830277fcea030b5",
+      "aprilgrid.yaml": "f741d6efa22602ac0c37af9332f2953030cdde3f28c94df25d02c9d1884158d8"
+    }
+  },
+  "missing_estimated": 490,
+  "missing_fraction": 0.010071942446043165,
+  "review_status": "CAPTURE_METADATA_REVIEWED_INPUTS_AND_TIME_AXIS_PENDING",
+  "images_and_imu_raw_inspected": false,
+  "quality_accepted": false,
+  "notes": [
+    "490 pairs recorded; no image pixels are included in this metadata archive. No corner detection or motion excitation validation performed.",
+    "Both camera and IMU YAML were absent at capture. Parameters can be supplied after recording; no need to repeat solely for missing YAML.",
+    "60-second joint run sets a 65-second IMU safety deadline and ends it when image capture ends; CAPTURE_STOPPED_EARLY here does not alone imply an interrupted joint capture.",
+    "run_status.json was packed before DONE status persisted and is stale; use joint_capture.json as final capture/preflight output."
+  ]
+}
