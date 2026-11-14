@@ -67,5 +67,36 @@
       "camera_imu-results-imucam.txt": "0ed2a14b3de10f7128d4287b3860fa89e030abf4f32109b7b293f0d3ffb745df"
     },
     "interpretation": "Replacing the fixed old camera model reduces structured reprojection residuals on the same record. This supports camera-model mismatch as a contributor. New parameters remain candidates pending independent motion recording and timing review. Near-equal fitted time shifts are not exposure synchronization proof."
+  },
+  "independent_record_repeat": {
+    "record": "camera_imu_20261114T075600Z_269e962d",
+    "output": "joint_repeat_ik9mmEUn",
+    "common_target_pairs": 759,
+    "camera_pairs": 765,
+    "imu_samples": 72394,
+    "mean_residuals": {
+      "cam0_px": 0.9453191058967322,
+      "cam1_px": 0.8940447002440375,
+      "gyro_rad_s": 0.009109796501725624,
+      "accel_m_s2": 0.05956616181469241
+    },
+    "comparison": {
+      "cam0": {
+        "rotation_difference_deg": 0.32308635773398353,
+        "translation_column_difference_mm": 11.832056813150508,
+        "timeshift_change_ms": 0.2835824606446033
+      },
+      "cam1": {
+        "rotation_difference_deg": 0.32308635774300815,
+        "translation_column_difference_mm": 11.832056813150508,
+        "timeshift_change_ms": 0.2919257679967202
+      }
+    },
+    "wall_seconds": 184.87,
+    "user_seconds": 1220.52,
+    "sys_seconds": 110.56,
+    "fixed_extrinsics_validation": false,
+    "quality_accepted": false,
+    "interpretation": "Low refitted residuals repeat, but translation differs by about 11.8 mm. Do not infer hardware movement or acceptance from these two estimates alone. Preserve both records; next evaluate independent data with candidate extrinsics fixed."
   }
 }
