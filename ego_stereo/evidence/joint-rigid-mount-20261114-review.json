@@ -1,0 +1,44 @@
+{
+  "device": "2UQ2",
+  "record": "camera_imu_20261114T072623Z_dd4dca05",
+  "mount": "User confirmed mainboard rigidly secured before recording",
+  "camera_pairs": 686,
+  "common_target_pose_pairs": 572,
+  "imu_samples": 60410,
+  "imu_missing_samples": 1890,
+  "joint_trial": {
+    "output": "joint_experimental_trial_u2c1sf9c",
+    "exit_code": 0,
+    "mean_residuals": {
+      "cam0_px": 2.873948350933582,
+      "cam1_px": 3.2080515470431132,
+      "gyro_rad_s": 0.014644058418611255,
+      "accel_m_s2": 0.07023484152411211
+    },
+    "timeshift_seconds": [
+      -0.047858302774539035,
+      -0.05111513577365975
+    ],
+    "quality_accepted": false
+  },
+  "camera_recheck": {
+    "output": "camera_recheck_qo1Ycf3T",
+    "processed_images": 572,
+    "used_images": 83,
+    "axis_residual_std_px": [
+      [
+        0.757742,
+        0.704216
+      ],
+      [
+        0.723057,
+        0.743662
+      ]
+    ],
+    "baseline_mm": 89.15903673671518,
+    "camchain_sha256": "ff8dbe19a6ed4895cc2bb035ca98958941d7ad4bcb865345f2ad22be3d4a91c0",
+    "wall_seconds": 176.95,
+    "independent_validation": false
+  },
+  "interpretation": "Old fixed camera parameters are a plausible contributor to structured joint reprojection residuals. Same-record camera refit is diagnostic, not held-out validation or proof of mechanical lens motion. Next repeat joint optimization with refitted camera parameters and unchanged BAG/IMU weights. Hardware timing remains unverified."
+}
