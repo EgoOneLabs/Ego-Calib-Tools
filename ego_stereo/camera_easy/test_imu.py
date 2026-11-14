@@ -62,6 +62,28 @@ class ImuTests(unittest.TestCase):
             self.assertFalse(r['quality_accepted'])
             self.assertNotIn('timestamp_ns',rows[0])
 
+    def test_polling_diagnostic_zero_wait_and_invalid_wait(self):
+        finish=threading.Event()
+        class Reader:
+            def __init__(self, device): self.n=0
+            def read(self):
+                import time
+                self.n+=1
+                if self.n==10: finish.set()
+                return packet((self.n-1)*448),time.monotonic_ns(),time.monotonic_ns()
+            def close(self): pass
+        stop=threading.Event()
+        with tempfile.TemporaryDirectory() as d:
+            with patch.object(stop,'wait',return_value=False) as wait:
+                r=capture(d,'x',60,stop,finish,lambda *a:None,Reader,poll_wait_seconds=0)
+            self.assertEqual(r['samples'],140)
+            self.assertEqual(r['poll_wait_seconds'],0)
+            self.assertTrue(wait.called)
+            self.assertTrue(all(c.args==(0,) for c in wait.call_args_list))
+        for invalid in [-1,float('nan'),float('inf'),.2]:
+            with self.assertRaises(ValueError):
+                capture('/not-written','x',60,stop,finish,lambda *a:None,poll_wait_seconds=invalid)
+
     def test_read_failure_flushes_and_preserves_abort_reason(self):
         class Broken:
             def __init__(self,*a):pass

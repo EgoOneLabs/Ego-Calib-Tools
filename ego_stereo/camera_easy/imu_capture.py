@@ -88,11 +88,13 @@ class Continuity:
         return self.segment,self.tick
 
 
-def capture(run,device,seconds,stop,finish,notify,reader_factory=XuReader):
+def capture(run,device,seconds,stop,finish,notify,reader_factory=XuReader,poll_wait_seconds=.01):
+    if not math.isfinite(poll_wait_seconds) or not 0 <= poll_wait_seconds <= .1:
+        raise ValueError("IMU 读取后等待必须在 0～0.1 秒之间")
     run=Path(run); c=Continuity();count=0;packets=0;errors=0;consecutive=0
     reader=None;completed=False;error=None
     record_start=time.monotonic()
-    stats={'status':'RUNNING','quality_accepted':False,'requested_seconds':seconds,
+    stats={'status':'RUNNING','quality_accepted':False,'requested_seconds':seconds,'poll_wait_seconds':poll_wait_seconds,
            'timestamp_semantics':'Host request interval is packet timing only; raw counter unit and exposure relation are not vendor-confirmed. No per-sample timestamps invented.',
            'nominal_scale':{'accel_counts_per_g':4096,'gyro_counts_per_deg_s':16.4,'per_unit_calibrated':False}}
     (run/'imu_capture.json').write_text(json.dumps(stats,ensure_ascii=False,indent=2))
@@ -140,8 +142,8 @@ def capture(run,device,seconds,stop,finish,notify,reader_factory=XuReader):
                     last_flush=now
                     if os.statvfs(run).f_bavail*os.statvfs(run).f_frsize<256*1024**2:
                         raise ValueError('磁盘剩余空间不足，IMU 录制已停止，已有数据保留')
-                # Reuse the Android policy: leave 10ms after each completed request.
-                stop.wait(.01)
+                # Default is unchanged. Zero wait is an explicit diagnostic option.
+                stop.wait(poll_wait_seconds)
     except Exception as e:
         error=str(e);raise
     finally:
