@@ -1,5 +1,7 @@
 # Ego-Calib-Tools：头环采集辅助与相机标定工具
 
+[三项标定功能、实测与开源记录](docs/CALIBRATION_DEVELOPMENT.zh-CN.md)
+
 新同事的安装依赖、镜像与APK交付清单见[完整交接指南](docs/COLLEAGUE_HANDOFF.zh-CN.md)。
 
 **面向Linux工作站的四鱼眼采集辅助、2UQ2双目相机标定与质量核查工具。**
