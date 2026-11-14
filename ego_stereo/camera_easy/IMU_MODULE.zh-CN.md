@@ -2,7 +2,7 @@
 
 Camera、IMU、Camera–IMU 共用一个程序和同一个安装入口。手机 Ego-Capture 不需要更换。
 
-本版本增加 IMU 静止采集和噪声分析。Camera–IMU 入口可见但暂未启用。
+本版本增加 IMU 静止采集和噪声分析。Camera–IMU 已提供运动数据录制与前置检查，正式求解待时间轴复核。详见 [联合模块](CAMERA_IMU.zh-CN.md)。
 
 ## 本次先做 60 秒检查
 

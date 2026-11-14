@@ -41,7 +41,7 @@ if [[ "${1:-}" == --environment-package ]]; then
 fi
 [[ "$EUID" -ne 0 ]] || { echo "请使用普通用户运行 bash camera.run，按提示输入 sudo 密码。"; exit 1; }
 mkdir -p "$HOME/.local/share/ego-camera/releases"
-DEST="$(mktemp -d "$HOME/.local/share/ego-camera/releases/v1.3-custom_XXXXXXXX")"
+DEST="$(mktemp -d "$HOME/.local/share/ego-camera/releases/v1.4-joint-dev_XXXXXXXX")"
 cp -a "$TMP/content/source" "$DEST/"
 export EGO_CAMERA_ARCHIVE_DIR="$BASE"
 if [[ -s "$TMP/content/environment/kalibr-environment.tar.gz" ]]; then export EGO_CAMERA_ARCHIVE_DIR="$TMP/content"; fi

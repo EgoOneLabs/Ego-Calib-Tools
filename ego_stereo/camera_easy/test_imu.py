@@ -116,11 +116,11 @@ class ImuTests(unittest.TestCase):
             self.assertTrue((root/'imu_small_review.tar.gz').is_file())
             self.assertFalse((root/'imu-candidate.yaml').exists())
 
-    def test_unified_mode_rejects_joint_and_invalid_durations(self):
+    def test_unified_mode_rejects_unknown_mode_and_invalid_durations(self):
         from app import App
         app=App.__new__(App)
-        with self.assertRaisesRegex(ValueError,'Camera'):
-            app.start({'mode':'camera_imu'})
+        with self.assertRaisesRegex(ValueError,'未知'):
+            app.start({'mode':'unknown'})
         for invalid in (0,-1,59,86401,float('nan'),float('inf')):
             with self.assertRaisesRegex(ValueError,'录制时长'):
                 app.start_imu({'device_id':'test','imu_seconds':invalid})

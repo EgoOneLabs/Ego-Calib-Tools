@@ -14,7 +14,7 @@
 
 ## 统一标定工具开发版
 
-Camera 和 IMU 共用一个入口。[IMU 60 秒检查与长录步骤](ego_stereo/camera_easy/IMU_MODULE.zh-CN.md)。软件检查通过，IMU Linux 设备读取待实测；Camera–IMU 入口暂未启用。稳定下载仍使用下方 v1.2。
+Camera 和 IMU 共用一个入口。[IMU 60 秒检查与长录步骤](ego_stereo/camera_easy/IMU_MODULE.zh-CN.md)。软件检查通过，IMU Linux 设备读取待实测；Camera–IMU 已提供运动数据录制与前置检查，正式求解待联合时间轴复核。参见[三项标定的录制顺序、计算依赖和验证步骤](ego_stereo/camera_easy/CAMERA_IMU.zh-CN.md)。稳定下载仍使用下方 v1.2。
 
 ## 双目相机一键标定
 

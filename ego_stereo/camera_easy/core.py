@@ -52,8 +52,10 @@ def device_id(value):
     return value
 
 class FrameStore:
-    def __init__(self, root):
+    def __init__(self, root, sample_hz=SAMPLE_HZ, purpose='camera'):
         self.root = Path(root)
+        self.sample_hz = sample_hz
+        self.purpose = purpose
         self.pairs = []
         for eye in ('cam0', 'cam1'):
             (self.root / 'images' / eye).mkdir(parents=True, exist_ok=False)
@@ -74,9 +76,9 @@ class FrameStore:
     def finish(self):
         require(len(self.pairs) >= 40, '图像少于 40 对，请重新采集；数量门槛不代表图案观测质量通过')
         manifest = dict(status='CAMERA_FRAMES_PREPARED', purpose='calibration',
-                        width=EYE_WIDTH, height=HEIGHT, sample_hz=SAMPLE_HZ,
+                        width=EYE_WIDTH, height=HEIGHT, sample_hz=self.sample_hz,
                         selected_pair_count=len(self.pairs), selected_pairs=self.pairs,
-                        timestamp_semantics='Host complete-frame dequeue monotonic time mapped to Unix once; not exposure; camera only',
+                        timestamp_semantics='Host complete-frame dequeue monotonic time mapped to Unix once; not exposure; '+self.purpose,
                         hardware_sync_verified=False, image_geometry_changed=False,
                         preprocessing='MJPEG decoded to mono8, split at x=1920; no resize, crop, rectification or sharpening; PGM lossless')
         (self.root / 'camera_manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')

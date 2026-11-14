@@ -1,6 +1,6 @@
 # 头环标定工具：统一入口（开发验证版）
 
-Camera 和 IMU 共用程序、设备与结果目录。IMU 使用步骤见 [IMU 模块](IMU_MODULE.zh-CN.md)。Camera–IMU 尚未启用。
+Camera 和 IMU 共用程序、设备与结果目录。IMU 使用步骤见 [IMU 模块](IMU_MODULE.zh-CN.md)。Camera–IMU 已接入运动数据录制与前置检查；[操作顺序、计算条件和验证方法](CAMERA_IMU.zh-CN.md)。正式求解尚待联合时间轴与 BAG 复核。
 
 # 双目相机标定：一键入口 v1.2（彩色预览）
 

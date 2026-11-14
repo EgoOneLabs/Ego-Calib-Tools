@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Local single-entry camera calibration assistant (2UQ2, Linux, camera only)."""
+"""Unified 2UQ2 calibration: camera, IMU and joint raw capture/preflight."""
 import argparse
 from collections import deque
 from dataclasses import asdict
@@ -27,12 +27,17 @@ from hardware import Camera, find_device
 from pipeline import calculate
 from imu_capture import capture as capture_imu
 from imu_analysis import analyze as analyze_imu
+from joint import joint_motion, validate_inputs, save_inputs, inspect_capture, pack_review
 
 ROOT = Path(__file__).resolve().parent
 DOWNLOADS = {'camera-camchain.yaml', 'camera-results-cam.txt', 'camera-report-cam.pdf',
              'camera_easy_small_review.tar.gz', 'aprilgrid.yaml', 'calculation.json',
              'imu_capture.json', 'imu-analysis.json', 'imu-results.txt', 'imu-report.pdf',
-             'imu-allan.csv', 'imu-candidate.yaml', 'imu_small_review.tar.gz', 'imu_error.txt'}
+             'imu-allan.csv', 'imu-candidate.yaml', 'imu_small_review.tar.gz', 'imu_error.txt',
+             'joint_dependencies.json', 'joint_capture.json', 'joint_clock.json',
+             'camera_imu-results.txt', 'camera_imu_small_review.tar.gz', 'joint_error.txt',
+             'camera_imu-camchain-imucam.yaml', 'camera_imu-report-imucam.pdf',
+             'camera_imu-results-imucam.txt', 'joint_calculation.json'}
 
 def motion(elapsed, duration):
     fraction = elapsed / duration
@@ -55,6 +60,7 @@ class App:
         self.thread = None
         self.imu_thread = None
         self.imu_cancel = threading.Event()
+        self.joint_frames_done = threading.Event()
         self.store = None
         self.run = None
         self.container = None
@@ -96,19 +102,21 @@ class App:
     def public(self):
         with self.lock:
             data = dict(self.state)
-            if data['stage'] == 'RECORDING':
+            if data['stage'] in ('RECORDING','JOINT_RECORDING'):
                 data['elapsed'] = round(time.monotonic() - self.started, 1)
-                data['message'] = motion(data['elapsed'], data['duration'])
+                guide = joint_motion if data['mode']=='camera_imu' else motion
+                data['message'] = guide(data['elapsed'], data['duration'])
             data['log_tail'] = list(self.logs)[-30:]
             data['files'] = sorted(n for n in DOWNLOADS if self.run and (self.run / n).is_file())
             return data
 
     def boot(self):
         with self.lock:
-            if self.state['mode'] == 'imu' and self.state['stage'] in ('DONE', 'FAILED') and self.thread and self.thread.is_alive():
+            if self.state['mode'] in ('imu','camera_imu') and self.state['stage'] in ('DONE', 'FAILED') and self.thread and self.thread.is_alive():
                 require(not self.imu_thread or not self.imu_thread.is_alive(), 'IMU 任务正在结束，请稍候')
                 require(time.monotonic_ns() - self.frame_ns < 2_000_000_000, '预览已断开，请关闭并重新启动工具')
                 self.run = None
+                self.store = None
                 self.state.update(stage='READY', message='设备已就绪，可以选择下一项标定。', output='', result=None, samples=0)
                 return
             require(not self.thread or not self.thread.is_alive(), '当前任务尚未结束，请等待')
@@ -130,6 +138,9 @@ class App:
             capture_log = logs / ('preview_' + secrets.token_hex(5) + '.log')
             camera = Camera(device, capture_log)
             anchor_mono, anchor_unix = time.monotonic_ns(), time.time_ns()
+            self.clock_anchor = {'monotonic_ns':anchor_mono,'unix_ns':anchor_unix,
+                                 'image_time_basis':'Host complete-frame read, not exposure time',
+                                 'imu_time_basis':'Raw counters and host request intervals; per-sample time pending review'}
             next_sample = 0
             first = True
             while not self.stop.is_set():
@@ -149,23 +160,30 @@ class App:
                                              cv2_version=cv2.__version__, container=self.container,
                                              docker_image_id=self.info['Image'])
                         first = False
-                    if self.state['stage'] == 'RECORDING':
+                    if self.state['stage'] in ('RECORDING','JOINT_RECORDING'):
                         if next_sample == 0: next_sample = now_ns
                         if now_ns >= next_sample:
                             self.store.add(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY),
                                            int(anchor_unix + now_ns - anchor_mono))
                             self.state['pairs'] = len(self.store.pairs)
-                            period = int(1e9 / SAMPLE_HZ)
+                            period = int(1e9 / self.store.sample_hz)
                             next_sample += ((now_ns - next_sample) // period + 1) * period
                         elapsed = time.monotonic() - self.started
                         if elapsed >= self.state['duration'] or self.end_capture.is_set():
                             self.state.update(stage='PREPARING', elapsed=round(elapsed, 1))
                             self.store.finish()
+                            if self.state['mode']=='camera_imu':
+                                self.store = None
+                                self.state.update(stage='JOINT_CHECKING',message='正在检查联合采集数据和计算前置条件…')
+                                self.end_capture.set()
+                                self.joint_frames_done.set()
+                                continue
                             completed = True
                             break
             if self.stop.is_set(): raise InterruptedError('工具已停止')
         except Exception as error:
-            self.fail(error)
+            if not (self.stop.is_set() and self.state['stage']=='DONE'):
+                self.fail(error)
         finally:
             if camera:
                 camera.close()
@@ -183,7 +201,7 @@ class App:
     def fail(self, error):
         self.imu_cancel.set()
         with self.lock:
-            if self.store and self.state['stage'] == 'RECORDING':
+            if self.store and self.state['stage'] in ('RECORDING','JOINT_RECORDING'):
                 (self.run / 'capture_aborted.json').write_text(json.dumps(
                     {'status': 'CAPTURE_ABORTED', 'error': str(error), 'pairs_saved': self.store.pairs}, indent=2))
             self.store = None
@@ -191,9 +209,11 @@ class App:
 
     def start(self, value):
         mode = value.get('mode', 'camera')
-        require(mode in ('camera', 'imu'), 'Camera–IMU 尚未启用，需要先完成 IMU 与图像时间轴验证')
+        require(mode in ('camera', 'imu','camera_imu'), '未知标定模块')
         if mode == 'imu':
             return self.start_imu(value)
+        if mode == 'camera_imu':
+            return self.start_joint(value)
         board = Board.parse(value['board'])
         ident = device_id(value['device_id'])
         seconds = float(value.get('seconds', 60))
@@ -264,6 +284,11 @@ class App:
 
     def finish_early(self):
         with self.lock:
+            if self.state['mode']=='camera_imu':
+                require(self.state['stage']=='JOINT_RECORDING' and self.state['pairs']>=40,
+                        '至少保存 40 对图像后才能提前结束，完整运动仍需覆盖全部轴')
+                self.end_capture.set()
+                return
             if self.state['mode'] == 'imu':
                 require(self.state['stage'] == 'IMU_RECORDING', '当前没有 IMU 采集任务')
                 self.end_capture.set()
@@ -271,6 +296,53 @@ class App:
             require(self.state['stage'] == 'RECORDING' and self.state['pairs'] >= 40,
                     '至少采集 40 对后才能提前结束；建议完成全部动作提示')
             self.end_capture.set()
+
+    def start_joint(self,value):
+        ident=device_id(value['device_id'])
+        board=Board.parse(value['board'])
+        seconds=float(value.get('joint_seconds',90))
+        require(seconds in (60,90,120),'联合采集请选择 60、90 或 120 秒')
+        camera_text=value.get('camera_yaml','');imu_text=value.get('imu_yaml','')
+        validate_inputs(camera_text,imu_text)
+        with self.lock:
+            require(self.state['stage']=='READY' and time.monotonic_ns()-self.frame_ns<2_000_000_000,
+                    '请先等待左右实时预览正常')
+            require(not self.imu_thread or not self.imu_thread.is_alive(),'当前 IMU 任务还未结束')
+            parent=self.data_root/'camera_imu'/ident;parent.mkdir(parents=True,exist_ok=True)
+            needed=int(seconds*10*WIDTH*HEIGHT*2+1024**3)
+            require(shutil.disk_usage(parent).free>needed,f'联合采集至少需要约 {needed/1024**3:.1f} GiB 空间')
+            self.run=parent/(datetime.now(timezone.utc).strftime('camera_imu_%Y%m%dT%H%M%SZ_')+secrets.token_hex(4))
+            self.run.mkdir();board.write(self.run)
+            save_inputs(self.run,camera_text,imu_text)
+            (self.run/'hardware.json').write_text(json.dumps(self.hardware,ensure_ascii=False,indent=2))
+            (self.run/'joint_clock.json').write_text(json.dumps(self.clock_anchor,ensure_ascii=False,indent=2))
+            self.store=FrameStore(self.run,sample_hz=10,purpose='joint raw capture; timing review required')
+            self.end_capture.clear();self.imu_cancel.clear();self.joint_frames_done.clear()
+            self.started=time.monotonic()
+            self.state.update(stage='JOINT_RECORDING',mode='camera_imu',device_id=ident,board=asdict(board),
+                duration=seconds,elapsed=0,pairs=0,samples=0,packets=0,errors=0,gaps=0,duplicates=0,
+                message=joint_motion(0,seconds),result=None,output=str(self.run))
+            self.imu_thread=threading.Thread(target=self.joint_loop,args=(self.run,seconds),name='joint-capture',daemon=True)
+            self.imu_thread.start()
+        self.persist()
+
+    def joint_loop(self,run,seconds):
+        try:
+            def notify(stage,values):
+                with self.lock:
+                    self.state.update({k:v for k,v in values.items() if k!='elapsed'})
+                self.persist()
+            capture_imu(run,self.hardware['device'],seconds+5,self.imu_cancel,self.end_capture,notify)
+            require(not self.imu_cancel.is_set(),'联合采集已停止，原始数据保留')
+            require(self.joint_frames_done.wait(10),'图像采集未正常结束，原始数据保留')
+            result=inspect_capture(run)
+            with self.lock:self.state['result']=result
+            self.update('DONE','联合运动数据已保存。当前是采集检查结果；请先复核参数和时间轴，再运行联合求解。')
+        except Exception as error:
+            self.imu_cancel.set();self.end_capture.set()
+            (run/'joint_error.txt').write_text(str(error),encoding='utf-8')
+            pack_review(run)
+            self.update('FAILED',str(error))
 
     def close(self):
         self.stop.set()
@@ -330,7 +402,7 @@ class Handler(BaseHTTPRequestHandler):
         try:
             require(self.headers.get('X-Ego-Token') == self.server.token, '请求校验失败，请重新打开当前页面')
             size = int(self.headers.get('Content-Length', '0'))
-            require(0 <= size <= 8192, '请求过大')
+            require(0 <= size <= 98304, '请求过大')
             value = json.loads(self.rfile.read(size) or b'{}')
             if self.path == '/start': self.server.app.start(value)
             elif self.path == '/finish': self.server.app.finish_early()
