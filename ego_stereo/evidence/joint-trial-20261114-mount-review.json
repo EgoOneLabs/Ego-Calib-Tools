@@ -1,0 +1,102 @@
+{
+  "status": "EXPERIMENTAL_OUTPUTS_COMPLETE_REVIEW_PENDING",
+  "source": "/home/key/文档/kalibr/data/camera_imu/2UQ2/joint_experimental_input_owwzethi",
+  "output": "/home/key/文档/kalibr/data/camera_imu/2UQ2/joint_experimental_trial_jm69_hgh",
+  "source_files_modified": false,
+  "container": "kalibr",
+  "container_image": "sha256:ddbe45d2bd03e8a415688355dc23c4ceedf6eb576e1c6d7eeafa51567fa10b29",
+  "quality_accepted": false,
+  "hardware_sync_verified": false,
+  "imu_intrinsics_independently_verified": false,
+  "timing": "Experimental host/counter mapping; not reviewed exposure/sample timing.",
+  "imu_weights": "Mixed static model experimental weights; not final noise certification.",
+  "source_sha256": {
+    "camera.yaml": "153ab87359e8efd07be55a3d5c4734911bfbd7b7277452eb91087c4976c97aaf",
+    "imu-experimental.yaml": "94869a9b8473658829caae888865cf89bdaad4f92ba949d892d06c92e6a49762",
+    "aprilgrid.yaml": "f741d6efa22602ac0c37af9332f2953030cdde3f28c94df25d02c9d1884158d8",
+    "experimental_time_model.json": "cdb3d5912d4d633ef1f9f108283b3ae5fbf6f35192c9ecdab4f4d85d49f3dc21",
+    "bag_verification.json": "d37d54c4aa302e91fb8bb041ab229f7ba0dd32f42b8cc13d7f7e85cd292df0e6",
+    "corner_check.json": "f12ceb3d98d0465ea7a0211f7356e04affbfecc91b120fe9fdf83b0afc09e495",
+    "camera_imu_experimental.bag": "5772f2f8d6536f0b3c58317522363d2b9b257c3cb1571261407fd8419326df21"
+  },
+  "container_exit_code": 0,
+  "output_sha256": {
+    "camera_imu_experimental-camchain-imucam.yaml": "918fc22b1f8f6b72c094868846bd6419b3022b8ef410a5eaa0785385c605c890",
+    "camera_imu_experimental-report-imucam.pdf": "f16a6f52a22084c1239f7aba319f97d33455731cae4e73b69d684c513ea870b0",
+    "camera_imu_experimental-results-imucam.txt": "0795ec5cfbecef715a5966cb54e334a786c9ac33f241088879862e0982aacf1a"
+  },
+  "experimental_results": {
+    "cam0": {
+      "T_cam_imu": [
+        [
+          0.9932821218108988,
+          0.03185694419578973,
+          0.1112464003792724,
+          0.14744534582147334
+        ],
+        [
+          0.0795847289768333,
+          0.5098340697515841,
+          -0.8565836166039024,
+          -0.005778443015267813
+        ],
+        [
+          -0.08400534152375687,
+          0.8596827068326102,
+          0.5038737403044871,
+          -0.1458234909646119
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "timeshift_cam_imu": -0.039704185976124316
+    },
+    "cam1": {
+      "T_cam_imu": [
+        [
+          0.9998753436696421,
+          0.011125427773525102,
+          -0.011203659150977239,
+          0.06894317912612707
+        ],
+        [
+          -0.015407123074371806,
+          0.5323455092546159,
+          -0.8463869560283966,
+          -0.013535667301063658
+        ],
+        [
+          -0.0034521993115055796,
+          0.8464540646918178,
+          0.5324505598519114,
+          -0.1380888107629584
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "timeshift_cam_imu": -0.03955560691860891
+    }
+  },
+  "wall_seconds": 143.64493517499068,
+  "review_decision": "NOT_ACCEPTED_RIGID_MOUNT_NOT_ESTABLISHED",
+  "user_reported_mount": "Mainboard detached from taped mount; user supported it by hand during camera and camera_imu recording.",
+  "suitable_as_final_calibration": false,
+  "old_extrinsics_comparable_as_repeatability": false,
+  "old_vs_new_comparison_limitation": "Mount changed and was not rigidly secured; numerical difference is not a same-mount repeatability test.",
+  "next": "Rigidly secure IMU mainboard to camera assembly, then record a new joint sequence; retain current data only as diagnostic evidence.",
+  "static_two_hour_mount_conditions_known": false,
+  "residual_mean": {
+    "camera0_px": 3.1401915743224778,
+    "camera1_px": 3.2444947726204596,
+    "gyro_rad_s": 0.15475661581411002,
+    "accel_m_s2": 0.35325657658527304
+  }
+}

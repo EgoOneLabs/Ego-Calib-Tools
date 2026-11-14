@@ -46,7 +46,7 @@
     "camera_easy/imu_capture.py": "b4165391f7e076943d9bd4fcc33cef6fb3ee11691779cc8b6f5e6bc09505f93c",
     "camera_easy/test_joint.py": "1c953666822e66e4be9393e58db0e4268d6bd5d3f77a2a4306a41d0c2b032221",
     "camera_easy/joint.py": "cb7ff4bf49f9a5a0d82bb32c8be31cdeb02434931717d0e31045c45b12468fe8",
-    "camera_easy/CAMERA_IMU.zh-CN.md": "4f57692db5bd019c9f34d66a215aa7679e79732112f94023ce9e59da4bb5b86e",
+    "camera_easy/CAMERA_IMU.zh-CN.md": "3e6ade8c698bbf45def9e4886edbba4001402c04fe712f3fc5567b823826e486",
     "camera_easy/imu_recover.py": "9f0c68ef3a65f8384b81ffcd933449c7e0b182292bdb90ccc59c34c307a5e161",
     "camera_easy/test_imu_recovery.py": "f22895a94ceca7ea51a8613f5b29e511794c5f18279aff5de06c19179d0d8802",
     "camera_easy/imu_poll_check.py": "56d88d2556746a15a17862b83fdd680e6dee6a114c390e99420c78e8392276d0",
