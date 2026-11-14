@@ -31,7 +31,7 @@
     "camera_easy/core.py": "77b192fdd5ca460ee4ae2955d1d83939513aa662883e3445d811ba3169716760",
     "camera_easy/install.sh": "68647884b2dfbde02e98d3a7f75980ec62e833d388241a7d7063ef29f79360c4",
     "camera_easy/test_easy.py": "899c12864b9777fea487cf3331cd00d98687b5559e15f7da9ef3a61a8cef41e5",
-    "camera_easy/VALIDATION.json": "16e4ec1cf12cacab524a74042157a9807fa2efb9b1ef3a26f636e336b3ca4471",
+    "camera_easy/VALIDATION.json": "f1332cfc718465f4764a9455c33eb973fffb21035a3332fc797814bf0c235e7a",
     "camera_easy/build_installer.py": "04419c8e1fdefbd6ed3eefa60198f35937a8ae515cd01fd2021fcdb05588cfb8",
     "camera_easy/INSTALL_SIMPLE.zh-CN.md": "253c3fd3afa4894e3836e346e4a0bec4df3de5669f3408fb065391957c2a0c8a",
     "camera_easy/make_full.py": "5902f8ac8dfe0ff2435189ee96597310d537deef7e1bef34d71a4dfdd81f72d2",
@@ -40,14 +40,14 @@
     "camera_easy/test_color.py": "3b6ffa71efa620523ab902203d7d1ec8c63ba69acd51f082d0359f1b907da890",
     "camera_easy/download-install.sh": "66a3317bb5f125423d1198e59025194dfb40fcd1a1376ce045a0ab6902899b1d",
     "camera_easy/extract_environment.py": "a2ae0de7d39907aa0595d5f76e9cb399515632d7838aff6354eb6f31d34cf597",
-    "camera_easy/imu_analysis.py": "c2bd162e99a5c27bf1facfc0c889c549eddc98136859da0fbb1485792c2771a9",
-    "camera_easy/IMU_MODULE.zh-CN.md": "795f4172cd0144b9f07f55d18b73330a0737e450dddb658a80e60dacb7974d37",
+    "camera_easy/imu_analysis.py": "99ca1ad83d631e20bcdb25a164a8c6d58435e671f2d22f4806c05db666a89f0b",
+    "camera_easy/IMU_MODULE.zh-CN.md": "b82b45681b9919f6c06075c9c83e4ba086f42ac5bbcd6bc9b2e19f42423232b2",
     "camera_easy/test_imu.py": "1d3af0db84c9a6d7e375741559db2d9271151cfa1a350e36a14d037b5144f694",
     "camera_easy/imu_capture.py": "fe3d3906fb8ee057e67df588296797011f58734b839ba5d26d5607ece1095fd3",
     "camera_easy/test_joint.py": "1c953666822e66e4be9393e58db0e4268d6bd5d3f77a2a4306a41d0c2b032221",
     "camera_easy/joint.py": "cb7ff4bf49f9a5a0d82bb32c8be31cdeb02434931717d0e31045c45b12468fe8",
     "camera_easy/CAMERA_IMU.zh-CN.md": "2b07731c6b28a1a4a6214ba212f1c785ad69532ea5f7040115d087d29973f48b",
     "camera_easy/imu_recover.py": "9f0c68ef3a65f8384b81ffcd933449c7e0b182292bdb90ccc59c34c307a5e161",
-    "camera_easy/test_imu_recovery.py": "fcdc2143aae0de698074c36afbce88c932484607466f34a37b3b09e1fd87a34a"
+    "camera_easy/test_imu_recovery.py": "f22895a94ceca7ea51a8613f5b29e511794c5f18279aff5de06c19179d0d8802"
   }
 }

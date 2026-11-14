@@ -9,9 +9,29 @@ import numpy as np
 from imu_capture import Continuity, decode_packet, capture
 from imu_recover import recover,replay_counters
 from core import sha
+from imu_analysis import fit_axis
 
 
 class RecoveryTests(unittest.TestCase):
+    def test_allan_long_tau_uses_support_across_complete_segments(self):
+        from imu_analysis import allan_segments
+        pieces=[np.zeros((1000,6)),np.ones((1000,6))*10000]*20
+        result=allan_segments(pieces,100)
+        self.assertGreater(result[-1,0],1)
+        self.assertTrue(np.all(result[:,1:7]==0))
+        for row in result:
+            m=round(row[0]*100)
+            self.assertGreaterEqual(sum(max(0,len(v)//m-1) for v in pieces),20)
+
+    def test_noise_fit_follows_measured_branches_without_forcing_missing_term(self):
+        tau=np.geomspace(.02,100,60)
+        # A filtered sensor may exhibit a white-noise slope only above 2s.
+        dev=np.where(tau<2,.001,np.where(tau<20,.001*np.sqrt(2/tau),.001*np.sqrt(2/20)))
+        fitted=fit_axis(tau,dev)
+        self.assertIsNotNone(fitted['white_noise'])
+        self.assertIsNone(fitted['bias_random_walk'])
+        self.assertGreater(fitted['white_noise']['tau_range_s'][0],1)
+
     def test_rejected_packet_preserved_separately(self):
         stop=threading.Event();finish=threading.Event()
         class Reader:

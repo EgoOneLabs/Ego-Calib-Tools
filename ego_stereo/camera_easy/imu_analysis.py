@@ -11,11 +11,16 @@ import yaml
 
 def allan_segments(segments, rate, sizes=None, stop=None):
     longest=max(map(len,segments))
-    if sizes is None:sizes=np.unique(np.geomspace(1,max(2,longest//10),40).astype(int))
+    automatic=sizes is None
+    if automatic:sizes=np.unique(np.geomspace(1,max(2,longest//2),50).astype(int))
     rows=[]
     prefix=[np.vstack([np.zeros((1,6)),np.cumsum(v,axis=0,dtype=np.float64)]) for v in segments]
     for m in sizes:
         if stop is not None and stop.is_set():raise InterruptedError('IMU 分析已停止，数据保留')
+        # Select time scales by available complete clusters across all segments.
+        # This is an explicit tool heuristic, not an EDF/confidence guarantee.
+        support=sum(max(0,len(v)//m-1) for v in segments)
+        if automatic and support<20:continue
         total=np.zeros(6);count=0
         for p in prefix:
             n=len(p)-1
@@ -42,6 +47,20 @@ def fit_region(tau,dev,slope,minimum,maximum):
             coefficient=float(np.median(y*np.sqrt(x))) if slope<0 else float(np.median(y*np.sqrt(3)/np.sqrt(x)))
             best=(score,{'coefficient':coefficient,'slope':float(fitted[0]),'tau_range_s':[float(x[0]),float(x[-1])],'log_residual':residual})
     return None if best is None else best[1]
+
+
+def fit_axis(tau,dev):
+    """Search the measured descending/rising branches, not fixed time cutoffs.
+
+    A matching local slope is a candidate interpretation, never proof that the
+    entire recording is stationary or that every stochastic term is observed.
+    """
+    minimum=int(np.argmin(dev))
+    peak=int(np.argmax(dev[:minimum+1]))
+    return {'white_noise':fit_region(tau,dev,-.5,max(.02,float(tau[peak])),float(tau[minimum])),
+            'bias_random_walk':fit_region(tau,dev,.5,float(tau[minimum]),float(tau[-1])),
+            'allan_minimum_tau_s':float(tau[minimum]),
+            'allan_minimum_deviation':float(dev[minimum])}
 
 
 def analyze(run,stop=None,notify=lambda *_:None,prepared_data=None):
@@ -81,13 +100,16 @@ def analyze(run,stop=None,notify=lambda *_:None,prepared_data=None):
     if np.quantile(gyro,.99)>.15 or np.std(accel)>.15:issues.append('疑似存在运动或振动，需要检查静止条件')
     fits=[]
     for axis in range(6):
-        fits.append({'white_noise':fit_region(curves[:,0],curves[:,axis+1],-.5,.02,2),
-                     'bias_random_walk':fit_region(curves[:,0],curves[:,axis+1],.5,10,float(curves[-1,0]))})
+        fits.append(fit_axis(curves[:,0],curves[:,axis+1]))
     if any(x['white_noise'] is None or x['bias_random_walk'] is None for x in fits):issues.append('部分轴未识别到可靠的白噪声或随机游走斜率区间')
     report={'status':'IMU_NOISE_REVIEW_PENDING' if not issues else 'IMU_ANALYSIS_NEEDS_REVIEW',
         'quality_accepted':False,'ready_for_camera_imu':False,
         'samples':len(data),'segments':len(segments),'longest_segment_seconds':longest,
         'estimated_sample_rate_hz':rate,'clock_fit_residual_std_samples':float(np.std(residual)),
+        'time_scale_support':[{'tau_s':float(row[0]),
+            'complete_segment_count':sum(len(v)>=2*int(round(row[0]*rate))+1 for v in segments),
+            'nonoverlapping_cluster_comparisons':sum(max(0,len(v)//int(round(row[0]*rate))-1) for v in segments)} for row in curves],
+        'time_scale_selection':'At least 20 nonoverlapping cluster comparisons across complete segments; heuristic, not statistical confidence or an official minimum duration.',
         'time_basis':'Empirical host-clock/counter fit, not vendor-confirmed hardware time; not exposure synchronization.',
         'issues':issues,'warnings':warnings,'capture_status':capture['status'],'elapsed_seconds':capture['elapsed_seconds'],'axis_fits':fits,'wall_seconds':time.monotonic()-started}
     if not issues:

@@ -1,6 +1,6 @@
 {
   "status": "JOINT_RAW_CAPTURE_SOFTWARE_CHECKS_PASS_HARDWARE_PENDING",
-  "tests_passed": 39,
+  "tests_passed": 41,
   "test_command": "python3 -m unittest discover -s ego_stereo/camera_easy -p 'test_*.py' -v",
   "real_ros1_bag_io_tested": true,
   "real_full_3840x1080_pixel_split_tested": true,
@@ -68,5 +68,8 @@
   "joint_time_axis_verified": false,
   "counter_u24_rollover_supported": true,
   "existing_raw_reanalysis_implemented": true,
-  "existing_raw_reanalysis_real_result_pending": true
+  "existing_raw_reanalysis_real_result_pending": true,
+  "raw_reanalysis_completed_on_user_machine": true,
+  "full_imu_noise_profile_verified": false,
+  "noise_fit_search": "Measured branches around Allan minimum; long time scales selected by complete-cluster support, with explicit heuristic disclosure. Refit on real two-hour raw data pending."
 }
