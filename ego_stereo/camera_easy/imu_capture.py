@@ -78,7 +78,7 @@ def capture(run,device,seconds,stop,finish,notify,reader_factory=XuReader):
     reader=None;completed=False;error=None
     record_start=time.monotonic()
     stats={'status':'RUNNING','quality_accepted':False,'requested_seconds':seconds,
-           'warmup_seconds':0,'timestamp_semantics':'Host request interval is packet timing only; raw counter unit and exposure relation are not vendor-confirmed. No per-sample timestamps invented.',
+           'timestamp_semantics':'Host request interval is packet timing only; raw counter unit and exposure relation are not vendor-confirmed. No per-sample timestamps invented.',
            'nominal_scale':{'accel_counts_per_g':4096,'gyro_counts_per_deg_s':16.4,'per_unit_calibrated':False}}
     (run/'imu_capture.json').write_text(json.dumps(stats,ensure_ascii=False,indent=2))
     try:
