@@ -11,7 +11,7 @@
  function controls(){
   const action=el('off_action').value, candidate=action==='validate';
   el('off_camera_group').hidden=candidate;el('off_candidate_group').hidden=!candidate;
-  el('off_start').textContent=candidate?'开始固定参数验证':'开始联合计算';
+  el('off_start').textContent=candidate?'开始验证':'开始联合计算';
   el('off_explanation').textContent=candidate?'固定所选联合外参与时间偏移，只拟合本段运动轨迹、重力方向和 IMU 偏置，再报告误差；不是重新标定，也不是完全开环预测。':'自动准备并核对 BAG，再调用 Kalibr 求解；将生成联合外参 YAML、PDF 报告和 TXT 摘要。';
   for(const id of ['off_action','off_dataset','off_refresh','off_ack','off_camera','off_candidate','off_imu','off_camera_recent','off_candidate_recent','off_imu_recent'])el(id).disabled=busy||appBusy;
   for(const id of ['off_camera','off_candidate','off_imu']){
@@ -75,9 +75,9 @@
   if(polling)return;polling=true;
   try{
    const [state,app]=await Promise.all([request('/offline/state'),request('/state')]);
-   busy=state.busy;window.egoOfflineBusy=busy;appBusy=!['READY','FAILED','DONE'].includes(app.stage);
+   busy=state.busy;window.egoOfflineBusy=busy;window.egoOfflineView=state;appBusy=!['READY','FAILED','DONE'].includes(app.stage);
    el('off_status').textContent=state.message;el('off_progress').hidden=!busy;
-   el('off_output').textContent=state.output?'结果目录：'+state.output:'';el('off_open').disabled=!state.output;
+   el('off_results').hidden=state.stage==='IDLE';el('off_output').textContent=state.output&&!busy?'结果保存目录：'+state.output:'';el('off_open').disabled=!state.output||busy;
    el('off_logs').textContent=state.logs.join('\n');el('off_files').replaceChildren();
    for(const name of state.files){const a=document.createElement('a');a.className='link';a.href='/offline/files/'+encodeURIComponent(name);a.textContent=name;a.target='_blank';a.rel='noopener';el('off_files').append(a);}
    el('off_metrics').replaceChildren();

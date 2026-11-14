@@ -29,6 +29,7 @@ from imu_capture import capture as capture_imu
 from imu_analysis import analyze as analyze_imu
 from joint import joint_motion, validate_inputs, save_inputs, inspect_capture, pack_review
 from offline import Offline, EXPORTS as OFFLINE_EXPORTS
+from parameters import Parameters
 
 ROOT = Path(__file__).resolve().parent
 DOWNLOADS = {'camera-camchain.yaml', 'camera-results-cam.txt', 'camera-report-cam.pdf',
@@ -83,6 +84,7 @@ class App:
                 self.state['device_id'] = device_id(config['device_id'])
             except Exception:
                 pass
+        self.parameters = Parameters(self.config.parent/'joint_parameters.json')
         self.offline = Offline(self)
         self.boot()
 
@@ -195,6 +197,7 @@ class App:
                 result = calculate(self.run, self.docker, self.container, self.data_root, self.info,
                                    self.stop, self.update, self.log)
                 with self.lock: self.state['result'] = result
+                self.parameters.remember(self.state['device_id'],'camera',self.run/'camera-camchain.yaml')
                 self.update('DONE', '相机参数已计算并生成文件。请打开 PDF 报告检查结果。')
             except Exception as error:
                 self.fail(error)
@@ -250,6 +253,7 @@ class App:
             self.state['message']='实验混合模型权重已生成；局部斜率结果保留，尚未通过动态残差和重复性验收。'
             self.state['result']['experimental_weights_available']=True
             self.state['result']['experimental_weights_status']=report['status']
+            self.parameters.remember(self.state['device_id'],'imu',self.run/'imu-experimental.yaml')
 
     def start_imu(self, value):
         ident = device_id(value['device_id'])
@@ -285,6 +289,8 @@ class App:
                         self.imu_cancel,self.end_capture,notify)
             if self.imu_cancel.is_set(): raise InterruptedError('IMU 已停止，原始数据保留')
             result = analyze_imu(run,self.imu_cancel,self.update)
+            if (run/'imu-candidate.yaml').is_file():
+                self.parameters.remember(self.state['device_id'],'imu',run/'imu-candidate.yaml')
             with self.lock: self.state['result'] = result
             self.update('DONE', 'IMU 数据检查和曲线已生成，请查看报告。'+('60 秒仅用于检查读取，不作为噪声标定验收。' if seconds==60 else '候选参数需复核后使用。'))
         except Exception as error:
@@ -315,7 +321,11 @@ class App:
         seconds=float(value.get('joint_seconds',90))
         require(seconds in (60,90,120),'联合采集请选择 60、90 或 120 秒')
         camera_text=value.get('camera_yaml','');imu_text=value.get('imu_yaml','')
-        validate_inputs(camera_text,imu_text)
+        dependencies=validate_inputs(camera_text,imu_text)
+        auto_calculate=value.get('auto_calculate') is True
+        if auto_calculate:
+            require(not dependencies['missing'],'第三步需要 Camera 相机参数 YAML 和 IMU 噪声参数 YAML，请先拖入这两个文件')
+            require(value.get('experimental_ack') is True,'当前为实验时间映射计算，请使用更新后的页面')
         with self.lock:
             require(self.state['stage']=='READY' and time.monotonic_ns()-self.frame_ns<2_000_000_000,
                     '请先等待左右实时预览正常')
@@ -326,6 +336,9 @@ class App:
             self.run=parent/(datetime.now(timezone.utc).strftime('camera_imu_%Y%m%dT%H%M%SZ_')+secrets.token_hex(4))
             self.run.mkdir();board.write(self.run)
             save_inputs(self.run,camera_text,imu_text)
+            if auto_calculate:
+                self.parameters.remember(ident,'camera',self.run/'input-camera.yaml')
+                self.parameters.remember(ident,'imu',self.run/'input-imu.yaml')
             (self.run/'hardware.json').write_text(json.dumps(self.hardware,ensure_ascii=False,indent=2))
             (self.run/'joint_clock.json').write_text(json.dumps(self.clock_anchor,ensure_ascii=False,indent=2))
             self.store=FrameStore(self.run,sample_hz=10,purpose='joint raw capture; timing review required')
@@ -333,12 +346,12 @@ class App:
             self.started=time.monotonic()
             self.state.update(stage='JOINT_RECORDING',mode='camera_imu',device_id=ident,board=asdict(board),
                 duration=seconds,elapsed=0,pairs=0,samples=0,packets=0,errors=0,gaps=0,duplicates=0,
-                message=joint_motion(0,seconds),result=None,output=str(self.run))
-            self.imu_thread=threading.Thread(target=self.joint_loop,args=(self.run,seconds),name='joint-capture',daemon=True)
+                message=joint_motion(0,seconds),result=None,output=str(self.run),auto_calculate=auto_calculate)
+            self.imu_thread=threading.Thread(target=self.joint_loop,args=(self.run,seconds,auto_calculate),name='joint-capture',daemon=True)
             self.imu_thread.start()
         self.persist()
 
-    def joint_loop(self,run,seconds):
+    def joint_loop(self,run,seconds,auto_calculate=False):
         try:
             def notify(stage,values):
                 with self.lock:
@@ -350,6 +363,12 @@ class App:
             result=inspect_capture(run)
             with self.lock:self.state['result']=result
             self.update('DONE','联合运动数据已保存。当前是采集检查结果；请先复核参数和时间轴，再运行联合求解。')
+            if auto_calculate and not self.stop.is_set():
+                from offline import identity
+                self.offline.start(dict(dataset=identity(self.data_root,run),action='calibrate',experimental_ack=True,
+                    camera_yaml=(run/'input-camera.yaml').read_text(),imu_yaml=(run/'input-imu.yaml').read_text()))
+                with self.lock:self.state['message']='录制已保存，正在自动计算联合参数，请等待下方结果。'
+                self.persist()
         except Exception as error:
             self.imu_cancel.set();self.end_capture.set()
             (run/'joint_error.txt').write_text(str(error),encoding='utf-8')
@@ -387,6 +406,10 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send_bytes(200, html.encode(), 'text/html; charset=utf-8')
             if path == '/offline.js':
                 return self.send_bytes(200,(ROOT/'offline.js').read_bytes(),'application/javascript; charset=utf-8')
+            if path == '/flow.js':
+                return self.send_bytes(200,(ROOT/'flow.js').read_bytes(),'application/javascript; charset=utf-8')
+            if path.startswith('/joint/parameters/'):
+                return self.send_bytes(200,json.dumps(app.parameters.defaults(path.rsplit('/',1)[1]),ensure_ascii=False).encode())
             if path == '/state':
                 return self.send_bytes(200, json.dumps(app.public(), ensure_ascii=False).encode())
             if path == '/offline/catalog':
@@ -439,6 +462,9 @@ class Handler(BaseHTTPRequestHandler):
             elif self.path == '/offline/start': self.server.app.offline.start(value)
             elif self.path == '/offline/stop': self.server.app.offline.cancel()
             elif self.path == '/offline/open': self.server.app.offline.open_output()
+            elif self.path == '/open-output':
+                require(self.server.app.run and self.server.app.run.is_dir(),'尚无结果目录')
+                subprocess.Popen(['xdg-open',str(self.server.app.run)],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
             elif self.path == '/imu-experiment': self.server.app.generate_imu_experiment()
             elif self.path == '/finish': self.server.app.finish_early()
             elif self.path == '/reconnect': self.server.app.boot()

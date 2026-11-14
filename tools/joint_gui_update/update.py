@@ -29,7 +29,9 @@ def main():
     releases=(Path.home()/'.local/share/ego-camera/releases').resolve()
     if releases not in root.parents:raise ValueError('程序不在已知安装目录，未修改。')
     old_hash=sha(root/'app.py')
-    if old_hash not in (checks['base_app_sha256'],checks['payload_sha256']['app.py']):
+    base_hashes=checks['base_app_sha256']
+    if isinstance(base_hashes,str):base_hashes=[base_hashes]
+    if old_hash not in [*base_hashes,checks['payload_sha256']['app.py']]:
         raise ValueError('当前程序版本与本更新不匹配，未修改。请提供菜单入口检查结果。')
     running=[]
     for proc in Path('/proc').iterdir():
@@ -59,9 +61,9 @@ def main():
             elif (root/name).exists():(root/name).unlink()
         if (backup/'required_files.json').is_file():shutil.copy2(backup/'required_files.json',manifest)
         raise
-    print('界面已更新：20261114-JOINT-GUI',flush=True)
+    print('界面已更新：'+checks.get('version','20261114-JOINT-GUI'),flush=True)
     print('旧程序备份：'+str(backup),flush=True)
-    print('请点击页面顶部“已有数据计算／验证”，无需重新录制。',flush=True)
+    print('第三步准备 Camera、IMU 两个参数后，点击预览旁按钮录制并自动计算；已有结果可单独验证。',flush=True)
     subprocess.run(['bash',str(root/'start.sh')],check=True)
 
 

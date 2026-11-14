@@ -1,47 +1,66 @@
-# 头环标定工具：已有数据计算和验证入口
+# 头环标定工具：简化录制与自动计算
 
-针对已安装的 20261114-YAML-DROP 版本，复用本机 Docker 环境，不重新安装依赖。
-先在头环工具的启动终端按 Ctrl+C 退出，再解压 joint-ui.zip，运行：
+界面版本：20261114-SIMPLE-FLOW。支持从已安装的 YAML-DROP 或 JOINT-GUI 版本小更新，
+复用现有环境及桌面入口，不重新安装 Docker，不修改已有录制与结果。
+
+先在旧工具启动终端按 Ctrl+C 退出，再运行：
 
 ```bash
 cd "$(xdg-user-dir DOWNLOAD)" &&
-unzip -oq joint-ui.zip &&
-/usr/bin/python3 joint-ui/update.py
+unzip -oq simple-ui.zip &&
+/usr/bin/python3 simple-ui/update.py
 ```
 
-程序会核对版本、备份旧程序、更新同一个桌面入口并启动。
-界面版本：20261114-JOINT-GUI。关闭浏览器不等于停止程序；运行中不允许更新。
+工具会核对版本并备份旧程序，随后启动同一个“头环标定工具”。关闭浏览器不等于退出程序；
+仍在录制或计算时不会执行更新。
 
-## 使用已有数据
+## 主流程
 
-点击页面顶部“已有数据计算／验证”，无需再次录制。
+1. Camera：固定头环，移动标定板，录制并计算相机参数。
+2. IMU：保持头环静止，录制并分析噪声。建议 2～3 小时，可自定义，无预热等待。
+3. Camera–IMU：准备两个输入，固定板、移动整套头环，点击预览旁“开始录制并计算”。
 
-1. 选择“计算联合外参与时间偏移”或“验证已有联合参数”。
-2. 从本机列表选择录制或已准备 BAG。列表显示完整路径，不用手动寻找或上传大文件。
-3. 计算时选择或拖入 Camera YAML 与 IMU 噪声 YAML。
-4. 验证时选择或拖入 Camera–IMU 联合外参 YAML 与 IMU 噪声 YAML。
-5. 确认实验时间映射说明，点击开始。板配置读取所选录制目录中的 aprilgrid.yaml。
-6. 等待完成，查看日志、下载 YAML/PDF/TXT 或点击“打开结果目录”。
+第三步的两个输入：
 
-两项任务均写入新的结果目录，不覆盖原数据或旧结果。原始录制会自动生成 BAG 并读回校验；
-已有 BAG 会核对 SHA256 后创建独立副本。仅扫描当前容器数据根目录中已知的工具目录。
-其他目录的 YAML 可直接拖入；其他磁盘的录制需要先妥善复制到当前数据根目录。
+| 文件 | 来源 |
+|---|---|
+| Camera 相机参数 YAML | 第一步输出 camera-camchain.yaml |
+| IMU 噪声参数 YAML | 第二步输出；当前可用实验文件为 imu-experimental.yaml |
+
+本 App 刚生成或上次明确使用的同设备参数会自动带入，显示名称供核对。首次使用可直接拖入。
+如果文件移动、改变或切换设备，则不会静默复用。标定板配置从界面确认的实测尺寸生成，无需拖入。
+没有两个有效输入时，第三步会在录制前提示补齐。实验噪声文件不能等同于完整 IMU 内参验收。
+
+实时预览、开始、结束、动作提示、进度在同一固定区域。录制结束后，自动整理并读回核对 BAG，
+再调用 Kalibr 计算。不要关闭启动终端。正常用户无需理解或手动寻找 BAG。
+
+完成后显示结果保存路径和“打开结果文件夹”。报告、下载和详细日志默认折叠，数据及旧结果保留。
+任务失败也会显示保留的结果目录；可以展开日志查看原因，不必直接重新录制。
+
+## 单独验证已有结果（额外功能）
+
+展开“单独验证已有结果”：选择另一段独立录制，导入第三步输出的联合外参 YAML 和对应的
+IMU 噪声 YAML，点击“开始验证”。不要把计算参数的原录制冒充独立验证。
 
 验证锁住相机内参、双目基线、Camera–IMU 外参及时间偏移，只拟合该段轨迹、重力方向和
-IMU 偏置曲线。应选择另一段独立录制；它是条件一致性检查，不是完全开环预测。
-当前固定验证适配器只支持已复核的 Kalibr 源码版本，不匹配会保留日志并停止。
-无论成功生成文件与否，都不自动宣布质量验收；实验噪声与时间定义仍需复核。
+IMU 偏置，再报告残差。这是条件一致性检查，不是完全开环预测或硬件同步证明。
 
-## 当前 2UQ2 常用路径（仅本次设备，不是通用默认参数）
+需要重算已有数据时，可展开其中的“高级：处理已有录制”，不影响正常主流程。
+数据仅在当前容器已挂载的数据根目录内选择；大 BAG 不通过浏览器上传。
 
-- 独立数据 BAG 目录：`/home/key/文档/kalibr/data/camera_imu/2UQ2/joint_experimental_input_t70cgnxk`
-- Camera YAML：`/home/key/文档/kalibr/data/camera_imu/2UQ2/camera_recheck_qo1Ycf3T/camera-camchain.yaml`
-- IMU YAML：`/home/key/文档/kalibr/data/camera_imu/2UQ2/joint_experimental_input_t70cgnxk/imu-experimental.yaml`
-- 联合外参 YAML：`/home/key/文档/kalibr/data/camera_imu/2UQ2/joint_camera_updated_hDPklVhP/camera_imu-camchain-imucam.yaml`
-- 已完成固定验证：`/home/key/文档/kalibr/data/camera_imu/2UQ2/joint_fixed_check_45b8s7du`
+## 当前 2UQ2 已有文件（仅本次设备，不能当作其他头环的默认参数）
 
-## 验证范围
+数据根目录：`/home/key/文档/kalibr/data/camera_imu/2UQ2/`
 
-后台计算及固定验证已通过此前独立脚本实机执行。新增界面与后台连接经过软件检查，
-尚待本次桌面 App 实机验证。停止按钮只停止本次任务；关闭启动终端也会停止当前任务。
-失败时数据保留，可下载 offline_review.tar.gz 供排查。不要在运行中拔插设备或修改源数据。
+- 独立数据：`joint_experimental_input_t70cgnxk`
+- Camera：`camera_recheck_qo1Ycf3T/camera-camchain.yaml`
+- IMU：`joint_experimental_input_t70cgnxk/imu-experimental.yaml`
+- 联合外参：`joint_camera_updated_hDPklVhP/camera_imu-camchain-imucam.yaml`
+- 已完成固定参数验证：`joint_fixed_check_45b8s7du`
+
+## 当前验证范围
+
+后台求解、独立记录重复求解、固定参数检查此前已实机跑通。
+本次参数复用、自动交接与界面修改经过软件检查；新的桌面录制到自动计算流程仍需实机确认。
+继续使用实验时间映射和当前噪声权重，结果保留“需复核”，不自动宣布最终质量验收。
+本更新不要求重新录制已有两小时 IMU。完整开源发布与 README 下载命令仍待版本统一后同步。
