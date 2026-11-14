@@ -1,0 +1,25 @@
+<style>#offline_panel .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}#offline_panel .grid>div{min-width:0}#offline_panel p{overflow-wrap:anywhere}#off_files{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}#offline_panel .drop-zone{margin-top:8px}#offline_panel select{max-width:100%;text-overflow:ellipsis}@media(max-width:700px){#offline_panel .grid{grid-template-columns:1fr}}</style>
+<section id="offline_panel">
+<h2>已有数据：Camera–IMU 计算与验证</h2>
+<p>不需要重新录制。选择本机已保存的数据，导入参数后开始；原数据和旧结果都会保留。</p>
+<div class="grid">
+<div><label for="off_action">操作</label><select id="off_action"><option value="calibrate">计算联合外参与时间偏移</option><option value="validate">验证已有联合参数（固定外参与时间偏移）</option></select></div>
+<div><label for="off_dataset">已有联合数据</label><select id="off_dataset"><option value="">正在查找本机数据…</option></select></div>
+</div>
+<p id="off_source" class="hint"></p>
+<button id="off_refresh" type="button" class="secondary">刷新本机数据与参数</button>
+<div class="grid" style="margin-top:16px">
+<div id="off_camera_group"><label>Camera 参数 YAML</label><select id="off_camera_recent"><option value="">从本机已有参数中选择，或在下方拖入</option></select><div id="off_camera_drop" class="drop-zone" tabindex="0" role="button"><strong>拖入 Camera YAML，或点击选择</strong><p class="hint">单个 .yaml / .yml，最大 32 KiB</p></div><input id="off_camera" type="file" accept=".yaml,.yml"><p id="off_camera_name" class="hint">未选择</p></div>
+<div id="off_candidate_group" hidden><label>待验证的 Camera–IMU 联合外参 YAML</label><select id="off_candidate_recent"><option value="">选择已有联合结果，或在下方拖入</option></select><div id="off_candidate_drop" class="drop-zone" tabindex="0" role="button"><strong>拖入联合外参 YAML，或点击选择</strong><p class="hint">需包含 T_cam_imu 和 timeshift_cam_imu；最大 32 KiB</p></div><input id="off_candidate" type="file" accept=".yaml,.yml"><p id="off_candidate_name" class="hint">未选择</p></div>
+<div><label>IMU 噪声参数 YAML</label><select id="off_imu_recent"><option value="">从本机已有参数中选择，或在下方拖入</option></select><div id="off_imu_drop" class="drop-zone" tabindex="0" role="button"><strong>拖入 IMU YAML，或点击选择</strong><p class="hint">单个 .yaml / .yml，最大 32 KiB</p></div><input id="off_imu" type="file" accept=".yaml,.yml"><p id="off_imu_name" class="hint">未选择</p></div>
+</div>
+<p class="hint">标定板配置取自所选录制目录。请确保参数属于同一套头环和同一固定装配。验证时应选择另一段独立录制，不要用生成参数的同一段数据冒充独立验证。</p>
+<p id="off_explanation" class="hint"></p>
+<label style="display:flex;gap:10px;align-items:flex-start"><input id="off_ack" type="checkbox" style="width:auto;margin-top:7px">当前使用实验时间映射和输入的噪声参数；计算结果仍需复核，不能据此宣布硬件同步或最终质量验收。</label>
+<div class="actions"><button id="off_start" disabled>开始联合计算</button><button id="off_stop" class="secondary" disabled>停止本次计算</button><button id="off_open" class="secondary" disabled>打开结果目录</button></div>
+<p id="off_error" class="failed" role="alert"></p>
+<p id="off_status">等待选择已有数据。</p><progress id="off_progress" hidden></progress>
+<p id="off_output" class="hint"></p>
+<div id="off_metrics"></div><div id="off_files"></div>
+<details><summary>计算／验证运行日志</summary><pre id="off_logs"></pre></details>
+</section>

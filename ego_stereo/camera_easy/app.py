@@ -28,6 +28,7 @@ from pipeline import calculate
 from imu_capture import capture as capture_imu
 from imu_analysis import analyze as analyze_imu
 from joint import joint_motion, validate_inputs, save_inputs, inspect_capture, pack_review
+from offline import Offline, EXPORTS as OFFLINE_EXPORTS
 
 ROOT = Path(__file__).resolve().parent
 DOWNLOADS = {'camera-camchain.yaml', 'camera-results-cam.txt', 'camera-report-cam.pdf',
@@ -82,6 +83,7 @@ class App:
                 self.state['device_id'] = device_id(config['device_id'])
             except Exception:
                 pass
+        self.offline = Offline(self)
         self.boot()
 
     def log(self, line):
@@ -112,6 +114,7 @@ class App:
 
     def boot(self):
         with self.lock:
+            require(not self.offline.busy(), '已有数据计算或验证尚未结束')
             if self.state['mode'] in ('imu','camera_imu') and self.state['stage'] in ('DONE', 'FAILED') and self.thread and self.thread.is_alive():
                 require(not self.imu_thread or not self.imu_thread.is_alive(), 'IMU 任务正在结束，请稍候')
                 require(time.monotonic_ns() - self.frame_ns < 2_000_000_000, '预览已断开，请关闭并重新启动工具')
@@ -354,6 +357,7 @@ class App:
             self.update('FAILED',str(error))
 
     def close(self):
+        self.offline.cancel()
         self.stop.set()
         self.imu_cancel.set()
         if self.run and self.container:
@@ -379,10 +383,25 @@ class Handler(BaseHTTPRequestHandler):
         path = unquote(urlparse(self.path).path)
         try:
             if path == '/':
-                html = (ROOT / 'web.html').read_text().replace('__TOKEN__', self.server.token)
+                html = (ROOT / 'web.html').read_text().replace('<!--OFFLINE_PANEL-->', (ROOT/'offline.html').read_text()).replace('__TOKEN__', self.server.token)
                 return self.send_bytes(200, html.encode(), 'text/html; charset=utf-8')
+            if path == '/offline.js':
+                return self.send_bytes(200,(ROOT/'offline.js').read_bytes(),'application/javascript; charset=utf-8')
             if path == '/state':
                 return self.send_bytes(200, json.dumps(app.public(), ensure_ascii=False).encode())
+            if path == '/offline/catalog':
+                return self.send_bytes(200, json.dumps(app.offline.catalog(), ensure_ascii=False).encode())
+            if path == '/offline/state':
+                return self.send_bytes(200, json.dumps(app.offline.public(), ensure_ascii=False).encode())
+            if path.startswith('/offline/parameter/'):
+                return self.send_bytes(200, json.dumps(app.offline.parameter(path.rsplit('/',1)[1]), ensure_ascii=False).encode())
+            if path.startswith('/offline/files/'):
+                name=path.rsplit('/',1)[1]
+                require(name in OFFLINE_EXPORTS and app.offline.out, '未知结果文件')
+                file=app.offline.out/name
+                require(file.is_file(), '文件尚未生成')
+                kind='application/pdf' if name.endswith('.pdf') else 'application/octet-stream'
+                return self.send_bytes(200,file.read_bytes(),kind)
             if path == '/stream.mjpg':
                 self.send_response(200)
                 self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=ego_frame')
@@ -413,7 +432,13 @@ class Handler(BaseHTTPRequestHandler):
             size = int(self.headers.get('Content-Length', '0'))
             require(0 <= size <= 98304, '请求过大')
             value = json.loads(self.rfile.read(size) or b'{}')
-            if self.path == '/start': self.server.app.start(value)
+            if self.path == '/start':
+                with self.server.app.lock:
+                    require(not self.server.app.offline.busy(), '请先等待已有数据计算或验证结束')
+                    self.server.app.start(value)
+            elif self.path == '/offline/start': self.server.app.offline.start(value)
+            elif self.path == '/offline/stop': self.server.app.offline.cancel()
+            elif self.path == '/offline/open': self.server.app.offline.open_output()
             elif self.path == '/imu-experiment': self.server.app.generate_imu_experiment()
             elif self.path == '/finish': self.server.app.finish_early()
             elif self.path == '/reconnect': self.server.app.boot()

@@ -110,7 +110,8 @@ class HttpTests(unittest.TestCase):
         called = Mock()
         server = ThreadingHTTPServer(('127.0.0.1', 0), Handler); server.daemon_threads = True
         server.token = 'valid'
-        server.app = SimpleNamespace(start=called, run=Path('/tmp'), public=lambda: {'stage': 'READY'})
+        server.app = SimpleNamespace(start=called, run=Path('/tmp'), public=lambda: {'stage': 'READY'},
+                                     lock=threading.RLock(),offline=SimpleNamespace(busy=lambda:False))
         thread = threading.Thread(target=server.serve_forever, daemon=True); thread.start()
         base = f'http://127.0.0.1:{server.server_port}'
         try:
@@ -120,6 +121,18 @@ class HttpTests(unittest.TestCase):
             req = urllib.request.Request(base + '/start', data=b'{}', headers={'X-Ego-Token': 'valid'}, method='POST')
             with urllib.request.urlopen(req) as r: self.assertEqual(r.status, 200)
             called.assert_called_once_with({})
+            offline_start=Mock()
+            server.app.offline.start=offline_start
+            req=urllib.request.Request(base+'/offline/start',data=b'{}',method='POST')
+            with self.assertRaises(urllib.error.HTTPError):urllib.request.urlopen(req)
+            offline_start.assert_not_called()
+            req=urllib.request.Request(base+'/offline/start',data=b'{"action":"validate"}',headers={'X-Ego-Token':'valid'},method='POST')
+            with urllib.request.urlopen(req) as r:self.assertEqual(r.status,200)
+            offline_start.assert_called_once_with({'action':'validate'})
+            with urllib.request.urlopen(base+'/') as r:
+                html=r.read().decode()
+                self.assertIn('id="offline_panel"',html)
+                self.assertIn('id="off_candidate"',html)
             with self.assertRaises(urllib.error.HTTPError): urllib.request.urlopen(base + '/files/../../etc/passwd')
         finally:
             server.shutdown(); server.server_close(); thread.join()
