@@ -1,0 +1,72 @@
+{
+  "status": "DIAGNOSTIC_ONLY",
+  "video_stream_enabled": true,
+  "browser_preview_enabled": false,
+  "quality_accepted": false,
+  "phases": [
+    {
+      "name": "A_10ms",
+      "status": "CAPTURE_COMPLETED",
+      "elapsed_seconds": 60.01543551101349,
+      "samples": 48496,
+      "packets": 3464,
+      "errors": 0,
+      "duplicates": 0,
+      "gaps": 7,
+      "missing_estimated": 98,
+      "counter_discontinuities": 0,
+      "counter_wraps_24bit": 0,
+      "poll_wait_seconds": 0.01,
+      "missing_fraction": 0.002016709881878421,
+      "unique_samples_per_host_second": 808.0587866616489
+    },
+    {
+      "name": "B_5ms",
+      "status": "CAPTURE_COMPLETED",
+      "elapsed_seconds": 60.00940484998864,
+      "samples": 48552,
+      "packets": 3468,
+      "errors": 2965,
+      "duplicates": 0,
+      "gaps": 3,
+      "missing_estimated": 42,
+      "counter_discontinuities": 0,
+      "counter_wraps_24bit": 0,
+      "poll_wait_seconds": 0.005,
+      "missing_fraction": 0.000864304235090752,
+      "unique_samples_per_host_second": 809.0731798019021
+    },
+    {
+      "name": "A2_10ms",
+      "status": "CAPTURE_COMPLETED",
+      "elapsed_seconds": 60.00655667099636,
+      "samples": 48580,
+      "packets": 3470,
+      "errors": 1,
+      "duplicates": 0,
+      "gaps": 0,
+      "missing_estimated": 0,
+      "counter_discontinuities": 0,
+      "counter_wraps_24bit": 0,
+      "poll_wait_seconds": 0.01,
+      "missing_fraction": 0.0,
+      "unique_samples_per_host_second": 809.578197701864
+    }
+  ],
+  "note": "Sequential 60s A/B/A test with the normal FFmpeg video stream continuously drained; no browser JPEG rendering. Not long-run validation.",
+  "video_frames_drained": 1803,
+  "comparison_completed": true,
+  "source_review_sha256": "b3ff929f952217e023ad874ca976f46137f4b206f44f35244f039f556b18d977",
+  "error_reasons_by_phase": {
+    "B_5ms": {
+      "[Errno 32] Broken pipe": 2965
+    },
+    "A_10ms": {},
+    "A2_10ms": {
+      "[Errno 32] Broken pipe": 1
+    }
+  },
+  "review_conclusion": "5ms did not improve both metrics: 2965 EPIPE failures and 42 missing samples, while final 10ms phase had zero gaps and one EPIPE. Keep 10ms default. No causal attribution of residual gaps or missing gyro-Z random-walk term; no more identical short wait sweeps justified by this evidence.",
+  "production_default_changed": false,
+  "long_run_verified": false
+}
