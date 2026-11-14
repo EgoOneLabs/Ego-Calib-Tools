@@ -15,7 +15,7 @@
     "node --check"
   ],
   "algorithm_modifications": false,
-  "next_required_test": "Actual 60 second UVC XU capture while color preview streams, then review imu_small_review.tar.gz before 2h recording",
+  "next_required_test": "2 hour stationary recording without automatic warmup, then inspect long-term noise and continuity",
   "reported_first_install_failure": "ENTRYPOINT, runtime ROS cache and exact-path Git audit fixes incorporated; actual user machine optimization completed after manual repair.",
   "runtime_ros_cache_fix": "Copy baked root rosdep cache offline to runtime ROS_HOME; preflight imports actual Kalibr modules and verifies ds-none instead of testing help exit status.",
   "git_audit_fix": "Use command-scoped safe.directory for exact Kalibr source path; actual Git ownership rejection and success tested without global config changes.",
@@ -42,5 +42,15 @@
     "synthetic 60 second CSV/PDF pipeline",
     "mode validation and joint rejection"
   ],
-  "graphical_browser_test_limitation": "Headless Chromium blocked by runtime socket permissions; HTML/JS syntax checked."
+  "graphical_browser_test_limitation": "Headless Chromium blocked by runtime socket permissions; HTML/JS syntax checked.",
+  "automatic_warmup_removed": true,
+  "user_reported_imu_short_trial": {
+    "duration_seconds": 60.01153019099729,
+    "samples": 48580,
+    "read_errors": 0,
+    "duplicates": 0,
+    "counter_gaps": 2,
+    "missing_estimated": 28,
+    "sample_rate_estimate_hz": 809.8401502557471
+  }
 }

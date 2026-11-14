@@ -20,10 +20,10 @@
     "workflow/check_session.py": "98ba2889711d33c77f77e642fcf9765fa766b96b4925bf9dd216b41a7f8495f2",
     "workflow/prepare_camera.py": "d9b198e6e6e95ff8e4ff4538ec1c51fbaa7a596afe2c0713c45d395387fba724",
     "workflow/test_workflow.py": "e5785c63d6ea7ea4a77e38872958b0a5b1792984bbee75f9d641ee2f2005a2d3",
-    "camera_easy/web.html": "76d05b60e683199391f9420622f0d7a9a3b31118b74ca4f84b70528ba98bd743",
+    "camera_easy/web.html": "ffd64c95564e9b789c3a320b0b70e8c899ac0860cd21d49278dda4add1150ef7",
     "camera_easy/environment.py": "e95cef6cc29d67411d7d092c56cf378e8776aea90c08322d7ff22227b6db5341",
     "camera_easy/bag_writer.py": "fe51c49e40401258ebd7d0966ea251155a648ad290b5d9cb3ee1aacf333d49d2",
-    "camera_easy/app.py": "8d563eb131252e3a68cf4f9281ff5c3eaf435a7d32100ac73c5e86acd0a311c8",
+    "camera_easy/app.py": "c399e90345a405ae02c867dc6a0db74a4b0e1a010f6f1cfe0afe1818e39bdb69",
     "camera_easy/README.zh-CN.md": "ef125d2cc7d57e0f5248dd5d2c171483c9f88b262db84c2804c020164d337a11",
     "camera_easy/hardware.py": "b801a580ddc8f677ff8a5bf5f975949b31cb830d4a2e33cffa129e0a284aa7f3",
     "camera_easy/pipeline.py": "42e472925878ed42237a218e8f5d78a48ed7ad967c18476498638b6091a7b39f",
@@ -31,7 +31,7 @@
     "camera_easy/core.py": "14a78bf92b7438298a0d5799877fce080eb3f941583bca8ce70f1508282a6c46",
     "camera_easy/install.sh": "68647884b2dfbde02e98d3a7f75980ec62e833d388241a7d7063ef29f79360c4",
     "camera_easy/test_easy.py": "899c12864b9777fea487cf3331cd00d98687b5559e15f7da9ef3a61a8cef41e5",
-    "camera_easy/VALIDATION.json": "6c6a9fc5022a4a5aff9577d2af7cb6e2ece0d9bd73f512a5b24bd7c285c5f750",
+    "camera_easy/VALIDATION.json": "3937051f4bf138e837e685b0dd176d0a080b2b7832084c7d2e83da435efaa791",
     "camera_easy/build_installer.py": "22910f2c9cb8edc584918b237df970178d50c6ba92fb2044a8423052c6521c48",
     "camera_easy/INSTALL_SIMPLE.zh-CN.md": "253c3fd3afa4894e3836e346e4a0bec4df3de5669f3408fb065391957c2a0c8a",
     "camera_easy/make_full.py": "5902f8ac8dfe0ff2435189ee96597310d537deef7e1bef34d71a4dfdd81f72d2",
@@ -41,8 +41,8 @@
     "camera_easy/download-install.sh": "66a3317bb5f125423d1198e59025194dfb40fcd1a1376ce045a0ab6902899b1d",
     "camera_easy/extract_environment.py": "a2ae0de7d39907aa0595d5f76e9cb399515632d7838aff6354eb6f31d34cf597",
     "camera_easy/imu_analysis.py": "64e82d152fed43113b41eba43a68e6c1cfb2a2f4dfb567a882e82291e405d118",
-    "camera_easy/IMU_MODULE.zh-CN.md": "abf55e14ec3ebbac36163a611f4bb9694fb8f4fc77add867de7b13837d1f0d38",
-    "camera_easy/test_imu.py": "a29757ae4de50012295ba764ea9d042aecc17fe0e6a051ea18e43a73910aed14",
-    "camera_easy/imu_capture.py": "0e82581736f3dc1f871d1a5b209a5e544fbe311c2415988b9b17c234eeace398"
+    "camera_easy/IMU_MODULE.zh-CN.md": "b78f41e7e21db0f1b4e112c0067116fedaaad246184a30157cbea2ebd8890471",
+    "camera_easy/test_imu.py": "43cff27a523f38f856223d677187ff40fc099e3153f9352734e640b416b6a13e",
+    "camera_easy/imu_capture.py": "e3e41e701979c33594cd59ce77f7af1f24a550417ddff59aeb263bcbed74b1fa"
   }
 }

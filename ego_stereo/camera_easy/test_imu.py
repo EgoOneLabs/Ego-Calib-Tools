@@ -53,7 +53,7 @@ class ImuTests(unittest.TestCase):
                 return packet((self.n-1)*448),time.monotonic_ns(),time.monotonic_ns()
             def close(self):self.closed=True
         with tempfile.TemporaryDirectory() as d:
-            r=capture(d,'/dev/not-used',7200,0,threading.Event(),finish,lambda *a:None,Reader)
+            r=capture(d,'/dev/not-used',7200,threading.Event(),finish,lambda *a:None,Reader)
             self.assertEqual(r['status'],'CAPTURE_STOPPED_EARLY')
             self.assertEqual(r['samples'],140)
             self.assertEqual(Path(d,'imu_packets.bin').stat().st_size,2520)
@@ -69,7 +69,7 @@ class ImuTests(unittest.TestCase):
             def close(self):pass
         with tempfile.TemporaryDirectory() as d:
             with self.assertRaisesRegex(ValueError,'20'):
-                capture(d,'x',60,0,threading.Event(),threading.Event(),lambda *a:None,Broken)
+                capture(d,'x',60,threading.Event(),threading.Event(),lambda *a:None,Broken)
             report=json.loads(Path(d,'imu_capture.json').read_text())
             self.assertEqual(report['status'],'CAPTURE_ABORTED')
             self.assertEqual(report['errors'],20)

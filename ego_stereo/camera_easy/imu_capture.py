@@ -73,12 +73,12 @@ class Continuity:
         return self.segment,self.tick
 
 
-def capture(run,device,seconds,warmup,stop,finish,notify,reader_factory=XuReader):
+def capture(run,device,seconds,stop,finish,notify,reader_factory=XuReader):
     run=Path(run); c=Continuity();count=0;packets=0;errors=0;consecutive=0
     reader=None;completed=False;error=None
-    started=time.monotonic(); warm_end=started+warmup; record_start=None
+    record_start=time.monotonic()
     stats={'status':'RUNNING','quality_accepted':False,'requested_seconds':seconds,
-           'warmup_seconds':warmup,'timestamp_semantics':'Host request interval is packet timing only; raw counter unit and exposure relation are not vendor-confirmed. No per-sample timestamps invented.',
+           'warmup_seconds':0,'timestamp_semantics':'Host request interval is packet timing only; raw counter unit and exposure relation are not vendor-confirmed. No per-sample timestamps invented.',
            'nominal_scale':{'accel_counts_per_g':4096,'gyro_counts_per_deg_s':16.4,'per_unit_calibrated':False}}
     (run/'imu_capture.json').write_text(json.dumps(stats,ensure_ascii=False,indent=2))
     try:
@@ -89,8 +89,7 @@ def capture(run,device,seconds,warmup,stop,finish,notify,reader_factory=XuReader
             sw.writerow(['segment','tick_index','counter_raw','packet','host_before_ns','host_after_ns','ax_raw','ay_raw','az_raw','gx_raw','gy_raw','gz_raw','ax_m_s2','ay_m_s2','az_m_s2','gx_rad_s','gy_rad_s','gz_rad_s'])
             last_flush=time.monotonic();last_notify=0
             while not stop.is_set():
-                now=time.monotonic();warming=now<warm_end
-                if not warming and record_start is None:record_start=now
+                now=time.monotonic()
                 if record_start is not None and now-record_start>=seconds:
                     completed=True;break
                 if finish.is_set():break
@@ -99,27 +98,25 @@ def capture(run,device,seconds,warmup,stop,finish,notify,reader_factory=XuReader
                     raw,before,after=reader.read()
                     rows=decode_packet(raw);consecutive=0
                     added=0
-                    if not warming:
-                        binary.write(raw);packets+=1
-                        for counter,*axes in rows:
-                            accepted=c.accept(counter)
-                            if accepted is None:continue
-                            segment,tick=accepted
-                            sw.writerow([segment,tick,counter,packets,before,after,*axes,
-                                *[a*SCALE_ACC for a in axes[:3]],*[g*SCALE_GYRO for g in axes[3:]]])
-                            count+=1;added+=1
-                    rw.writerow([stats.get('requests',0),before,after,'warmup' if warming else 'record',len(raw),True,added,''])
+                    binary.write(raw);packets+=1
+                    for counter,*axes in rows:
+                        accepted=c.accept(counter)
+                        if accepted is None:continue
+                        segment,tick=accepted
+                        sw.writerow([segment,tick,counter,packets,before,after,*axes,
+                            *[a*SCALE_ACC for a in axes[:3]],*[g*SCALE_GYRO for g in axes[3:]]])
+                        count+=1;added+=1
+                    rw.writerow([stats.get('requests',0),before,after,'record',len(raw),True,added,''])
                 except (OSError,ValueError) as e:
                     errors+=1;consecutive+=1
-                    rw.writerow([stats.get('requests',0),before,time.monotonic_ns(),'warmup' if warming else 'record',len(raw),False,0,str(e)])
+                    rw.writerow([stats.get('requests',0),before,time.monotonic_ns(),'record',len(raw),False,0,str(e)])
                     if consecutive>=20:raise ValueError('IMU 连续 20 次读取失败：'+str(e)) from e
                 stats['requests']=stats.get('requests',0)+1
                 now=time.monotonic()
                 if now-last_notify>=.5:
-                    notify('WARMING' if warming else 'IMU_RECORDING',
+                    notify('IMU_RECORDING',
                         {'samples':count,'packets':packets,'errors':errors,'gaps':c.gaps,
-                         'duplicates':c.duplicates,'elapsed':0 if record_start is None else round(now-record_start,1),
-                         'warmup_remaining':max(0,math.ceil(warm_end-now))})
+                         'duplicates':c.duplicates,'elapsed':0 if record_start is None else round(now-record_start,1)})
                     last_notify=now
                 if now-last_flush>=2:
                     for f in (binary,requests,samples):f.flush()

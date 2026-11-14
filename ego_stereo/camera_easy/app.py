@@ -66,7 +66,7 @@ class App:
         self.state = dict(stage='CHECKING', message='正在检查 Linux、Docker 和 Kalibr 环境…',
                           pairs=0, elapsed=0, duration=60, result=None, output='',
                           board=asdict(Board()), device_id='2UQ2', mode='camera',
-                          samples=0, packets=0, errors=0, gaps=0, duplicates=0, warmup_remaining=0)
+                          samples=0, packets=0, errors=0, gaps=0, duplicates=0)
         self.config = Path.home() / '.config' / 'EgoStereoIMU' / 'camera_easy.json'
         if self.config.is_file():
             try:
@@ -233,7 +233,7 @@ class App:
             self.run.mkdir()
             (self.run / 'hardware.json').write_text(json.dumps(self.hardware, ensure_ascii=False, indent=2))
             self.end_capture.clear(); self.imu_cancel.clear()
-            self.state.update(stage='WARMING', mode='imu', device_id=ident, duration=seconds,
+            self.state.update(stage='IMU_RECORDING', mode='imu', device_id=ident, duration=seconds,
                 elapsed=0, samples=0, packets=0, errors=0, gaps=0, duplicates=0,
                 message='正在检查 IMU 读取，请保持头环静止。', result=None, output=str(self.run))
             self.imu_thread = threading.Thread(target=self.imu_loop,
@@ -245,10 +245,9 @@ class App:
             def notify(stage, values):
                 with self.lock:
                     self.state.update(stage=stage, **values)
-                    self.state['message'] = ('预热中，请保持头环静止。剩余 '+str(values['warmup_remaining'])+' 秒。'
-                        if stage=='WARMING' else '正在记录 IMU。保持静止，不要碰桌面、拉线或移动头环。')
+                    self.state['message'] = '正在记录 IMU。保持静止，不要碰桌面、拉线或移动头环。'
                 self.persist()
-            capture_imu(run,self.hardware['device'],seconds,0 if seconds==60 else 300,
+            capture_imu(run,self.hardware['device'],seconds,
                         self.imu_cancel,self.end_capture,notify)
             if self.imu_cancel.is_set(): raise InterruptedError('IMU 已停止，原始数据保留')
             result = analyze_imu(run,self.imu_cancel,self.update)
@@ -264,7 +263,7 @@ class App:
     def finish_early(self):
         with self.lock:
             if self.state['mode'] == 'imu':
-                require(self.state['stage'] in ('WARMING','IMU_RECORDING'), '当前没有 IMU 采集任务')
+                require(self.state['stage'] == 'IMU_RECORDING', '当前没有 IMU 采集任务')
                 self.end_capture.set()
                 return
             require(self.state['stage'] == 'RECORDING' and self.state['pairs'] >= 40,
