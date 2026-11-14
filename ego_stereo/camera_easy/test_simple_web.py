@@ -43,6 +43,15 @@ const tick=()=>new Promise(resolve=>setTimeout(resolve,0));
         checks=r'''
 (async()=>{
  assert.equal(pending.length,1);
+ assert.equal(get('offline_panel').hidden,false);assert.equal(get('offline_panel').open,false);
+ get('offline_panel').open=true;get('mode').value='imu';get('mode').onchange();
+ assert.equal(get('offline_panel').hidden,true);assert.equal(get('offline_panel').open,false);
+ get('mode').value='camera';get('mode').onchange();assert.equal(get('offline_panel').hidden,true);
+ get('mode').value='camera_imu';get('mode').onchange();assert.equal(get('offline_panel').hidden,false);
+ assert.equal(get('offline_panel').open,false);
+ // Resolve all earlier requests before checking stale device defaults.
+ for(const item of pending)item.resolve({ok:true,json:async()=>({})});await tick();pending.length=0;
+ get('mode').onchange();assert.equal(pending.length,1);
  get('device_id').value='OTHER';get('device_id').change();assert.equal(pending.length,2);
  const result=name=>({ok:true,json:async()=>({camera:{name,path:'/data/'+name,text:name}})});
  pending[1].resolve(result('current.yaml'));await tick();

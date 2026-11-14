@@ -59,7 +59,7 @@ class FlowTests(unittest.TestCase):
             self.assertIn(token,card)
         self.assertIn('#capture_panel{position:sticky',html)
         separate=Path(__file__).with_name('offline.html').read_text()
-        self.assertIn('<details id="offline_panel">',separate)
+        self.assertIn('<details id="offline_panel" hidden>',separate)
         self.assertNotIn('<details id="offline_panel" open',separate)
 
 

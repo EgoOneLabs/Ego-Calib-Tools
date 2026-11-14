@@ -1,14 +1,14 @@
 # 头环标定工具：简化录制与自动计算
 
-界面版本：20261114-SIMPLE-FLOW。支持从已安装的 YAML-DROP 或 JOINT-GUI 版本小更新，
+界面版本：20261114-CLEAR-FLOW。支持从已安装的 YAML-DROP、JOINT-GUI 或 SIMPLE-FLOW 版本小更新，
 复用现有环境及桌面入口，不重新安装 Docker，不修改已有录制与结果。
 
 先在旧工具启动终端按 Ctrl+C 退出，再运行：
 
 ```bash
 cd "$(xdg-user-dir DOWNLOAD)" &&
-unzip -oq simple-ui.zip &&
-/usr/bin/python3 simple-ui/update.py
+unzip -oq clear-ui.zip &&
+/usr/bin/python3 clear-ui/update.py
 ```
 
 工具会核对版本并备份旧程序，随后启动同一个“头环标定工具”。关闭浏览器不等于退出程序；
@@ -25,7 +25,7 @@ unzip -oq simple-ui.zip &&
 | 文件 | 来源 |
 |---|---|
 | Camera 相机参数 YAML | 第一步输出 camera-camchain.yaml |
-| IMU 噪声参数 YAML | 第二步输出；当前可用实验文件为 imu-experimental.yaml |
+| IMU 噪声参数 YAML | 第二步输出 imu-candidate.yaml；当前实验文件为 imu-experimental.yaml |
 
 本 App 刚生成或上次明确使用的同设备参数会自动带入，显示名称供核对。首次使用可直接拖入。
 如果文件移动、改变或切换设备，则不会静默复用。标定板配置从界面确认的实测尺寸生成，无需拖入。
@@ -39,7 +39,7 @@ unzip -oq simple-ui.zip &&
 
 ## 单独验证已有结果（额外功能）
 
-展开“单独验证已有结果”：选择另一段独立录制，导入第三步输出的联合外参 YAML 和对应的
+第三步页面底部有默认折叠的“可选：联合标定结果复核（一般无需展开）”。它不会显示在 Camera、IMU 页面，切换模块会收起。正常采集计算可以忽略。需要复核时展开：选择另一段独立录制，导入第三步输出的联合外参 YAML 和对应的
 IMU 噪声 YAML，点击“开始验证”。不要把计算参数的原录制冒充独立验证。
 
 验证锁住相机内参、双目基线、Camera–IMU 外参及时间偏移，只拟合该段轨迹、重力方向和

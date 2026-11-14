@@ -7,15 +7,15 @@
 <div class="actions"><button id="off_open" class="secondary" disabled>打开结果文件夹</button><button id="off_stop" class="secondary" disabled hidden>停止本次计算</button></div>
 <details><summary>查看报告、误差和运行日志</summary><div id="off_metrics"></div><div id="off_files"></div><pre id="off_logs"></pre></details>
 </section>
-<details id="offline_panel">
-<summary>单独验证已有结果</summary>
-<p>已有联合参数时，选择另一段独立录制，导入下面两个文件，点击验证。无需重复 Camera 和静止 IMU 录制。</p>
+<details id="offline_panel" hidden>
+<summary>可选：联合标定结果复核（一般无需展开）</summary>
+<p>用途：固定第三步算出的参数，检查它们在另一段独立运动数据上是否仍能对应。此项不是 Camera、IMU 采集或第三步计算的必填步骤；正常录制与计算不需要展开。需要复核时，选择另一段数据并拖入下方两个文件。</p>
 <label for="off_dataset">选择用于验证的独立录制<select id="off_dataset"><option value="">正在查找本机数据…</option></select></label>
 <p id="off_source" class="hint"></p>
 <div class="grid">
-<div id="off_camera_group" hidden><label>Camera 相机参数</label><select id="off_camera_recent"><option value="">选择本机参数，或拖入文件</option></select><div id="off_camera_drop" class="drop-zone" tabindex="0" role="button"><strong>拖入 Camera YAML，或点击选择</strong></div><input id="off_camera" type="file" accept=".yaml,.yml" hidden><p id="off_camera_name" class="hint">未选择</p></div>
-<div id="off_candidate_group"><label>第三步输出的联合外参 YAML</label><select id="off_candidate_recent"><option value="">选择已有联合结果，或拖入文件</option></select><div id="off_candidate_drop" class="drop-zone" tabindex="0" role="button"><strong>拖入联合外参，或点击选择</strong><p class="hint">包含 T_cam_imu 与 timeshift_cam_imu</p></div><input id="off_candidate" type="file" accept=".yaml,.yml" hidden><p id="off_candidate_name" class="hint">未选择</p></div>
-<div><label>第二步输出的 IMU 噪声参数 YAML</label><select id="off_imu_recent"><option value="">选择本机参数，或拖入文件</option></select><div id="off_imu_drop" class="drop-zone" tabindex="0" role="button"><strong>拖入 IMU 参数，或点击选择</strong><p class="hint">可使用当前的 imu-experimental.yaml</p></div><input id="off_imu" type="file" accept=".yaml,.yml" hidden><p id="off_imu_name" class="hint">未选择</p></div>
+<div id="off_camera_group" hidden><label>Camera 相机参数</label><details><summary>或从本机已有参数中选择</summary><select id="off_camera_recent"><option value="">选择本机参数，或拖入文件</option></select></details><div id="off_camera_drop" class="drop-zone" tabindex="0" role="button"><strong>拖入 Camera YAML，或点击选择</strong></div><input id="off_camera" type="file" accept=".yaml,.yml" hidden><p id="off_camera_name" class="hint">未选择</p></div>
+<div id="off_candidate_group"><label>第三步输出：joint-camchain-imucam.yaml</label><details><summary>或从本机已有参数中选择</summary><select id="off_candidate_recent"><option value="">选择已有联合结果，或拖入文件</option></select></details><div id="off_candidate_drop" class="drop-zone" tabindex="0" role="button"><strong>拖入联合外参，或点击选择</strong><p class="hint">新版本为 joint-camchain-imucam.yaml；旧版本也可使用 camera_imu-camchain-imucam.yaml</p></div><input id="off_candidate" type="file" accept=".yaml,.yml" hidden><p id="off_candidate_name" class="hint">未选择</p></div>
+<div><label>第二步输出：IMU 噪声参数 YAML</label><details><summary>或从本机已有参数中选择</summary><select id="off_imu_recent"><option value="">选择本机参数，或拖入文件</option></select></details><div id="off_imu_drop" class="drop-zone" tabindex="0" role="button"><strong>拖入 IMU 参数，或点击选择</strong><p class="hint">可使用当前的 imu-experimental.yaml</p></div><input id="off_imu" type="file" accept=".yaml,.yml" hidden><p id="off_imu_name" class="hint">未选择</p></div>
 </div>
 <p class="hint">文件必须对应同一套头环和固定装配。当前使用实验时间映射与噪声参数，结果需要复核。</p>
 <input id="off_ack" type="checkbox" checked hidden>

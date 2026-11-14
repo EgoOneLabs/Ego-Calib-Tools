@@ -18,8 +18,14 @@
    }
   }catch(e){document.getElementById('parameter_note').textContent=e.message+'；也可以手动拖入两个参数文件。';}
  }
+ const review=document.getElementById('offline_panel');
+ function resetReview(){
+  // Optional review never opens automatically or appears in Camera/IMU capture.
+  review.open=false;review.hidden=mode.value!=='camera_imu';
+ }
  const changeMode=mode.onchange;
- mode.onchange=()=>{if(changeMode)changeMode();loadDefaults();};
+ mode.onchange=()=>{if(changeMode)changeMode();resetReview();loadDefaults();};
+ resetReview();
  device.addEventListener('change',()=>{
   generation++;
   for(const id of ['joint_camera_file','joint_imu_file']){

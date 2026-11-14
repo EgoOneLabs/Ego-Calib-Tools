@@ -1,8 +1,8 @@
 # 头环标定工具：统一入口（开发验证版）
 
-Camera 和 IMU 共用程序、设备与结果目录。IMU 使用步骤见 [IMU 模块](IMU_MODULE.zh-CN.md)。Camera–IMU 已接入运动数据录制与前置检查；[操作顺序、计算条件和验证方法](CAMERA_IMU.zh-CN.md)。正式求解尚待联合时间轴与 BAG 复核。
+Camera、IMU、Camera–IMU 共用同一 App。选择模块后按页面录制、计算，结束显示结果路径。IMU 使用步骤见 [IMU 模块](IMU_MODULE.zh-CN.md)，第三步所需文件及可选复核见 [Camera–IMU 操作说明](CAMERA_IMU.zh-CN.md)。当前联合求解使用实验时间映射和噪声权重，结果需结合报告判断。
 
-# 双目相机标定：一键入口 v1.2（彩色预览）
+## Camera 模块（彩色预览）
 
 本入口的 Camera 模块处理 2UQ2 的相机标定。头环直接接 Linux 电脑，不经过手机；固定头环，按页面提示移动标定板。60 秒采集结束后自动生成并读回核对 BAG，再运行 Kalibr 的 ds-none 双目模型。
 
