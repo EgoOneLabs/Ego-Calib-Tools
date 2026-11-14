@@ -1,0 +1,17 @@
+{
+  "status": "EXPERIMENTAL_JOINT_BAG_READBACK_VERIFIED",
+  "counts": {
+    "/imu0": 48160,
+    "/cam0/image_raw": 490,
+    "/cam1/image_raw": 490
+  },
+  "bag_sha256": "5772f2f8d6536f0b3c58317522363d2b9b257c3cb1571261407fd8419326df21",
+  "all_image_pixels_verified": true,
+  "all_imu_values_verified": true,
+  "all_header_and_bag_times_verified": true,
+  "hardware_sync_verified": false,
+  "quality_accepted": false,
+  "joint_optimization_executed": false,
+  "source_output": "/home/key/文档/kalibr/data/camera_imu/2UQ2/joint_experimental_input_owwzethi",
+  "time_mapping_status": "EXPERIMENTAL_NOT_EXPOSURE_SYNC_VERIFIED"
+}

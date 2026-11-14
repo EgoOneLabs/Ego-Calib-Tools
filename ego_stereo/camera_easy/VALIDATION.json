@@ -1,6 +1,6 @@
 {
   "status": "JOINT_RAW_CAPTURE_SOFTWARE_CHECKS_PASS_HARDWARE_PENDING",
-  "tests_passed": 51,
+  "tests_passed": 53,
   "test_command": "python3 -m unittest discover -s ego_stereo/camera_easy -p 'test_*.py' -v",
   "real_ros1_bag_io_tested": true,
   "real_full_3840x1080_pixel_split_tested": true,
@@ -96,5 +96,7 @@
     "imu_samples": 48160,
     "backend": "rosbags",
     "full_490_pair_bag_verified": false
-  }
+  },
+  "joint_full_490_pair_rosbag_readback_on_user_machine": true,
+  "current_joint_optimization_on_user_machine": false
 }
