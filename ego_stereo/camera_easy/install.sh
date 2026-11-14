@@ -7,7 +7,7 @@ source /etc/os-release
   echo "本安装入口面向 Ubuntu 22.04/24.04 桌面版；其他发行版请手动安装依赖。"; exit 1;
 }
 sudo apt-get update
-PACKAGES=(python3 python3-opencv python3-numpy python3-yaml python3-matplotlib ffmpeg v4l-utils xdg-utils zenity)
+PACKAGES=(python3 python3-opencv python3-numpy python3-yaml python3-matplotlib python3-scipy ffmpeg v4l-utils xdg-utils zenity)
 command -v docker >/dev/null || PACKAGES+=(docker.io)
 sudo apt-get install -y "${PACKAGES[@]}"
 sudo systemctl enable --now docker

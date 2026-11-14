@@ -33,7 +33,7 @@ ROOT = Path(__file__).resolve().parent
 DOWNLOADS = {'camera-camchain.yaml', 'camera-results-cam.txt', 'camera-report-cam.pdf',
              'camera_easy_small_review.tar.gz', 'aprilgrid.yaml', 'calculation.json',
              'imu_capture.json', 'imu-analysis.json', 'imu-results.txt', 'imu-report.pdf',
-             'imu-allan.csv', 'imu-candidate.yaml', 'imu_small_review.tar.gz', 'imu_error.txt',
+             'imu_experimental_review.tar.gz', 'imu-experimental.yaml', 'imu-experimental-fit.json', 'imu-allan.csv', 'imu-candidate.yaml', 'imu_small_review.tar.gz', 'imu_error.txt',
              'joint_dependencies.json', 'joint_capture.json', 'joint_clock.json',
              'camera_imu-results.txt', 'camera_imu_small_review.tar.gz', 'joint_error.txt',
              'camera_imu-camchain-imucam.yaml', 'camera_imu-report-imucam.pdf',
@@ -239,6 +239,15 @@ class App:
                               elapsed=0, result=None, output=str(run), board=asdict(board), device_id=ident)
         self.persist()
 
+    def generate_imu_experiment(self):
+        from imu_experimental import generate
+        with self.lock:
+            require(self.state['mode']=='imu' and self.state['stage']=='DONE', '请先完成当前 IMU 分析')
+            report=generate(self.run)
+            self.state['message']='实验混合模型权重已生成；局部斜率结果保留，尚未通过动态残差和重复性验收。'
+            self.state['result']['experimental_weights_available']=True
+            self.state['result']['experimental_weights_status']=report['status']
+
     def start_imu(self, value):
         ident = device_id(value['device_id'])
         seconds = float(value.get('imu_seconds', 7200))
@@ -405,6 +414,7 @@ class Handler(BaseHTTPRequestHandler):
             require(0 <= size <= 98304, '请求过大')
             value = json.loads(self.rfile.read(size) or b'{}')
             if self.path == '/start': self.server.app.start(value)
+            elif self.path == '/imu-experiment': self.server.app.generate_imu_experiment()
             elif self.path == '/finish': self.server.app.finish_early()
             elif self.path == '/reconnect': self.server.app.boot()
             else: raise ValueError('未知操作')

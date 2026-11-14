@@ -182,3 +182,8 @@
 旧 IMU 复核目录：/home/key/Downloads/EgoStereoIMU-static-noise-raw-review-v1；旧联合目录：/home/key/文档/kalibr/data/2uq2_camera_imu_trials/trial_jbi7p1st、/home/key/文档/kalibr/data/2uq2_independent_blhd1uwr/original_chain、/home/key/文档/kalibr/data/2uq2_repeat_o6y8nj4w/original_chain。下一步先对照旧 model_fit.json、实验 YAML 与时间映射脚本，再决定新入口如何复用实验求解和呈现可信边界，不通过无依据填数解除门槛。
 
 最新统一工具 60 秒复核包：48440 样本、11 缺口、估计缺 154 样本、错误 0、重复 0、未知跳变 0；六轴白噪声候选，随机游走未识别。它只证明本次短测的采集分析链路走通。
+
+
+### 旧实验噪声模型已实际复现
+
+已取回 20261103 原脚本、五组 Allan CSV、实验 YAML 和拟合 JSON，以及 camera_imu trial v1.3 的旧结果。五组×六轴拟合参数 N/P/K 逐项复现，相对差最大为 0。旧流程明确允许无独立 +0.5 区间的混合模型实验权重。新统一工具新增显式按钮保留两种结论，不取消逐轴检查。对本次两小时上传曲线生成全记录实验权重：acc N=0.0035730115563122585、acc K=0.006777334971579917、gyro N=0.0007710791973879812、gyro K=3.656006384974556e-05，经验率 809.5909892196505Hz。新旧参数及录制条件有差异，不据此宣布通过；未使用旧数值替换新拟合。49 项软件测试通过；实机 GUI 按钮与正式联合计算未验证。
