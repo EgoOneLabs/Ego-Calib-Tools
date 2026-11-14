@@ -1,4 +1,5 @@
 import copy
+import ast
 import unittest
 from pathlib import Path
 import sys
@@ -21,6 +22,14 @@ class Transform:
 
 
 class TestFixedCheck(unittest.TestCase):
+    def test_upstream_native_library_bootstrap_order(self):
+        tree=ast.parse((Path(__file__).parent/'fixed_check.py').read_text())
+        main=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='main')
+        imports=[n.names[0].name if isinstance(n,ast.Import) else n.module
+                 for n in main.body if isinstance(n,(ast.Import,ast.ImportFrom))]
+        self.assertLess(imports.index('sm'),imports.index('kalibr_common'))
+        self.assertLess(imports.index('kalibr_common'),imports.index('kalibr_imu_camera_calibration'))
+
     def setUp(self):
         T=np.eye(4);B=np.eye(4);B[0,3]=-.09
         self.data={'cam0':dict(T_cam_imu=T.tolist(),timeshift_cam_imu=-.048),

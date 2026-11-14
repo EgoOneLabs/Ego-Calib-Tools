@@ -13,7 +13,7 @@
   },
   "bundle_sha256": {
     "run.py": "3eeb2cdffb86122f27c33f828f06242da33b80b2fba930300cbdf15644cbd383",
-    "fixed_check.py": "bb3461d75c49f9d3ef77fb976e691b7fd5bea69e99505b1aae07607f1185ea69",
+    "fixed_check.py": "7eac14506d30741b2d7dd3ac56acccb1307b07a68e7a9aced21b19e865e770bc",
     "kalibr_hashes.json": "8761e2b699b6caa35ed169195913edb4d7f449bd5ea15077911c62a1f7e7fe72",
     "README.zh-CN.md": "d012eb978de6651b363730e3e5985f71911b287ee5551bbb4eee98eee3c239e9"
   }

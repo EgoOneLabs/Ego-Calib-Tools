@@ -62,6 +62,9 @@ def residual_summary(cal):
 
 def main():
     import sm
+    # Match the upstream CLI bootstrap: kalibr_common loads native libraries
+    # needed by bsplines (including CHOLMOD) before IccCalibrator is imported.
+    import kalibr_common
     from kalibr_imu_camera_calibration import IccCalibrator, sens
     root=Path('/catkin_ws/src/kalibr/aslam_offline_calibration/kalibr/python')
     expected=json.loads((Path(__file__).parent/'kalibr_hashes.json').read_text())

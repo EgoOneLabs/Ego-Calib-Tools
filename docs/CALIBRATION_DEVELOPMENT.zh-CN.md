@@ -246,3 +246,5 @@ Camera–IMU 的 Camera / IMU 参数区域分别支持拖入单个 YAML、点击
 不是完全开环预测。使用原有实验时间映射及实验噪声权重，不代表硬件同步或 IMU 内参验收。
 新增 8 项单元检查通过；尚无真实 Kalibr 容器执行结果，仍等待用户运行。
 输出保留 quality_accepted=false，不能自动覆盖正式参数。该入口尚未集成 GUI。
+
+固定验证首次实机执行在导入阶段报 libbsplines.so undefined symbol cholmod_solve，尚未计算残差。修正入口按原 CLI 顺序加载 sm、kalibr_common、kalibr_imu_camera_calibration；增加启动导入顺序检查，共 9 项软件检查通过。等待实机复跑确认，不重装环境、不重新录制。
