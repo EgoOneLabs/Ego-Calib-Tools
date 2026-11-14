@@ -40,5 +40,32 @@
     "wall_seconds": 176.95,
     "independent_validation": false
   },
-  "interpretation": "Old fixed camera parameters are a plausible contributor to structured joint reprojection residuals. Same-record camera refit is diagnostic, not held-out validation or proof of mechanical lens motion. Next repeat joint optimization with refitted camera parameters and unchanged BAG/IMU weights. Hardware timing remains unverified."
+  "interpretation": "Old fixed camera parameters are a plausible contributor to structured joint reprojection residuals. Same-record camera refit is diagnostic, not held-out validation or proof of mechanical lens motion. Next repeat joint optimization with refitted camera parameters and unchanged BAG/IMU weights. Hardware timing remains unverified.",
+  "updated_camera_joint_trial": {
+    "output": "joint_camera_updated_hDPklVhP",
+    "mean_residuals": {
+      "cam0_px": 0.8881337623793244,
+      "cam1_px": 0.9191711336065034,
+      "gyro_rad_s": 0.009586714009274555,
+      "accel_m_s2": 0.06966698539591051
+    },
+    "timeshift_seconds": [
+      -0.048845406342843234,
+      -0.048820495783934076
+    ],
+    "wall_seconds": 132.36,
+    "user_seconds": 931.53,
+    "sys_seconds": 108.88,
+    "optimization_iterations": 8,
+    "same_record_refit": true,
+    "independent_validation": false,
+    "hardware_sync_verified": false,
+    "quality_accepted": false,
+    "sha256": {
+      "camera_imu-camchain-imucam.yaml": "69a75e55cf1648614e345689114c466895ba3fb3522066434dda71b8840c465c",
+      "camera_imu-report-imucam.pdf": "316612acb34b37e24a75d490a4fb40e5b4bcfa4385128d8b7fc6167eb2b82d4b",
+      "camera_imu-results-imucam.txt": "0ed2a14b3de10f7128d4287b3860fa89e030abf4f32109b7b293f0d3ffb745df"
+    },
+    "interpretation": "Replacing the fixed old camera model reduces structured reprojection residuals on the same record. This supports camera-model mismatch as a contributor. New parameters remain candidates pending independent motion recording and timing review. Near-equal fitted time shifts are not exposure synchronization proof."
+  }
 }
