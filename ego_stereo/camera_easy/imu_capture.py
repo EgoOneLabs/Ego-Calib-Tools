@@ -16,6 +16,19 @@ SCALE_ACC = 9.80665 / 4096
 SCALE_GYRO = math.pi / 180 / 16.4
 
 
+def counter_delta(before,after):
+    """Accept the u24 boundary observed in this 2UQ2, retaining real resets.
+
+    The stored field is still the original big-endian u32. This is an empirical
+    rollover interpretation, not confirmation of counter tick duration.
+    """
+    delta=(after-before)%2**32
+    short=(after-before)%2**24
+    wrapped24=(2**24-8192<=before<2**24 and 0<=after<=8192 and after<before
+               and 0<short<=8192 and short%COUNTER_STEP==0)
+    return (short,True) if wrapped24 else (delta,False)
+
+
 def decode_packet(raw):
     if len(raw) != PACKET_BYTES:
         raise ValueError('IMU 包长度不是 252 字节')
@@ -24,7 +37,7 @@ def decode_packet(raw):
         magic,counter,*axes=struct.unpack_from('>2sI6h',raw,offset)
         if magic != b'\xde\xc8':
             raise ValueError('IMU 数据头不匹配')
-        if rows and (counter-rows[-1][0])%2**32 != COUNTER_STEP:
+        if rows and counter_delta(rows[-1][0],counter)[0] != COUNTER_STEP:
             raise ValueError('IMU 包内计数步长不是 32')
         rows.append((counter,*axes))
     return rows
@@ -56,11 +69,13 @@ class Continuity:
         self.last=None;self.segment=0;self.tick=0
         self.seen=set();self.queue=deque()
         self.duplicates=0;self.gaps=0;self.missing_estimated=0;self.resets=0
+        self.wraps24=0
     def accept(self,counter):
         if counter in self.seen:
             self.duplicates+=1;return None
         if self.last is not None:
-            delta=(counter-self.last)%2**32
+            delta,wrapped24=counter_delta(self.last,counter)
+            if wrapped24:self.wraps24+=1
             if delta==COUNTER_STEP:self.tick+=1
             elif 0<delta<2**31 and delta%COUNTER_STEP==0:
                 self.segment+=1;self.gaps+=1
@@ -83,9 +98,9 @@ def capture(run,device,seconds,stop,finish,notify,reader_factory=XuReader):
     (run/'imu_capture.json').write_text(json.dumps(stats,ensure_ascii=False,indent=2))
     try:
         reader=reader_factory(device)
-        with (run/'imu_packets.bin').open('wb') as binary, (run/'imu_requests.csv').open('w',newline='') as requests, (run/'imu_samples.csv').open('w',newline='') as samples:
+        with (run/'imu_packets.bin').open('wb') as binary, (run/'imu_rejected_packets.bin').open('wb') as rejected, (run/'imu_requests.csv').open('w',newline='') as requests, (run/'imu_samples.csv').open('w',newline='') as samples:
             rw=csv.writer(requests);sw=csv.writer(samples)
-            rw.writerow(['request','host_before_ns','host_after_ns','phase','bytes','valid','unique_samples','error'])
+            rw.writerow(['request','host_before_ns','host_after_ns','phase','bytes','valid','unique_samples','error','rejected_offset'])
             sw.writerow(['segment','tick_index','counter_raw','packet','host_before_ns','host_after_ns','ax_raw','ay_raw','az_raw','gx_raw','gy_raw','gz_raw','ax_m_s2','ay_m_s2','az_m_s2','gx_rad_s','gy_rad_s','gz_rad_s'])
             last_flush=time.monotonic();last_notify=0
             while not stop.is_set():
@@ -106,10 +121,12 @@ def capture(run,device,seconds,stop,finish,notify,reader_factory=XuReader):
                         sw.writerow([segment,tick,counter,packets,before,after,*axes,
                             *[a*SCALE_ACC for a in axes[:3]],*[g*SCALE_GYRO for g in axes[3:]]])
                         count+=1;added+=1
-                    rw.writerow([stats.get('requests',0),before,after,'record',len(raw),True,added,''])
+                    rw.writerow([stats.get('requests',0),before,after,'record',len(raw),True,added,'',''])
                 except (OSError,ValueError) as e:
                     errors+=1;consecutive+=1
-                    rw.writerow([stats.get('requests',0),before,time.monotonic_ns(),'record',len(raw),False,0,str(e)])
+                    offset=rejected.tell() if raw else ''
+                    if raw:rejected.write(raw)
+                    rw.writerow([stats.get('requests',0),before,time.monotonic_ns(),'record',len(raw),False,0,str(e),offset])
                     if consecutive>=20:raise ValueError('IMU 连续 20 次读取失败：'+str(e)) from e
                 stats['requests']=stats.get('requests',0)+1
                 now=time.monotonic()
@@ -119,7 +136,7 @@ def capture(run,device,seconds,stop,finish,notify,reader_factory=XuReader):
                          'duplicates':c.duplicates,'elapsed':0 if record_start is None else round(now-record_start,1)})
                     last_notify=now
                 if now-last_flush>=2:
-                    for f in (binary,requests,samples):f.flush()
+                    for f in (binary,rejected,requests,samples):f.flush()
                     last_flush=now
                     if os.statvfs(run).f_bavail*os.statvfs(run).f_frsize<256*1024**2:
                         raise ValueError('磁盘剩余空间不足，IMU 录制已停止，已有数据保留')
@@ -135,7 +152,8 @@ def capture(run,device,seconds,stop,finish,notify,reader_factory=XuReader):
         stats.update(status='CAPTURE_COMPLETED' if completed else 'CAPTURE_ABORTED' if stop.is_set() or error else 'CAPTURE_STOPPED_EARLY',
             samples=count,packets=packets,errors=errors,elapsed_seconds=elapsed,
             duplicates=c.duplicates,gaps=c.gaps,missing_estimated=c.missing_estimated,
-            counter_discontinuities=c.resets,error=error)
+            counter_discontinuities=c.resets,counter_wraps_24bit=c.wraps24,
+            counter_rollover_basis='Observed 2UQ2 u24 boundary inside a u32 field; tick time not vendor-confirmed',error=error)
         (run/'imu_capture.json').write_text(json.dumps(stats,ensure_ascii=False,indent=2))
     if count<100:raise ValueError('有效 IMU 样本不足，已有原始文件保留')
     return stats

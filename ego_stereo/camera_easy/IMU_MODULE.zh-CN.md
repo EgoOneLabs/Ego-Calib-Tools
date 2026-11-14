@@ -61,3 +61,11 @@ bash camera.run
 - 本功能是 IMU 噪声分析，不包含六位置加速度比例、轴不正交等完整内参校准。
 
 协议接口参考：[Linux UVC 驱动文档](https://docs.kernel.org/userspace-api/media/drivers/uvcvideo.html)。噪声模型参考：[Kalibr IMU Noise Model](https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model)。Kalibr 求解算法未修改。
+
+## 长录计数回绕修复（2026-11-14）
+
+本台 2UQ2 的两小时原始数据表明：字段虽按 u32 读取，实际边界符合 u24 回绕，步长仍为 32。11 次回绕周期约 647.6 秒；旧实现按 32 位解释，造成错误回跳判定，并误拒绝 10 个跨回绕包。另有 3 次数据头不匹配，根因仍待检查。
+
+新读取与分析支持已观察到的边界模式，并保留原始计数值；不将任意回跳解释为回绕。该模式不等于厂商确认的时钟单位，也不证明相机/IMU同步。新采集另存 imu_rejected_packets.bin，并在请求记录中写偏移，便于后续检查。
+
+已有记录可使用 imu_recover.py 从有效原始包重建派生计数和连续片段，输出到新的同级目录；原始文件不修改、不补样本，旧版未保存的拒绝包无法恢复。先检查复算曲线和参数，再决定是否扩大录制。

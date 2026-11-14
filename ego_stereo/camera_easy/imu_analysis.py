@@ -44,12 +44,13 @@ def fit_region(tau,dev,slope,minimum,maximum):
     return None if best is None else best[1]
 
 
-def analyze(run,stop=None,notify=lambda *_:None):
+def analyze(run,stop=None,notify=lambda *_:None,prepared_data=None):
     started=time.monotonic();run=Path(run)
     capture=json.loads((run/'imu_capture.json').read_text())
     notify('IMU_ANALYZING','正在读取 IMU 数据，按连续片段计算 Allan 曲线…')
     # cols: segment, tick_index, host_after_ns, then accel and gyro SI values.
-    data=np.loadtxt(run/'imu_samples.csv',delimiter=',',skiprows=1,usecols=(0,1,5,12,13,14,15,16,17),ndmin=2)
+    data=(np.loadtxt(run/'imu_samples.csv',delimiter=',',skiprows=1,usecols=(0,1,5,12,13,14,15,16,17),ndmin=2)
+          if prepared_data is None else prepared_data)
     if stop is not None and stop.is_set():raise InterruptedError('工具已停止，采集数据保留')
     if len(data)<100:raise ValueError('IMU 数据不足')
     if not np.all(np.isfinite(data)):raise ValueError('IMU 数据存在非有限数值')
@@ -59,7 +60,7 @@ def analyze(run,stop=None,notify=lambda *_:None):
     host=(anchors[:,2]-anchors[0,2])/1e9
     valid=(host>1)&(host<host[-1]-1)
     if valid.sum()<10 or capture['counter_discontinuities']:
-        raise ValueError('计数器时间关系不足或发生回跳，保留数据，暂不生成噪声参数')
+        raise ValueError('有效包时间不足或仍存在未识别的计数跳变，保留数据，请先运行计数器诊断')
     slope,offset=np.polyfit(host[valid],anchors[valid,1],1)
     rate=float(slope)
     if not 50<rate<5000:raise ValueError('实测采样速率不合理：'+str(rate))
@@ -110,6 +111,6 @@ def analyze(run,stop=None,notify=lambda *_:None):
     (run/'imu-analysis.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     (run/'imu-results.txt').write_text('Status: '+report['status']+'\nSamples: '+str(len(data))+'\nEstimated sample rate Hz: '+str(rate)+'\nLongest segment s: '+str(longest)+'\nReview: '+('; '.join(issues) or 'Candidate generated; independent review required')+'\n',encoding='utf-8')
     with tarfile.open(run/'imu_small_review.tar.gz','w:gz') as tar:
-        for name in ['imu_capture.json','imu-analysis.json','imu-results.txt','imu-report.pdf','imu-allan.csv','imu-candidate.yaml']:
+        for name in ['imu_capture.json','imu-analysis.json','imu-results.txt','imu-report.pdf','imu-allan.csv','imu-candidate.yaml','recovery.json','original_imu_capture.json']:
             if (run/name).is_file():tar.add(run/name,arcname=name)
     return report
