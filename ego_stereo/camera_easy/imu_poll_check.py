@@ -6,8 +6,48 @@ import tarfile
 import tempfile
 import threading
 from pathlib import Path
-from hardware import find_device
+from hardware import Camera, find_device
 from imu_capture import capture
+
+
+class VideoStream:
+    """Keep the normal UVC stream alive; release it on every exit path."""
+    def __init__(self, device, log, factory=Camera):
+        self.camera = factory(device, log)
+        self.stop = threading.Event()
+        self.error = None
+        self.thread = None
+        self.frames = 0
+
+    def __enter__(self):
+        try:
+            self.camera.read(self.stop)
+            self.frames = 1
+            self.thread = threading.Thread(target=self.drain, daemon=True)
+            self.thread.start()
+            return self
+        except BaseException:
+            self.camera.close()
+            raise
+
+    def drain(self):
+        try:
+            while not self.stop.is_set():
+                self.camera.read(self.stop)
+                self.frames += 1
+        except Exception as exc:
+            if not self.stop.is_set():
+                self.error = str(exc)
+
+    def check(self):
+        if self.error is not None:
+            raise ValueError('视频流已中断：'+self.error)
+
+    def __exit__(self, *exc):
+        self.stop.set()
+        if self.thread is not None:
+            self.thread.join(timeout=2)
+        self.camera.close()
 
 
 def summarize(stats):
@@ -30,33 +70,45 @@ def main():
                (p/'idProduct').read_text().strip().lower() == '0b15'
                for p in (sys, *sys.parents)):
             nodes.append(str(node))
-    if nodes and subprocess.run(['fuser', '-s', *nodes]).returncode == 0:
-        raise ValueError('头环正在被使用。请关闭标定工具的启动终端和其他预览程序后再试；本程序不会停止其他进程。')
+    if nodes:
+        busy = subprocess.run(['fuser', '-s', *nodes]).returncode
+        if busy == 0:
+            raise ValueError('头环正在被使用。请关闭标定工具的启动终端和其他预览程序后再试；本程序不会停止其他进程。')
+        if busy != 1:
+            raise ValueError('无法检查设备占用情况，停止。')
     device, info = find_device()
     root = Path(tempfile.mkdtemp(prefix='imu_poll_check_', dir=Path.home()))
     (root/'device.txt').write_text(device+'\n'+info)
-    report = {'status': 'DIAGNOSTIC_ONLY', 'camera_preview_enabled': False,
+    report = {'status': 'DIAGNOSTIC_ONLY', 'video_stream_enabled': True,
+              'browser_preview_enabled': False,
               'quality_accepted': False, 'phases': [],
-              'note': 'Sequential 60s A/B/A polling test without camera preview; not proof of long-run reliability or sensor noise quality.'}
+              'note': 'Sequential 60s A/B/A test with the normal FFmpeg video stream continuously drained; no browser JPEG rendering. Not long-run validation.'}
     try:
-        for name, wait in [('A_10ms', .01), ('B_0ms', 0), ('A2_10ms', .01)]:
-            out = root/name
-            out.mkdir()
-            print('\n开始 '+name+'：60 秒。保持头环连接，按 Ctrl+C 可停止。', flush=True)
-            last = [-1]
-            def notify(state, values):
-                second = int(values['elapsed'])
-                if second//10 != last[0]:
-                    last[0] = second//10
-                    print(f"  {second}/60 秒；有效样本 {values['samples']}；缺口 {values['gaps']}；重复 {values['duplicates']}", flush=True)
-            stats = capture(out, device, 60, threading.Event(), threading.Event(),
-                            notify, poll_wait_seconds=wait)
-            report['phases'].append({'name': name, **summarize(stats)})
+        print('正在启动视频流并检查首帧……', flush=True)
+        with VideoStream(device, root/'video-stream.log') as stream:
+            for name, wait in [('A_10ms', .01), ('B_0ms', 0), ('A2_10ms', .01)]:
+                stream.check()
+                out = root/name
+                out.mkdir()
+                print('\n开始 '+name+'：60 秒。保持头环连接，按 Ctrl+C 可停止。', flush=True)
+                last = [-1]
+                def notify(state, values):
+                    stream.check()
+                    second = int(values['elapsed'])
+                    if second//10 != last[0]:
+                        last[0] = second//10
+                        print(f"  {second}/60 秒；有效样本 {values['samples']}；缺口 {values['gaps']}；重复 {values['duplicates']}", flush=True)
+                stats = capture(out, device, 60, threading.Event(), threading.Event(),
+                                notify, poll_wait_seconds=wait)
+                report['phases'].append({'name': name, **summarize(stats)})
+            stream.check()
+            report['video_frames_drained'] = stream.frames
+            report['comparison_completed'] = True
     finally:
         (root/'poll-comparison.json').write_text(json.dumps(report, ensure_ascii=False, indent=2)+'\n')
         with tarfile.open(root/'imu_poll_review.tar.gz', 'w:gz') as tar:
             for path in root.rglob('*'):
-                if path.is_file() and path.suffix in ('.json', '.txt'):
+                if path.is_file() and path.suffix in ('.json', '.txt', '.log'):
                     tar.add(path, arcname=str(path.relative_to(root)))
                 elif path.name == 'imu_requests.csv':
                     tar.add(path, arcname=str(path.relative_to(root)))
