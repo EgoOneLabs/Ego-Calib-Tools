@@ -121,3 +121,8 @@ Camera、IMU 的结果是联合计算的前提之一，但不是联合结果通�
 
 - [Camera–IMU calibration](https://github.com/ethz-asl/kalibr/wiki/camera-imu-calibration)
 - [YAML formats](https://github.com/ethz-asl/kalibr/wiki/yaml-formats)
+
+
+## 参数文件拖入
+
+版本 20261114-YAML-DROP：将本套头环 Camera 的 camchain YAML 拖入左侧，IMU 实验/噪声 YAML 拖入右侧，也可点击选择；每处单个 .yaml/.yml，非空且最大 32 KiB，清除按钮可重选。显示已选名称不代表参数内容验收，开始时仍检查模型、话题等。录制期间禁止换文件。固定板，移动整套头环，先按默认 90 秒采集；左右画面尽量持续清楚看到图案，做左右转动、上下点头、左右侧倾与少量平移，避免急甩和拉线。停止并保存后上传 camera_imu_small_review.tar.gz。此入口仅采集及前置检查，正式联合求解仍待时间轴验证。
