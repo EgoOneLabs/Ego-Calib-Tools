@@ -1,0 +1,25 @@
+{
+  "status": "RAW_AND_SAMPLED_IMAGES_REVIEWED_NOT_CALIBRATED",
+  "hash_verified_raw_files": 6,
+  "hash_verified_sample_images": 12,
+  "sampled_pairs": 6,
+  "raw_samples_and_integer_axes_match_csv": true,
+  "empirical_counter_host_rate_hz": 809.6761820609082,
+  "clock_fit_residual_std_ms": 1.9309814179688978,
+  "clock_fit_residual_min_ms": -22.0544518739073,
+  "clock_fit_residual_max_ms": 0.8036734053780586,
+  "hardware_sync_verified": false,
+  "quality_accepted": false,
+  "gyro_std_rad_s": {
+    "gx_rad_s": 0.155364920366351,
+    "gy_rad_s": 0.3152727614779808,
+    "gz_rad_s": 0.21383479441935876
+  },
+  "visual_review": "All six sampled stereo pairs show the target; first pair is very close and clipped. Other sampled pairs show changes in distance/orientation, including roll. No full-sequence corner detection or pose-based excitation check performed.",
+  "pending": [
+    "Camera YAML missing; needs source/unit/config check before use",
+    "IMU experiment weights available from prior static fit; no dynamic validation yet",
+    "All-frame target detection on workstation",
+    "Experimental joint BAG time mapping and readback; not physical exposure synchronization"
+  ]
+}
