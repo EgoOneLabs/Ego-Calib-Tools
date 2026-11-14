@@ -248,3 +248,5 @@ Camera–IMU 的 Camera / IMU 参数区域分别支持拖入单个 YAML、点击
 输出保留 quality_accepted=false，不能自动覆盖正式参数。该入口尚未集成 GUI。
 
 固定验证首次实机执行在导入阶段报 libbsplines.so undefined symbol cholmod_solve，尚未计算残差。修正入口按原 CLI 顺序加载 sm、kalibr_common、kalibr_imu_camera_calibration；增加启动导入顺序检查，共 9 项软件检查通过。等待实机复跑确认，不重装环境、不重新录制。
+
+2026-11-14 实机复跑固定验证完成：joint_fixed_check_45b8s7du，退出码 0，外参和时间偏移禁用且数值不变。独立数据平均残差左/右 0.945374/0.894103 px，陀螺仪 0.00918366 rad/s，加速度计 0.0596381 m/s²，与自由重估接近。仅确认此条件一致性检查跑通，不能据此消除约 11.8 mm 平移重复性差异或宣布同步与噪声最终验收。当前 GUI 两个 YAML 框仍仅用于联合采集参数输入；离线求解与固定验证未接入 GUI，下一阶段优先整合，现有两段运动数据和静止 IMU 数据继续复用。

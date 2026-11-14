@@ -98,5 +98,47 @@
     "fixed_extrinsics_validation": false,
     "quality_accepted": false,
     "interpretation": "Low refitted residuals repeat, but translation differs by about 11.8 mm. Do not infer hardware movement or acceptance from these two estimates alone. Preserve both records; next evaluate independent data with candidate extrinsics fixed."
+  },
+  "fixed_candidate_independent_check": {
+    "output": "/home/key/文档/kalibr/data/camera_imu/2UQ2/joint_fixed_check_45b8s7du",
+    "container_exit_code": 0,
+    "status": "FIXED_CANDIDATE_CONDITIONAL_CHECK_COMPLETE",
+    "extrinsics_fixed": true,
+    "time_offsets_fixed": true,
+    "nuisance_variables_fitted": [
+      "trajectory",
+      "gravity_direction",
+      "imu_bias_splines"
+    ],
+    "hardware_sync_verified": false,
+    "quality_accepted": false,
+    "candidate_sha256": "69a75e55cf1648614e345689114c466895ba3fb3522066434dda71b8840c465c",
+    "residuals": {
+      "cam0_px": {
+        "count": 97157,
+        "mean": 0.9453741199116581,
+        "rms": 1.0625238286988719,
+        "p95": 1.7908983270548153
+      },
+      "cam1_px": {
+        "count": 85573,
+        "mean": 0.8941025116968473,
+        "rms": 1.0133764758093664,
+        "p95": 1.7661186483972475
+      },
+      "gyro_rad_s": {
+        "count": 72394,
+        "mean": 0.009183661681870499,
+        "rms": 0.012122027637064632,
+        "p95": 0.024816072173314743
+      },
+      "accel_m_s2": {
+        "count": 72394,
+        "mean": 0.0596380890881581,
+        "rms": 0.08313205644252525,
+        "p95": 0.13238284598806505
+      }
+    },
+    "interpretation": "Extrinsics and time offsets verified inactive and numerically unchanged. Fixed-candidate residuals closely match independently refitted residuals. This is conditional consistency with trajectory, gravity and bias fitted, not final sync/noise acceptance or proof of translation precision. GUI verification entry not yet integrated."
   }
 }
