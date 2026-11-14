@@ -72,8 +72,9 @@ def analyze(run,stop=None,notify=lambda *_:None):
         writer=csv.writer(f);writer.writerow(['tau_s','ax','ay','az','gx','gy','gz','differences_used']);writer.writerows(curves)
     longest=max(map(len,segments))/rate
     issues=[]
-    if capture['status']!='CAPTURE_COMPLETED' or capture['elapsed_seconds']<7200:issues.append('未完成至少 2 小时静止采集')
-    if longest<600:issues.append('最长连续片段不足 10 分钟')
+    warnings=[]
+    if capture['status']!='CAPTURE_COMPLETED':warnings.append('录制提前结束；按实际保留的数据分析')
+    if capture['elapsed_seconds']<7200:warnings.append('本次少于建议的 2～3 小时，请结合曲线判断长期噪声是否充分观测')
     gyro=np.linalg.norm(data[:,6:],axis=1)
     accel=np.linalg.norm(data[:,3:6],axis=1)
     if np.quantile(gyro,.99)>.15 or np.std(accel)>.15:issues.append('疑似存在运动或振动，需要检查静止条件')
@@ -87,7 +88,7 @@ def analyze(run,stop=None,notify=lambda *_:None):
         'samples':len(data),'segments':len(segments),'longest_segment_seconds':longest,
         'estimated_sample_rate_hz':rate,'clock_fit_residual_std_samples':float(np.std(residual)),
         'time_basis':'Empirical host-clock/counter fit, not vendor-confirmed hardware time; not exposure synchronization.',
-        'issues':issues,'axis_fits':fits,'wall_seconds':time.monotonic()-started}
+        'issues':issues,'warnings':warnings,'capture_status':capture['status'],'elapsed_seconds':capture['elapsed_seconds'],'axis_fits':fits,'wall_seconds':time.monotonic()-started}
     if not issues:
         profile={'rostopic':'/imu0','update_rate':rate,
           'accelerometer_noise_density':max(fits[i]['white_noise']['coefficient'] for i in range(3)),

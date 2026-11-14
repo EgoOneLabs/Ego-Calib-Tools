@@ -5,6 +5,7 @@ from collections import deque
 from dataclasses import asdict
 from datetime import datetime, timezone
 import json
+import math
 import os
 from pathlib import Path
 import platform
@@ -221,14 +222,15 @@ class App:
     def start_imu(self, value):
         ident = device_id(value['device_id'])
         seconds = float(value.get('imu_seconds', 7200))
-        require(seconds in (60, 7200, 10800), '请选择 60 秒检查、2 小时或 3 小时')
+        require(math.isfinite(seconds) and 60 <= seconds <= 86400, '录制时长请输入 1 分钟至 24 小时之间的有效数值')
         with self.lock:
             require(self.state['stage'] == 'READY' and time.monotonic_ns()-self.frame_ns < 2_000_000_000,
                     '请先等待设备连接和左右预览正常')
             require(not self.imu_thread or not self.imu_thread.is_alive(), '已有 IMU 任务运行中')
             parent = self.data_root / 'imu' / ident
             parent.mkdir(parents=True, exist_ok=True)
-            require(shutil.disk_usage(parent).free > 3*1024**3, 'IMU 录制前请至少留出 3 GiB 空间')
+            needed = max(3*1024**3, int(seconds*400000 + 1024**3))
+            require(shutil.disk_usage(parent).free > needed, f'本次录制请至少留出约 {needed/1024**3:.1f} GiB 空间')
             self.run = parent / (datetime.now(timezone.utc).strftime('imu_%Y%m%dT%H%M%SZ_')+secrets.token_hex(4))
             self.run.mkdir()
             (self.run / 'hardware.json').write_text(json.dumps(self.hardware, ensure_ascii=False, indent=2))

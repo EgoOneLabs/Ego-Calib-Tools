@@ -1,6 +1,6 @@
 {
   "status": "UNIFIED_IMU_SOFTWARE_TESTS_PASS_HARDWARE_TRIAL_PENDING",
-  "tests_passed": 27,
+  "tests_passed": 28,
   "test_command": "python3 -m unittest discover -s ego_stereo/camera_easy -p 'test_*.py' -v",
   "real_ros1_bag_io_tested": true,
   "real_full_3840x1080_pixel_split_tested": true,
@@ -15,7 +15,7 @@
     "node --check"
   ],
   "algorithm_modifications": false,
-  "next_required_test": "2 hour stationary recording without automatic warmup, then inspect long-term noise and continuity",
+  "next_required_test": "User machine: verify custom minutes/hours, immediate start, elapsed/target time and automatic stop. Multi-hour stability remains pending.",
   "reported_first_install_failure": "ENTRYPOINT, runtime ROS cache and exact-path Git audit fixes incorporated; actual user machine optimization completed after manual repair.",
   "runtime_ros_cache_fix": "Copy baked root rosdep cache offline to runtime ROS_HOME; preflight imports actual Kalibr modules and verifies ds-none instead of testing help exit status.",
   "git_audit_fix": "Use command-scoped safe.directory for exact Kalibr source path; actual Git ownership rejection and success tested without global config changes.",
@@ -52,5 +52,11 @@
     "counter_gaps": 2,
     "missing_estimated": 28,
     "sample_rate_estimate_hz": 809.8401502557471
-  }
+  },
+  "custom_duration_supported": true,
+  "custom_duration_range_seconds": [
+    60,
+    86400
+  ],
+  "minimum_two_hour_quality_gate": false
 }

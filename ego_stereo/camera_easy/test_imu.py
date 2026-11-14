@@ -116,10 +116,29 @@ class ImuTests(unittest.TestCase):
             self.assertTrue((root/'imu_small_review.tar.gz').is_file())
             self.assertFalse((root/'imu-candidate.yaml').exists())
 
-    def test_unified_mode_rejects_joint_and_short_formal_durations(self):
+    def test_unified_mode_rejects_joint_and_invalid_durations(self):
         from app import App
         app=App.__new__(App)
         with self.assertRaisesRegex(ValueError,'Camera'):
             app.start({'mode':'camera_imu'})
-        with self.assertRaisesRegex(ValueError,'请选择'):
-            app.start_imu({'device_id':'test','imu_seconds':120})
+        for invalid in (0,-1,59,86401,float('nan'),float('inf')):
+            with self.assertRaisesRegex(ValueError,'录制时长'):
+                app.start_imu({'device_id':'test','imu_seconds':invalid})
+
+    def test_custom_durations_reach_capture_without_waiting(self):
+        from app import App
+        import time
+        from types import SimpleNamespace
+        for seconds in (120,1800,5400,9000):
+            with tempfile.TemporaryDirectory() as d:
+                app=App.__new__(App)
+                app.lock=threading.RLock();app.imu_thread=None
+                app.frame_ns=time.monotonic_ns();app.state={'stage':'READY'}
+                app.data_root=Path(d);app.hardware={'device':'/dev/not-used'}
+                app.end_capture=threading.Event();app.imu_cancel=threading.Event()
+                with patch('app.threading.Thread') as thread, patch('app.shutil.disk_usage',return_value=SimpleNamespace(free=10**12)):
+                    app.start_imu({'device_id':'test','imu_seconds':seconds})
+                    self.assertEqual(thread.call_args.kwargs['args'][1],seconds)
+                    self.assertEqual(app.state['duration'],seconds)
+                    self.assertEqual(app.state['stage'],'IMU_RECORDING')
+                    thread.return_value.start.assert_called_once()
