@@ -171,3 +171,14 @@
 ### 统一工具 IMU-REVIEW 安装版本
 
 将现有计数回绕、Allan 搜索与轮询决策合入同一安装包；新增六轴状态表、明确缺项的 TXT/JSON，以及候选 YAML 是否生成的提示。安装路径使用独立 v1.5-imu-review 前缀，菜单入口保持头环标定工具。Camera–IMU 仍仅运动采集和前置检查，未宣称正式联合求解可用。46 项软件测试通过，实际安装与页面实机复核待用户完成，源码仅本地提交。
+
+
+### 旧双目三项结果与新工具的差异：不得混淆计算完成和验收
+
+已回读《头环采集与标定开源发布说明.md》2026-11-12 版本（libfile_225defc371548191b2f31667b053adc3，版本 1）。同一 2UQ2 双目流程曾生成 camera、imu、camera_imu 结果：旧 IMU 使用实验配置 imu_experimental.yaml；联合使用实验逐样本时间映射，多条求解已生成报告，三条重复性平移差约 9.58～17.84mm，尚未定版。旧结果应保留复用为实验基线，不因新入口未导出 YAML 而否定。
+
+旧静态分析：5934572 有效样本、95 连续段、最长约 986.94 秒；新两小时数据：5824210 样本、最长约 445.60 秒。不同录制与分析条件，不能直接推断硬件退化。当前新工具自动导出条件是六轴两类斜率候选齐全且通过静止检查；这是本工具自动导出的策略，不能当成旧实验求解没有成功或硬件有故障的证据。
+
+旧 IMU 复核目录：/home/key/Downloads/EgoStereoIMU-static-noise-raw-review-v1；旧联合目录：/home/key/文档/kalibr/data/2uq2_camera_imu_trials/trial_jbi7p1st、/home/key/文档/kalibr/data/2uq2_independent_blhd1uwr/original_chain、/home/key/文档/kalibr/data/2uq2_repeat_o6y8nj4w/original_chain。下一步先对照旧 model_fit.json、实验 YAML 与时间映射脚本，再决定新入口如何复用实验求解和呈现可信边界，不通过无依据填数解除门槛。
+
+最新统一工具 60 秒复核包：48440 样本、11 缺口、估计缺 154 样本、错误 0、重复 0、未知跳变 0；六轴白噪声候选，随机游走未识别。它只证明本次短测的采集分析链路走通。
