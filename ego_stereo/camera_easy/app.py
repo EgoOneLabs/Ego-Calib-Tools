@@ -30,6 +30,7 @@ from imu_analysis import analyze as analyze_imu
 from joint import joint_motion, validate_inputs, save_inputs, inspect_capture, pack_review
 from offline import Offline, EXPORTS as OFFLINE_EXPORTS
 from parameters import Parameters
+from data_import import DataImport
 
 ROOT = Path(__file__).resolve().parent
 DOWNLOADS = {'camera-camchain.yaml', 'camera-results-cam.txt', 'camera-report-cam.pdf',
@@ -86,6 +87,7 @@ class App:
                 pass
         self.parameters = Parameters(self.config.parent/'joint_parameters.json')
         self.offline = Offline(self)
+        self.imports = DataImport(self)
         self.boot()
 
     def log(self, line):
@@ -376,6 +378,8 @@ class App:
             self.update('FAILED',str(error))
 
     def close(self):
+        pending=self.imports.active if getattr(self,'imports',None) else None
+        if pending:self.imports.abort(pending['id'])
         self.offline.cancel()
         self.stop.set()
         self.imu_cancel.set()
@@ -454,12 +458,25 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         try:
             require(self.headers.get('X-Ego-Token') == self.server.token, '请求校验失败，请重新打开当前页面')
+            if self.path.startswith('/imports/chunk/'):
+                _,_,_,key,index,offset=self.path.split('/')
+                size=int(self.headers.get('Content-Length','0'))
+                result=self.server.app.imports.chunk(key,int(index),int(offset),self.rfile,size)
+                return self.send_bytes(200,json.dumps(result).encode())
             size = int(self.headers.get('Content-Length', '0'))
-            require(0 <= size <= 98304, '请求过大')
+            require(0 <= size <= (8*1024**2 if self.path=='/imports/create' else 98304), '请求过大')
             value = json.loads(self.rfile.read(size) or b'{}')
+            if self.path == '/imports/create':
+                return self.send_bytes(200,json.dumps(self.server.app.imports.create(value)).encode())
+            if self.path == '/imports/finish':
+                return self.send_bytes(200,json.dumps(self.server.app.imports.finish(value.get('id')),ensure_ascii=False).encode())
+            if self.path == '/imports/abort':
+                self.server.app.imports.abort(value.get('id'))
+                return self.send_bytes(200,b'{"ok":true}')
             if self.path == '/start':
                 with self.server.app.lock:
                     require(not self.server.app.offline.busy(), '请先等待已有数据计算或验证结束')
+                    require(not getattr(getattr(self.server.app,'imports',None),'active',None),'文件正在导入，请等待或取消')
                     self.server.app.start(value)
             elif self.path == '/offline/start': self.server.app.offline.start(value)
             elif self.path == '/offline/stop': self.server.app.offline.cancel()

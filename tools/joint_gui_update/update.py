@@ -63,7 +63,7 @@ def main():
         raise
     print('界面已更新：'+checks.get('version','20261114-JOINT-GUI'),flush=True)
     print('旧程序备份：'+str(backup),flush=True)
-    print('第三步准备 Camera、IMU 两个参数后，点击预览旁按钮录制并自动计算；已有结果可单独验证。',flush=True)
+    print('已有录制可拖入文件或选择本地文件／文件夹，导入后点击开始计算；联合结果复核默认折叠。',flush=True)
     subprocess.run(['bash',str(root/'start.sh')],check=True)
 
 

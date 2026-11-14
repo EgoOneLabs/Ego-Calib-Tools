@@ -54,6 +54,20 @@ def inventory(root):
                 for n in needed:identity(root,p/n)
                 datasets[key]=(p,kind)
             except ValueError:continue
+    for p in sorted(root.glob('imports/*/*'),reverse=True)[:2000]:
+        marker=p/'.import-ready.json'
+        if not marker.is_file():continue
+        try:
+            key=identity(root,p);identity(root,marker)
+            require(marker.stat().st_size<4*1024**2,'导入记录过大')
+            data=json.loads(marker.read_text());kind=data.get('kind')
+            require(kind in ('camera','imu','raw','imported_joint'),'未知导入类型')
+            names={'camera':['camera.bag'],'imu':['imu_samples.csv','imu_capture.json'],
+                   'raw':['camera_manifest.json','imu_samples.csv','imu_capture.json','joint_clock.json'],
+                   'imported_joint':['camera_imu_experimental.bag']}[kind]
+            for n in names:require((p/n).is_file(),'导入文件丢失');identity(root,p/n)
+            datasets[key]=(p,kind)
+        except (ValueError,OSError,KeyError,TypeError):continue
     patterns=['camera_imu/*/*/*.yaml','camera_easy/*/*/*camchain*.yaml','imu/*/*/imu-experimental.yaml','imu/*/*/imu-candidate.yaml']
     for pattern in patterns:
         for p in sorted(root.glob(pattern),reverse=True)[:2000]:
@@ -103,6 +117,7 @@ class Offline:
     def start(self,value):
         with self.app.lock,self.lock:
             require(not self.busy(),'已有计算或验证正在运行')
+            require(not getattr(getattr(self.app,'imports',None),'active',None),'文件正在导入，请等待或取消')
             require(self.app.state['stage'] in ('READY','FAILED','DONE'),'请先等待当前采集结束')
             require(self.app.data_root and self.app.container,'Docker 环境尚未准备好')
             if value.get('action') in ('camera','imu'):
@@ -116,9 +131,15 @@ class Offline:
             imu=value.get('imu_yaml','');require(isinstance(camera,str) and isinstance(imu,str),'参数格式无效')
             status=validate_inputs(camera,imu);require(not status['missing'],'请导入相机或联合外参 YAML，以及 IMU 噪声 YAML')
             if action=='validate':candidate_values(yaml.safe_load(camera))
-            require((source/'aprilgrid.yaml').stat().st_size<=32768,'标定板配置过大')
-            board=yaml.safe_load((source/'aprilgrid.yaml').read_text())
-            require(isinstance(board,dict) and board.get('target_type')=='aprilgrid','缺少有效 AprilGrid 配置')
+            if (source/'aprilgrid.yaml').is_file():
+                identity(self.app.data_root,source/'aprilgrid.yaml')
+                require((source/'aprilgrid.yaml').stat().st_size<=32768,'标定板配置过大')
+                board=yaml.safe_load((source/'aprilgrid.yaml').read_text())
+                require(isinstance(board,dict) and board.get('target_type')=='aprilgrid','缺少有效 AprilGrid 配置')
+            else:
+                require(value.get('board'),'该录制没有板配置，请在主流程填写实测板尺寸后开始计算')
+                b=Board.parse(value['board'])
+                board=dict(target_type='aprilgrid',tagRows=b.rows,tagCols=b.cols,tagSize=b.tag_mm/1000,tagSpacing=b.gap_mm/b.tag_mm)
             if kind=='raw':
                 for n in ('camera_manifest.json','joint_clock.json','imu_capture.json'):
                     require((source/n).stat().st_size<16*1024**2,'采集元数据过大')
@@ -130,7 +151,7 @@ class Offline:
             self.inner='/data/'+self.out.relative_to(self.app.data_root).as_posix()
             self.stop.clear();self.logs.clear()
             self.state=dict(stage='QUEUED',message='正在准备已有数据…',action=action,output=str(self.out),result=None)
-            self.thread=threading.Thread(target=self.worker,args=(source,kind,action,camera,imu),daemon=True)
+            self.thread=threading.Thread(target=self.worker,args=(source,kind,action,camera,imu,board),daemon=True)
             self.thread.start()
 
     def start_single(self,value):
@@ -212,12 +233,13 @@ trap 'rm -f .kalibr.pid' EXIT
         logged_run(self.app.docker.prefix+['exec',self.app.container,'setsid','bash','-c',script,'_',self.inner],
                    self.out,filename,self.stop,self.log)
 
-    def worker(self,source,kind,action,camera,imu):
+    def worker(self,source,kind,action,camera,imu,board=None):
         start=time.monotonic();details=dict(source=str(source),action=action,quality_accepted=False,hardware_sync_verified=False)
         try:
             for name,text in [('camera.yaml',camera),('imu.yaml',imu)]: (self.out/name).write_text(text)
             if action=='validate':(self.out/'candidate.yaml').write_text(camera)
-            shutil.copy2(source/'aprilgrid.yaml',self.out/'aprilgrid.yaml')
+            if board is None:shutil.copy2(source/'aprilgrid.yaml',self.out/'aprilgrid.yaml')
+            else:(self.out/'aprilgrid.yaml').write_text(yaml.safe_dump(board,sort_keys=False))
             details['input_sha256']={n:sha(self.out/n) for n in ('camera.yaml','imu.yaml','aprilgrid.yaml')}
             if kind=='raw':
                 self.stage('BAG','正在生成 BAG 并逐条读回核对；保留原始数据…')
@@ -229,6 +251,14 @@ trap 'rm -f .kalibr.pid' EXIT
                 (self.out/'prepare_job.py').write_text(script)
                 self.command('timeout --kill-after=10s 1800 python3 "$1/prepare_job.py" "$1/prepare_args.json"\n',filename='prepare.log')
                 verified=json.loads((self.out/'bag_verification.json').read_text())
+            elif kind=='imported_joint':
+                self.stage('BAG','正在逐条读取导入的联合 BAG，检查图像、IMU 与时间记录…')
+                subprocess.run(['cp','--reflink=auto','--',str(source/'camera_imu_experimental.bag'),str(self.out/'camera_imu_experimental.bag')],check=True)
+                shutil.copy2(ROOT/'camera_bag_check.py',self.out/'camera_bag_check.py')
+                self.command('timeout --kill-after=10s 1800 python3 "$1/camera_bag_check.py" "$1" --joint\n',filename='prepare.log')
+                verified=json.loads((self.out/'bag_verification.json').read_text())
+                require(verified.get('status')=='JOINT_IMPORTED_BAG_CHECKED','联合 BAG 检查失败')
+                details['imported_timestamp_provenance']='Used BAG header timestamps as supplied; exposure synchronization not verified'
             else:
                 self.stage('BAG','正在核对已有 BAG 并准备独立副本…')
                 verified=json.loads((source/'bag_verification.json').read_text())
