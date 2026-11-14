@@ -11,7 +11,7 @@ from unittest.mock import patch
 
 import numpy as np
 from imu_capture import Continuity, Query, capture, decode_packet
-from imu_analysis import allan_segments, analyze, fit_region
+from imu_analysis import allan_segments, analyze, fit_region, summarize_fits
 
 
 def packet(start):
@@ -118,6 +118,17 @@ class ImuTests(unittest.TestCase):
         self.assertAlmostEqual(fit_region(tau,.002*np.sqrt(tau/3),.5,10,1000)['coefficient'],.002)
         self.assertIsNone(fit_region(tau,np.ones_like(tau),.5,10,1000))
 
+    def test_fit_summary_names_missing_gyro_z_without_filling_parameters(self):
+        fits=[{'white_noise':{'coefficient':1},'bias_random_walk':{'coefficient':2}} for _ in range(6)]
+        fits[5]['bias_random_walk']=None
+        rows,missing=summarize_fits(fits)
+        self.assertEqual(len(rows),6)
+        self.assertEqual(rows[5]['axis'],'gyro_z')
+        self.assertEqual(rows[5]['bias_random_walk'],'NOT_IDENTIFIED')
+        self.assertEqual(missing,['陀螺仪 Z：随机游走尚未识别到可靠的斜率区间'])
+        self.assertIsNone(fits[5]['bias_random_walk'])
+        with self.assertRaises(ValueError):summarize_fits(fits[:5])
+
     def test_short_synthetic_recording_generates_report_not_final_yaml(self):
         import matplotlib
         matplotlib.use('Agg')
@@ -134,6 +145,10 @@ class ImuTests(unittest.TestCase):
             report=analyze(root)
             self.assertAlmostEqual(report['estimated_sample_rate_hz'],rate,places=4)
             self.assertFalse(report['ready_for_camera_imu'])
+            self.assertFalse(report['noise_candidate_available'])
+            self.assertTrue(report['missing_noise_terms'])
+            self.assertEqual(len(report['axis_fit_summary']),6)
+            self.assertIn('未识别',(root/'imu-results.txt').read_text())
             self.assertTrue((root/'imu-report.pdf').read_bytes().startswith(b'%PDF'))
             self.assertTrue((root/'imu_small_review.tar.gz').is_file())
             self.assertFalse((root/'imu-candidate.yaml').exists())
