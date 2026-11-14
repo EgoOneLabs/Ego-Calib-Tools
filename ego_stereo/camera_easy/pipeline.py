@@ -45,27 +45,39 @@ def logged_run(command, root, filename, stop, notify):
             process.stdout.close()
 
 
-def calculate(root, docker, container, data_root, info, stop, update, notify):
+def calculate(root, docker, container, data_root, info, stop, update, notify, existing=False):
     inner = '/data/' + root.relative_to(data_root).as_posix()
     status = dict(status='BUILDING_BAG', image_id=info['Image'], model=['ds-none', 'ds-none'],
                   kalibr_algorithm_modified_by_this_tool=False, calibration_quality_accepted=False)
     started = time.monotonic()
     try:
-        script = Path(__file__).with_name('bag_writer.py')
-        shutil.copy2(script, root / 'bag_writer.py')
-        update('BAG', '正在生成相机 BAG 并逐帧读回核对像素和时间记录…')
-        logged_run(docker.prefix + ['exec', container, 'bash', '-c',
-                   ROS_ENV + 'exec python3 "$1/bag_writer.py" --root "$1" --backend rosbag\n', '_', inner],
-                   root, 'bag_write.log', stop, notify)
-        verified = json.loads((root / 'bag_verification.json').read_text())
-        require(verified['status'] == 'CAMERA_BAG_READBACK_PASS' and
-                verified['bag_sha256'] == sha(root / 'camera.bag') and
-                verified['manifest_sha256'] == sha(root / 'camera_manifest.json'), 'BAG 核对未通过')
-        status['bag_sha256'] = verified['bag_sha256']
+        if existing:
+            update('BAG', '正在逐条检查已有相机 BAG，不重新录制…')
+            shutil.copy2(Path(__file__).with_name('camera_bag_check.py'), root/'camera_bag_check.py')
+            logged_run(docker.prefix + ['exec', container, 'bash', '-c',
+                       ROS_ENV + 'exec python3 "$1/camera_bag_check.py" "$1"\n', '_', inner],
+                       root, 'bag_check.log', stop, notify)
+            verified=json.loads((root/'bag_verification.json').read_text())
+            require(verified.get('status')=='CAMERA_EXISTING_BAG_CHECKED' and
+                    verified.get('bag_sha256')==sha(root/'camera.bag'), '已有 BAG 检查未通过')
+            status['bag_sha256']=verified['bag_sha256']
+        else:
+            script = Path(__file__).with_name('bag_writer.py')
+            shutil.copy2(script, root / 'bag_writer.py')
+            update('BAG', '正在生成相机 BAG 并逐帧读回核对像素和时间记录…')
+            logged_run(docker.prefix + ['exec', container, 'bash', '-c',
+                       ROS_ENV + 'exec python3 "$1/bag_writer.py" --root "$1" --backend rosbag\n', '_', inner],
+                       root, 'bag_write.log', stop, notify)
+            verified = json.loads((root / 'bag_verification.json').read_text())
+            require(verified['status'] == 'CAMERA_BAG_READBACK_PASS' and
+                    verified['bag_sha256'] == sha(root / 'camera.bag') and
+                    verified['manifest_sha256'] == sha(root / 'camera_manifest.json'), 'BAG 核对未通过')
+            status['bag_sha256'] = verified['bag_sha256']
         status['target_sha256'] = sha(root / 'aprilgrid.yaml')
         update('CALIBRATING', '正在计算左右相机参数，请等待；取景预览已暂停。')
         shell = ROS_ENV + '''
 umask 022
+export PYTHONUNBUFFERED=1
 cd "$1"
 echo "$$" > .kalibr.pid
 git -c safe.directory=/catkin_ws/src/kalibr -C /catkin_ws/src/kalibr rev-parse HEAD > kalibr_source_commit.txt

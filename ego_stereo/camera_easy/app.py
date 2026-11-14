@@ -406,6 +406,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self.send_bytes(200, html.encode(), 'text/html; charset=utf-8')
             if path == '/offline.js':
                 return self.send_bytes(200,(ROOT/'offline.js').read_bytes(),'application/javascript; charset=utf-8')
+            if path == '/existing.js':
+                return self.send_bytes(200,(ROOT/'existing.js').read_bytes(),'application/javascript; charset=utf-8')
             if path == '/flow.js':
                 return self.send_bytes(200,(ROOT/'flow.js').read_bytes(),'application/javascript; charset=utf-8')
             if path.startswith('/joint/parameters/'):

@@ -48,7 +48,7 @@
   try{
    catalog=await request('/offline/catalog');if(!catalog.ready){el('off_source').textContent='等待 Docker 数据目录就绪；未连接头环时仍可处理已有数据。';return;}
    const select=el('off_dataset'),old=select.value;select.replaceChildren(new Option('请选择已有联合录制或已准备的 BAG',''));
-   for(const p of catalog.datasets)select.append(new Option((p.kind==='raw'?'原始录制：':'已准备 BAG：')+p.path,p.id));
+   for(const p of catalog.datasets.filter(p=>!p.mode||p.mode==='camera_imu'))select.append(new Option((p.kind==='raw'?'原始录制：':'已准备 BAG：')+p.path,p.id));
    if(catalog.datasets.some(p=>p.id===old))select.value=old;
    for(const id of ['off_camera','off_candidate','off_imu']){
     const s=el(id+'_recent'),previous=s.value;s.replaceChildren(new Option('从本机已有参数中选择，或拖入文件',''));
@@ -70,7 +70,7 @@
  };
  el('off_stop').onclick=async()=>{try{await request('/offline/stop',{});}catch(e){el('off_error').textContent=e.message;}};
  el('off_open').onclick=async()=>{try{await request('/offline/open',{});}catch(e){el('off_error').textContent=e.message;}};
- let polling=false;
+ let polling=false,lastRunning=false;
  async function poll(){
   if(polling)return;polling=true;
   try{
@@ -78,7 +78,7 @@
    busy=state.busy;window.egoOfflineBusy=busy;window.egoOfflineView=state;appBusy=!['READY','FAILED','DONE'].includes(app.stage);
    el('off_status').textContent=state.message;el('off_progress').hidden=!busy;
    el('off_results').hidden=state.stage==='IDLE';el('off_output').textContent=state.output&&!busy?'结果保存目录：'+state.output:'';el('off_open').disabled=!state.output||busy;
-   el('off_logs').textContent=state.logs.join('\n');el('off_files').replaceChildren();
+   if(busy&&!lastRunning)el('off_log_panel').open=true;lastRunning=busy;const nearEnd=el('off_logs').scrollHeight-el('off_logs').scrollTop-el('off_logs').clientHeight<60;el('off_logs').textContent=state.logs.join('\n');if(nearEnd)el('off_logs').scrollTop=el('off_logs').scrollHeight;el('off_files').replaceChildren();
    for(const name of state.files){const a=document.createElement('a');a.className='link';a.href='/offline/files/'+encodeURIComponent(name);a.textContent=name;a.target='_blank';a.rel='noopener';el('off_files').append(a);}
    el('off_metrics').replaceChildren();
    if(state.result?.residuals){

@@ -9,13 +9,14 @@ import numpy as np
 import yaml
 
 
-def allan_segments(segments, rate, sizes=None, stop=None):
+def allan_segments(segments, rate, sizes=None, stop=None, notify=lambda *_:None):
     longest=max(map(len,segments))
     automatic=sizes is None
     if automatic:sizes=np.unique(np.geomspace(1,max(2,longest//2),50).astype(int))
     rows=[]
     prefix=[np.vstack([np.zeros((1,6)),np.cumsum(v,axis=0,dtype=np.float64)]) for v in segments]
-    for m in sizes:
+    for point,m in enumerate(sizes,1):
+        notify('IMU_ANALYZING', f'Allan 曲线：正在计算第 {point}/{len(sizes)} 个时间尺度（{m/rate:.4g} 秒）…')
         if stop is not None and stop.is_set():raise InterruptedError('IMU 分析已停止，数据保留')
         # Select time scales by available complete clusters across all segments.
         # This is an explicit tool heuristic, not an EDF/confidence guarantee.
@@ -105,7 +106,7 @@ def analyze(run,stop=None,notify=lambda *_:None,prepared_data=None):
     cuts=np.r_[0,np.flatnonzero(np.diff(data[:,0])!=0)+1,len(data)]
     segments=[data[a:b,3:] for a,b in zip(cuts[:-1],cuts[1:]) if b-a>=100]
     if not segments:raise ValueError('没有足够的连续 IMU 数据片段')
-    curves=allan_segments(segments,rate,stop=stop)
+    curves=allan_segments(segments,rate,stop=stop,notify=notify)
     with (run/'imu-allan.csv').open('w',newline='') as f:
         writer=csv.writer(f);writer.writerow(['tau_s','ax','ay','az','gx','gy','gz','differences_used']);writer.writerows(curves)
     longest=max(map(len,segments))/rate
@@ -118,6 +119,7 @@ def analyze(run,stop=None,notify=lambda *_:None,prepared_data=None):
     if np.quantile(gyro,.99)>.15 or np.std(accel)>.15:issues.append('疑似存在运动或振动，需要检查静止条件')
     fits=[]
     for axis in range(6):
+        notify('IMU_ANALYZING',f'正在拟合第 {axis+1}/6 个传感器轴的噪声候选…')
         fits.append(fit_axis(curves[:,0],curves[:,axis+1]))
     fit_summary, missing_terms = summarize_fits(fits)
     issues.extend(missing_terms)
@@ -141,6 +143,7 @@ def analyze(run,stop=None,notify=lambda *_:None,prepared_data=None):
           'gyroscope_noise_density':max(fits[i]['white_noise']['coefficient'] for i in range(3,6)),
           'gyroscope_random_walk':max(fits[i]['bias_random_walk']['coefficient'] for i in range(3,6))}
         (run/'imu-candidate.yaml').write_text('# Experimental noise candidate; review required. Not a hardware timestamp calibration.\n'+yaml.safe_dump(profile,sort_keys=False))
+    notify('IMU_ANALYZING','正在生成 PDF 报告与 TXT 摘要…')
     import matplotlib
     matplotlib.use('Agg')
     from matplotlib import pyplot as plt

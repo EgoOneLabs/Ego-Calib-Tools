@@ -1,18 +1,49 @@
 # 头环标定工具：简化录制与自动计算
 
-界面版本：20261114-CLEAR-FLOW。支持从已安装的 YAML-DROP、JOINT-GUI 或 SIMPLE-FLOW 版本小更新，
+界面版本：20261114-COMPUTE-FLOW。支持从已安装的 YAML-DROP、JOINT-GUI 或 SIMPLE-FLOW 版本小更新，
 复用现有环境及桌面入口，不重新安装 Docker，不修改已有录制与结果。
 
 先在旧工具启动终端按 Ctrl+C 退出，再运行：
 
 ```bash
 cd "$(xdg-user-dir DOWNLOAD)" &&
-unzip -oq clear-ui.zip &&
-/usr/bin/python3 clear-ui/update.py
+unzip -oq compute-ui.zip &&
+/usr/bin/python3 compute-ui/update.py
 ```
 
 工具会核对版本并备份旧程序，随后启动同一个“头环标定工具”。关闭浏览器不等于退出程序；
 仍在录制或计算时不会执行更新。
+
+## 已录完数据：直接计算并查看实时过程
+
+界面版本：20261114-COMPUTE-FLOW。
+
+1. 选择 Camera、IMU 或 Camera–IMU 模块。
+2. “操作”选择“已有录制，直接计算”，选择本机保存的对应录制。
+3. Camera 和 IMU 无需导入其他模块的结果；第三步才需要拖入下表的两个参数。
+4. 点击预览旁“开始计算”。下方实时过程像终端一样滚动显示实际输出；某些步骤无新输出时请等待，不能把日志暂时安静当作失败。
+5. 完成后显示 YAML、PDF、TXT 等实际生成的文件，以及结果保存目录和“打开结果文件夹”。
+
+| 模块 | 计算输入 | 是否需要其他步骤的结果 |
+|---|---|---|
+| Camera | 本工具录制目录中的 camera.bag；优先复用原录制 aprilgrid.yaml，缺失时使用页面实测板尺寸 | 不需要 IMU 结果 |
+| IMU | 本工具保存的 imu_samples.csv、imu_capture.json（含单位换算后的六轴值及连续性/时间信息） | 不需要 Camera 结果或标定板 |
+| Camera–IMU | 联合运动录制，加第一步 camera-camchain.yaml、第二步 imu-candidate.yaml 或明确标注实验用途的 imu-experimental.yaml | 需要 Camera 与 IMU 参数 |
+
+只有 BAG 仍不足以表达 Camera 标定板的物理尺寸；这里直接复用工具保存的配置，不让用户反复找文件。
+当前 IMU 重算读取的是本工具保存的静止录制格式，**不是任意 IMU BAG 导入器**。
+已有数据列表仅扫描当前挂载数据根目录下本工具的已知录制目录；不扫描全盘或上传大 BAG。
+Camera 使用 /cam0/image_raw、/cam1/image_raw 的原始图像消息；不自动改写话题或猜测设备。
+
+重算创建新的计算目录，保留原 BAG、CSV 和旧结果。Camera 先读回检查已有 BAG 的图像内容结构、时间记录及哈希，
+再使用 Kalibr 求解；这不等于已经与最初的图像文件逐像素复核。IMU 按连续片段做 Allan 分析，
+缺少可靠噪声项时保留曲线/PDF/TXT，并明确未生成完整候选 YAML，不补零、不虚报成功。
+
+正常现场录制仍支持“录制结束后自动计算”，不用手动整理文件。Camera–IMU 第三步计算才需要两个 YAML；
+PDF、TXT 是报告，无需作为输入拖入。当前联合计算使用实验时间映射和噪声权重，结果需结合报告判断。
+
+“可选：联合标定结果复核”只在第三步底部，默认折叠。它是使用另一段独立数据检查已算出参数的一致性，
+不是以上 Camera、IMU、Camera–IMU 正常计算的前置步骤；不需要时可以一直忽略。
 
 ## 主流程
 

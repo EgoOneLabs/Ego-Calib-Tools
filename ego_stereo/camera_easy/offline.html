@@ -5,7 +5,7 @@
 <h2>处理结果</h2><p id="off_status">等待开始。</p><progress id="off_progress" hidden></progress>
 <p id="off_output"></p>
 <div class="actions"><button id="off_open" class="secondary" disabled>打开结果文件夹</button><button id="off_stop" class="secondary" disabled hidden>停止本次计算</button></div>
-<details><summary>查看报告、误差和运行日志</summary><div id="off_metrics"></div><div id="off_files"></div><pre id="off_logs"></pre></details>
+<div id="off_files"></div><details><summary>查看误差详情</summary><div id="off_metrics"></div></details><details id="off_log_panel"><summary>实时计算过程（可收起）</summary><pre id="off_logs" role="log" aria-live="off" style="max-height:320px;overflow:auto;background:#182332;color:#def1df;padding:14px"></pre></details>
 </section>
 <details id="offline_panel" hidden>
 <summary>可选：联合标定结果复核（一般无需展开）</summary>

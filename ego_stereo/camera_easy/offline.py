@@ -12,15 +12,18 @@ import tempfile
 import threading
 import time
 import yaml
-from core import require, sha
+from core import require, sha, Board, device_id
 from environment import ROS_ENV
 from joint import validate_inputs
 from joint_fixed_check import candidate_values
-from pipeline import logged_run
+from pipeline import logged_run, calculate
+from imu_analysis import analyze as analyze_imu
 
 ROOT=Path(__file__).resolve().parent
 EXPORTS={'joint-camchain-imucam.yaml','joint-results-imucam.txt','joint-report-imucam.pdf',
          'fixed_validation.json','job_status.json','job.log','offline_review.tar.gz',
+         'camera-camchain.yaml','camera-report-cam.pdf','camera-results-cam.txt','calculation.json',
+         'imu-candidate.yaml','imu-analysis.json','imu-results.txt','imu-report.pdf','imu-allan.csv',
          'camera.yaml','imu.yaml','aprilgrid.yaml','candidate.yaml','experimental_time_model.json','bag_verification.json'}
 
 
@@ -39,6 +42,18 @@ def inventory(root):
         raw=all((p/n).is_file() for n in ('camera_manifest.json','imu_samples.csv','imu_capture.json','joint_clock.json','aprilgrid.yaml'))
         prepared=all((p/n).is_file() for n in ('camera_imu_experimental.bag','bag_verification.json','experimental_time_model.json','aprilgrid.yaml'))
         if raw or prepared:datasets[key]=(p,'raw' if raw else 'prepared')
+    # Existing captures from this App; a dataset key never contains a client-supplied path.
+    for pattern,kind,needed in [
+        ('camera_easy/*/*','camera',('camera.bag',)),
+        ('imu/*/*','imu',('imu_samples.csv','imu_capture.json'))]:
+        for p in sorted(root.glob(pattern),reverse=True)[:2000]:
+            if not p.is_dir() or not all((p/n).is_file() for n in needed):continue
+            try:
+                key=identity(root,p)
+                # Reject escaped input symlinks as well as escaped directories.
+                for n in needed:identity(root,p/n)
+                datasets[key]=(p,kind)
+            except ValueError:continue
     patterns=['camera_imu/*/*/*.yaml','camera_easy/*/*/*camchain*.yaml','imu/*/*/imu-experimental.yaml','imu/*/*/imu-candidate.yaml']
     for pattern in patterns:
         for p in sorted(root.glob(pattern),reverse=True)[:2000]:
@@ -66,7 +81,7 @@ class Offline:
         if not root:return dict(ready=False,datasets=[],parameters=[],root='')
         datasets,params=inventory(root)
         return dict(ready=True,root=str(root),
-                    datasets=[dict(id=k,path=str(p),kind=kind) for k,(p,kind) in datasets.items()],
+                    datasets=[dict(id=k,path=str(p),kind=kind,mode=kind if kind in ('camera','imu') else 'camera_imu') for k,(p,kind) in datasets.items()],
                     parameters=[dict(id=k,path=str(p),kind=kind) for k,(p,kind) in params.items()])
 
     def parameter(self,key):
@@ -90,6 +105,8 @@ class Offline:
             require(not self.busy(),'已有计算或验证正在运行')
             require(self.app.state['stage'] in ('READY','FAILED','DONE'),'请先等待当前采集结束')
             require(self.app.data_root and self.app.container,'Docker 环境尚未准备好')
+            if value.get('action') in ('camera','imu'):
+                return self.start_single(value)
             require(value.get('experimental_ack') is True,'请确认当前使用实验时间映射，结果需要复核')
             datasets,_=inventory(self.app.data_root);key=value.get('dataset')
             require(key in datasets,'请选择已有联合数据；目录移动后请刷新列表')
@@ -116,8 +133,77 @@ class Offline:
             self.thread=threading.Thread(target=self.worker,args=(source,kind,action,camera,imu),daemon=True)
             self.thread.start()
 
+    def start_single(self,value):
+        action=value['action'];datasets,_=inventory(self.app.data_root)
+        require(value.get('dataset') in datasets,'请选择本机已录制的数据')
+        source,kind=datasets[value['dataset']]
+        require(kind==action,'所选数据与当前 Camera / IMU 模块不一致')
+        ident=device_id(value.get('device_id',''))
+        board=None
+        if action=='camera':
+            if (source/'aprilgrid.yaml').is_file():
+                identity(self.app.data_root,source/'aprilgrid.yaml')
+                require((source/'aprilgrid.yaml').stat().st_size<=32768,'板配置文件过大')
+                board=yaml.safe_load((source/'aprilgrid.yaml').read_text())
+                require(isinstance(board,dict) and board.get('target_type')=='aprilgrid','板配置无效')
+                Board.parse(dict(rows=board['tagRows'],cols=board['tagCols'],tag_mm=float(board['tagSize'])*1000,
+                                 gap_mm=float(board['tagSize'])*float(board['tagSpacing'])*1000))
+            else:
+                b=Board.parse(value.get('board',{}))
+                board=dict(target_type='aprilgrid',tagRows=b.rows,tagCols=b.cols,tagSize=b.tag_mm/1000,tagSpacing=b.gap_mm/b.tag_mm)
+        names=['camera.bag'] if action=='camera' else ['imu_samples.csv','imu_capture.json']
+        for n in names:identity(self.app.data_root,source/n)
+        size=sum((source/n).stat().st_size for n in names)+1024**3
+        require(shutil.disk_usage(source.parent).free>size,'磁盘空间不足，请先释放空间')
+        self.out=Path(tempfile.mkdtemp(prefix=action+'_calculate_',dir=source.parent));os.chmod(self.out,0o755)
+        self.inner='/data/'+self.out.relative_to(self.app.data_root).as_posix()
+        self.stop.clear();self.logs.clear()
+        self.state=dict(stage='QUEUED',message='正在准备已有数据，不需要重新录制…',action=action,output=str(self.out),result=None)
+        self.thread=threading.Thread(target=self.worker_single,args=(source,action,ident,board),daemon=True)
+        self.thread.start()
+
+    def worker_single(self,source,action,ident,board):
+        started=time.monotonic();details=dict(source=str(source),action=action,quality_accepted=False)
+        try:
+            names=['camera.bag'] if action=='camera' else ['imu_samples.csv','imu_capture.json']
+            details['input_sha256']={}
+            self.stage('PREPARING','正在准备独立计算目录，原始录制保留…')
+            for name in names:
+                require(not self.stop.is_set(),'计算已停止')
+                # Reflink when available, independent copy otherwise. Never edit source data.
+                original=source/name;identity(self.app.data_root,original)
+                before=sha(original)
+                subprocess.run(['cp','--reflink=auto','--',str(original),str(self.out/name)],check=True)
+                require(sha(self.out/name)==before,'数据副本校验失败：'+name)
+                details['input_sha256'][name]=before
+                self.log('已核对输入：'+name)
+            if action=='camera':
+                (self.out/'aprilgrid.yaml').write_text(yaml.safe_dump(board,sort_keys=False))
+                result=calculate(self.out,self.app.docker,self.app.container,self.app.data_root,self.app.info,
+                                 self.stop,self.stage,self.log,existing=True)
+                if hasattr(self.app,'parameters'):self.app.parameters.remember(ident,'camera',self.out/'camera-camchain.yaml')
+            else:
+                result=analyze_imu(self.out,stop=self.stop,notify=self.stage)
+                if hasattr(self.app,'parameters') and (self.out/'imu-candidate.yaml').is_file():
+                    self.app.parameters.remember(ident,'imu',self.out/'imu-candidate.yaml')
+                for line in (self.out/'imu-results.txt').read_text().splitlines():self.log(line)
+            require(not self.stop.is_set(),'计算已停止；原始数据保留')
+            details['result']=result
+            with self.lock:self.state['result']=result
+            self.stage('DONE','计算完成。请查看下方结果文件和保存路径；文件生成不等于质量验收。')
+        except BaseException as exc:
+            details['error']=str(exc);self.stage('FAILED',str(exc)+'；原始录制保留。')
+        finally:
+            if self.stop.is_set():self.app.docker.kill_group(self.app.container,self.inner)
+            details.update(stage=self.state['stage'],wall_seconds=time.monotonic()-started)
+            (self.out/'job_status.json').write_text(json.dumps(details,ensure_ascii=False,indent=2)+'\n')
+            with tarfile.open(self.out/'offline_review.tar.gz','w:gz') as tar:
+                for p in sorted(self.out.iterdir()):
+                    if p.is_file() and p.suffix in ('.json','.yaml','.txt','.pdf','.log','.sh'):tar.add(p,arcname=p.name)
+
     def command(self,shell,filename='job.log'):
         script=ROS_ENV+'''\nexport GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=safe.directory GIT_CONFIG_VALUE_0=/catkin_ws/src/kalibr
+export PYTHONUNBUFFERED=1
 cd "$1"
 echo "$$" > .kalibr.pid
 trap 'rm -f .kalibr.pid' EXIT

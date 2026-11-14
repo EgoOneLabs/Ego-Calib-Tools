@@ -27,6 +27,15 @@ const post=async(path,value)=>{submitted={path,value};};
  await $('start').onclick();assert.equal(submitted.path,'/start');
  assert.equal(submitted.value.camera_yaml,'camera-input');assert.equal(submitted.value.imu_yaml,'imu-input');
  assert.equal(submitted.value.auto_calculate,true);assert.equal(submitted.value.experimental_ack,true);
+ $('workflow').value='existing';$('existing_dataset').value='record-id';
+ for(const mode of ['camera','imu']){
+  $('mode').value=mode;submitted=null;await $('start').onclick();
+  assert.equal(submitted.path,'/offline/start');assert.equal(submitted.value.action,mode);
+  assert.equal(submitted.value.dataset,'record-id');assert.equal(submitted.value.camera_yaml,undefined);
+  assert.equal(submitted.value.imu_yaml,undefined);
+ }
+ $('mode').value='camera_imu';await $('start').onclick();assert.equal(submitted.value.action,'calibrate');
+ assert.equal(submitted.value.camera_yaml,'camera-input');
 })().catch(e=>{console.error(e);process.exitCode=1});
 '''
         self.run_node(setup+"$('start').onclick="+callback+checks)
