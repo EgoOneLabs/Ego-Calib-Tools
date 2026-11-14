@@ -1,0 +1,70 @@
+{
+  "status": "DIAGNOSTIC_ONLY",
+  "video_stream_enabled": true,
+  "browser_preview_enabled": false,
+  "quality_accepted": false,
+  "phases": [
+    {
+      "name": "A_10ms",
+      "status": "CAPTURE_COMPLETED",
+      "elapsed_seconds": 60.01014510600362,
+      "samples": 47964,
+      "packets": 3426,
+      "errors": 0,
+      "duplicates": 0,
+      "gaps": 45,
+      "missing_estimated": 630,
+      "counter_discontinuities": 0,
+      "counter_wraps_24bit": 0,
+      "poll_wait_seconds": 0.01,
+      "missing_fraction": 0.01296456352636128,
+      "unique_samples_per_host_second": 799.264856221811
+    },
+    {
+      "name": "B_0ms",
+      "status": "CAPTURE_COMPLETED",
+      "elapsed_seconds": 60.00070433600922,
+      "samples": 48566,
+      "packets": 3469,
+      "errors": 20225,
+      "duplicates": 0,
+      "gaps": 2,
+      "missing_estimated": 28,
+      "counter_discontinuities": 0,
+      "counter_wraps_24bit": 0,
+      "poll_wait_seconds": 0,
+      "missing_fraction": 0.0005762028233938346,
+      "unique_samples_per_host_second": 809.4238315608118
+    },
+    {
+      "name": "A2_10ms",
+      "status": "CAPTURE_COMPLETED",
+      "elapsed_seconds": 60.008406345994445,
+      "samples": 48440,
+      "packets": 3460,
+      "errors": 1,
+      "duplicates": 0,
+      "gaps": 10,
+      "missing_estimated": 140,
+      "counter_discontinuities": 0,
+      "counter_wraps_24bit": 0,
+      "poll_wait_seconds": 0.01,
+      "missing_fraction": 0.002881844380403458,
+      "unique_samples_per_host_second": 807.2202371232171
+    }
+  ],
+  "note": "Sequential 60s A/B/A test with the normal FFmpeg video stream continuously drained; no browser JPEG rendering. Not long-run validation.",
+  "video_frames_drained": 1803,
+  "comparison_completed": true,
+  "source_review_sha256": "beb55ec8da82082a7b4d40cf636e9449b0f9b09b04bc609eda12735022ad12ec",
+  "error_reasons_by_phase": {
+    "A_10ms": {},
+    "B_0ms": {
+      "[Errno 32] Broken pipe": 20225
+    },
+    "A2_10ms": {
+      "[Errno 32] Broken pipe": 1
+    }
+  },
+  "review_conclusion": "Zero wait had fewer missing samples but 20225 EPIPE failures in 60 seconds; do not adopt as production policy. Test 5ms against 10ms with video stream active. No long-run reliability or noise acceptance proven."
+}
