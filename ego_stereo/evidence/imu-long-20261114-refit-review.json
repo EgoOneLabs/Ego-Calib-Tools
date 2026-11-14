@@ -1,0 +1,152 @@
+{
+  "status": "PARTIAL_NOISE_REVIEW_PENDING",
+  "source_review_sha256": "47b3c8d42456440db74a15acacb1f71ecb55afb7538f4b4b849a729686f4dba3",
+  "raw_reanalysis_completed_on_user_machine": true,
+  "raw_source_sha256": {
+    "imu_packets.bin": "ac2b504b608e0f125c1bb4651d4495dfb896ed9683ce0b775e0b8ade0744873b",
+    "imu_requests.csv": "9150ac00e2d94b005b6bebfb7ea9c908bd8ab50456cea72a212ef16440e387f4",
+    "imu_capture.json": "3beeb9ffb278467d655c71833204c89535d0ffa676436a2fd374a0f78047f662"
+  },
+  "counter_discontinuities": 0,
+  "recognized_counter_wraps": 11,
+  "samples": 5824210,
+  "maximum_analyzed_tau_seconds": 82.95299835875437,
+  "axis_fits": {
+    "accel_x": {
+      "white_noise": {
+        "coefficient": 0.0015930126870861137,
+        "slope": -0.48485990002373075,
+        "tau_range_s": [
+          0.36191114266528235,
+          0.7596428421131353
+        ],
+        "log_residual": 0.01596355635498553
+      },
+      "bias_random_walk": {
+        "coefficient": 0.0022435140176243285,
+        "slope": 0.4874572697042998,
+        "tau_range_s": [
+          5.480545187733303,
+          11.499633918818358
+        ],
+        "log_residual": 0.004294059419781396
+      },
+      "allan_minimum_tau_s": 0.9720957995821747,
+      "allan_minimum_deviation": 0.0018086465851578507
+    },
+    "accel_y": {
+      "white_noise": {
+        "coefficient": 0.0017111495458013374,
+        "slope": -0.48564159336100643,
+        "tau_range_s": [
+          0.2828588794209886,
+          0.5928919743322032
+        ],
+        "log_residual": 0.021012093513097643
+      },
+      "bias_random_walk": {
+        "coefficient": 0.0033178625553913982,
+        "slope": 0.49190064244078474,
+        "tau_range_s": [
+          2.6124302619012703,
+          5.480545187733303
+        ],
+        "log_residual": 0.0023714309300394767
+      },
+      "allan_minimum_tau_s": 0.7596428421131353,
+      "allan_minimum_deviation": 0.00218967759788955
+    },
+    "accel_z": {
+      "white_noise": {
+        "coefficient": 0.003360895994464301,
+        "slope": -0.4946859208845602,
+        "tau_range_s": [
+          0.03829094000895479,
+          0.08152264647067793
+        ],
+        "log_residual": 0.02076079862676145
+      },
+      "bias_random_walk": {
+        "coefficient": 0.006209385371106423,
+        "slope": 0.4967793307540344,
+        "tau_range_s": [
+          5.480545187733303,
+          11.499633918818358
+        ],
+        "log_residual": 0.0039146496704075
+      },
+      "allan_minimum_tau_s": 0.9720957995821747,
+      "allan_minimum_deviation": 0.005247447456823303
+    },
+    "gyro_x": {
+      "white_noise": {
+        "coefficient": 0.0007628352224881014,
+        "slope": -0.49911812566867747,
+        "tau_range_s": [
+          0.1716916342337005,
+          0.36191114266528235
+        ],
+        "log_residual": 0.0018784569958455568
+      },
+      "bias_random_walk": {
+        "coefficient": 4.946674052258126e-05,
+        "slope": 0.4601263357513035,
+        "tau_range_s": [
+          39.5384835382788,
+          82.95299835875437
+        ],
+        "log_residual": 0.017444044732475093
+      },
+      "allan_minimum_tau_s": 30.885966287868207,
+      "allan_minimum_deviation": 0.00018640366316770597
+    },
+    "gyro_y": {
+      "white_noise": {
+        "coefficient": 0.00020675098921185654,
+        "slope": -0.524833477527155,
+        "tau_range_s": [
+          2.0405365449933326,
+          4.281174131323784
+        ],
+        "log_residual": 0.010616138514123371
+      },
+      "bias_random_walk": {
+        "coefficient": 4.244890566984687e-05,
+        "slope": 0.4324828365967464,
+        "tau_range_s": [
+          18.845318442471715,
+          39.5384835382788
+        ],
+        "log_residual": 0.0020102753195852434
+      },
+      "allan_minimum_tau_s": 7.01588836293107,
+      "allan_minimum_deviation": 9.030404423655285e-05
+    },
+    "gyro_z": {
+      "white_noise": {
+        "coefficient": 0.00035620703800954027,
+        "slope": -0.5022135891555864,
+        "tau_range_s": [
+          3.3436636969109874,
+          7.01588836293107
+        ],
+        "log_residual": 0.0025146586937972813
+      },
+      "bias_random_walk": null,
+      "allan_minimum_tau_s": 18.845318442471715,
+      "allan_minimum_deviation": 9.9899404354225e-05
+    }
+  },
+  "remaining_unidentified_terms": [
+    "gyro_z_bias_random_walk"
+  ],
+  "full_noise_yaml_generated": false,
+  "quality_accepted": false,
+  "ready_for_camera_imu": false,
+  "review_notes": [
+    "Six white-noise and five random-walk terms are local slope candidates, not independently validated sensor parameters.",
+    "Gyroscope Z Allan deviation is nearly flat at long measured time scales; do not force a +0.5 slope or substitute another axis.",
+    "349 gaps remain; longest contiguous segment is 445.5978448422728 seconds. No interpolation or cross-gap Allan comparison.",
+    "Source data retained; no further identical refit is justified."
+  ]
+}
