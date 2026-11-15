@@ -2,24 +2,24 @@
 #offline_panel{background:#ffffffc9;border:1px solid white;border-radius:22px;padding:18px 22px;margin-bottom:18px}#offline_panel>summary{font-size:19px;font-weight:650;cursor:pointer}#offline_panel .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:14px}#offline_panel .grid>div{min-width:0}#offline_panel p,#off_results p{overflow-wrap:anywhere}#off_files{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}#offline_panel select{max-width:100%;text-overflow:ellipsis}@media(max-width:700px){#offline_panel .grid{grid-template-columns:1fr}}
 </style>
 <section id="off_results" hidden>
-<h2>处理结果</h2><p id="off_status">等待开始。</p><progress id="off_progress" hidden></progress>
+<h2>Processing results</h2><p id="off_status">Waiting to start.</p><progress id="off_progress" hidden></progress>
 <p id="off_output"></p>
-<div class="actions"><button id="off_open" class="secondary" disabled>打开结果文件夹</button><button id="off_stop" class="secondary" disabled hidden>停止本次计算</button></div>
-<div id="off_files"></div><details><summary>查看误差详情</summary><div id="off_metrics"></div></details><details id="off_log_panel"><summary>实时计算过程（可收起）</summary><pre id="off_logs" role="log" aria-live="off" style="max-height:320px;overflow:auto;background:#182332;color:#def1df;padding:14px"></pre></details>
+<div class="actions"><button id="off_open" class="secondary" disabled>Open result folder</button><button id="off_stop" class="secondary" disabled hidden>Stop this calculation</button></div>
+<div id="off_files"></div><details><summary>View residual details</summary><div id="off_metrics"></div></details><details id="off_log_panel"><summary>Live calculation log (collapsible)</summary><pre id="off_logs" role="log" aria-live="off" style="max-height:320px;overflow:auto;background:#182332;color:#def1df;padding:14px"></pre></details>
 </section>
 <details id="offline_panel" hidden>
-<summary>可选：联合标定结果复核（一般无需展开）</summary>
-<p>用途：固定第三步算出的参数，检查它们在另一段独立运动数据上是否仍能对应。此项不是 Camera、IMU 采集或第三步计算的必填步骤；正常录制与计算不需要展开。需要复核时，选择另一段数据并拖入下方两个文件。</p>
-<label for="off_dataset">选择用于验证的独立录制<select id="off_dataset"><option value="">正在查找本机数据…</option></select></label>
+<summary>Optional: review an existing joint result</summary>
+<p>Use the parameters from step 3 to check consistency against a separate motion recording. This is optional; it is not required for Camera recording, IMU recording or joint calculation. To review a result, select another recording and provide the two files below.</p>
+<label for="off_dataset">Select an independent recording for review<select id="off_dataset"><option value="">Searching local recordings…</option></select></label>
 <p id="off_source" class="hint"></p>
 <div class="grid">
-<div id="off_camera_group" hidden><label>Camera 相机参数</label><details><summary>或从本机已有参数中选择</summary><select id="off_camera_recent"><option value="">选择本机参数，或拖入文件</option></select></details><div id="off_camera_drop" class="drop-zone" tabindex="0" role="button"><strong>拖入 Camera YAML，或点击选择</strong></div><input id="off_camera" type="file" accept=".yaml,.yml" hidden><p id="off_camera_name" class="hint">未选择</p></div>
-<div id="off_candidate_group"><label>第三步输出：joint-camchain-imucam.yaml</label><details><summary>或从本机已有参数中选择</summary><select id="off_candidate_recent"><option value="">选择已有联合结果，或拖入文件</option></select></details><div id="off_candidate_drop" class="drop-zone" tabindex="0" role="button"><strong>拖入联合外参，或点击选择</strong><p class="hint">新版本为 joint-camchain-imucam.yaml；旧版本也可使用 camera_imu-camchain-imucam.yaml</p></div><input id="off_candidate" type="file" accept=".yaml,.yml" hidden><p id="off_candidate_name" class="hint">未选择</p></div>
-<div><label>第二步输出：IMU 噪声参数 YAML</label><details><summary>或从本机已有参数中选择</summary><select id="off_imu_recent"><option value="">选择本机参数，或拖入文件</option></select></details><div id="off_imu_drop" class="drop-zone" tabindex="0" role="button"><strong>拖入 IMU 参数，或点击选择</strong><p class="hint">可使用当前的 imu-experimental.yaml</p></div><input id="off_imu" type="file" accept=".yaml,.yml" hidden><p id="off_imu_name" class="hint">未选择</p></div>
+<div id="off_camera_group" hidden><label>Camera parameters</label><details><summary>Or select local parameters</summary><select id="off_camera_recent"><option value="">Select local parameters or drop a file</option></select></details><div id="off_camera_drop" class="drop-zone" tabindex="0" role="button"><strong>Drop Camera YAML here or click to browse</strong></div><input id="off_camera" type="file" accept=".yaml,.yml" hidden><p id="off_camera_name" class="hint">Not selected</p></div>
+<div id="off_candidate_group"><label>Step 3 output: joint-camchain-imucam.yaml</label><details><summary>Or select local parameters</summary><select id="off_candidate_recent"><option value="">Select an existing joint result or drop a file</option></select></details><div id="off_candidate_drop" class="drop-zone" tabindex="0" role="button"><strong>Drop joint extrinsics here or click to browse</strong><p class="hint">Current name: joint-camchain-imucam.yaml. Older camera_imu-camchain-imucam.yaml files are also supported.</p></div><input id="off_candidate" type="file" accept=".yaml,.yml" hidden><p id="off_candidate_name" class="hint">Not selected</p></div>
+<div><label>Step 2 output: IMU-noise parameter YAML</label><details><summary>Or select local parameters</summary><select id="off_imu_recent"><option value="">Select local parameters or drop a file</option></select></details><div id="off_imu_drop" class="drop-zone" tabindex="0" role="button"><strong>Drop IMU parameters here or click to browse</strong><p class="hint">You can use the applicable imu-experimental.yaml</p></div><input id="off_imu" type="file" accept=".yaml,.yml" hidden><p id="off_imu_name" class="hint">Not selected</p></div>
 </div>
-<p class="hint">文件必须对应同一套头环和固定装配。当前使用实验时间映射与噪声参数，结果需要复核。</p>
+<p class="hint">Files must belong to the same headband and fixed assembly. Experimental time mapping and noise parameters require review.</p>
 <input id="off_ack" type="checkbox" checked hidden>
-<div class="actions"><button id="off_start" disabled>开始验证</button><button id="off_refresh" type="button" class="secondary">刷新列表</button></div>
+<div class="actions"><button id="off_start" disabled>Start review</button><button id="off_refresh" type="button" class="secondary">Refresh list</button></div>
 <p id="off_error" class="failed" role="alert"></p>
-<details><summary>高级：处理已有录制</summary><label for="off_action">操作<select id="off_action"><option value="validate" selected>验证已有联合参数</option><option value="calibrate">重新计算联合参数</option></select></label><p id="off_explanation" class="hint"></p></details>
+<details><summary>Advanced: process an existing recording</summary><label for="off_action">Operation<select id="off_action"><option value="validate" selected>Review existing joint parameters</option><option value="calibrate">Recalculate joint parameters</option></select></label><p id="off_explanation" class="hint"></p></details>
 </details>

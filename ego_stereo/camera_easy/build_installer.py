@@ -18,38 +18,38 @@ BASE="$(dirname "$SELF")"
 TMP="$(mktemp -d "${TMPDIR:-/tmp}/ego-camera.XXXXXXXX")"
 trap 'rm -rf -- "$TMP"' EXIT
 LINE="$(awk '/^__EGO_PAYLOAD_BELOW__$/ {print NR+1;exit}' "$SELF")"
-[[ -n "$LINE" ]] || { echo "安装包不完整，请重新下载。"; exit 1; }
+[[ -n "$LINE" ]] || { echo "Incomplete installer. Download it again."; exit 1; }
 tail -n +"$LINE" "$SELF" > "$TMP/payload.gz"
 ACTUAL="$(sha256sum "$TMP/payload.gz")"
-[[ "${ACTUAL%% *}" == "__PAYLOAD_SHA__" ]] || { echo "安装包校验失败，请重新下载。"; exit 1; }
+[[ "${ACTUAL%% *}" == "__PAYLOAD_SHA__" ]] || { echo "Installer checksum failed. Download it again."; exit 1; }
 mkdir "$TMP/content"
 tar -xzf "$TMP/payload.gz" -C "$TMP/content"
-(cd "$TMP/content" && sha256sum -c SHA256SUMS >/dev/null) || { echo "源码校验失败。"; exit 1; }
+(cd "$TMP/content" && sha256sum -c SHA256SUMS >/dev/null) || { echo "Source checksum failed."; exit 1; }
 rm -f "$TMP/payload.gz"
 if [[ "${1:-}" == --make-full ]]; then
   python3 "$TMP/content/source/ego_stereo/camera_easy/make_full.py" --source "$TMP/content/source" --output "$PWD/camera-full" --archive-dir "$BASE" "${@:2}"
   exit 0
 fi
 if [[ "${1:-}" == --check ]]; then
-  echo "安装包校验通过，未安装软件、未改变系统环境。"
+  echo "Installer checks passed. No software was installed and no system settings were changed."
   exit 0
 fi
 if [[ "${1:-}" == --environment-package ]]; then
-  [[ -f "${2:-}" ]] || { echo "找不到已下载的完整环境包"; exit 1; }
+  [[ -f "${2:-}" ]] || { echo "Downloaded complete environment package not found."; exit 1; }
   python3 "$TMP/content/source/ego_stereo/camera_easy/extract_environment.py" "$2" "$TMP/content/environment/kalibr-environment.tar.gz"
   shift 2
 fi
-[[ "$EUID" -ne 0 ]] || { echo "请使用普通用户运行 bash camera.run，按提示输入 sudo 密码。"; exit 1; }
+[[ "$EUID" -ne 0 ]] || { echo "Run bash camera.run as your normal user and enter the sudo password when requested."; exit 1; }
 mkdir -p "$HOME/.local/share/ego-camera/releases"
-DEST="$(mktemp -d "$HOME/.local/share/ego-camera/releases/v1.8-simple-flow_XXXXXXXX")"
+DEST="$(mktemp -d "$HOME/.local/share/ego-camera/releases/v1.9-bilingual_XXXXXXXX")"
 cp -a "$TMP/content/source" "$DEST/"
 export EGO_CAMERA_ARCHIVE_DIR="$BASE"
 if [[ -s "$TMP/content/environment/kalibr-environment.tar.gz" ]]; then export EGO_CAMERA_ARCHIVE_DIR="$TMP/content"; fi
-echo "开始安装头环标定工具。"
-echo "系统依赖只需首次安装，按提示输入本机密码。"
+echo "Installing Headband Calibration Tool."
+echo "System dependency setup may request your local sudo password."
 bash "$DEST/source/ego_stereo/camera_easy/install.sh" "$@"
 rm -rf -- "$TMP/content/environment"
-echo "安装完成，正在打开相机标定入口。以后从应用菜单打开“头环标定工具”。"
+echo "Installation complete. Opening Headband Calibration Tool. Use the application menu to start it later."
 bash "$DEST/source/ego_stereo/camera_easy/start.sh"
 exit 0
 __EGO_PAYLOAD_BELOW__

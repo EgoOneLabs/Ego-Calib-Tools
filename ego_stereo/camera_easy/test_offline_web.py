@@ -52,5 +52,5 @@ const tick=()=>new Promise(r=>setTimeout(r,0));
  console.log('DOM event workflow passed');
 })().catch(e=>{console.error(e);process.exitCode=1});
 '''
-        result=subprocess.run(['node','-e',setup+Path(__file__).with_name('offline.js').read_text()+checks],capture_output=True,text=True)
+        result=subprocess.run(['node','-e',"global.egoI18n={t:x=>x,english:()=>false};\n"+setup+Path(__file__).with_name('offline.js').read_text()+checks],capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stderr)

@@ -38,7 +38,7 @@ const tick=()=>new Promise(resolve=>setTimeout(resolve,0));
  assert.ok(get('existing_import_status').textContent.includes('开始计算'));
 })().catch(e=>{console.error(e);process.exitCode=1});
 '''
-        result=subprocess.run(['node','-e',setup+Path(__file__).with_name('existing.js').read_text()+checks],capture_output=True,text=True)
+        result=subprocess.run(['node','-e',"global.egoI18n={t:x=>x,english:()=>false};\n"+setup+Path(__file__).with_name('existing.js').read_text()+checks],capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stderr)
 
 

@@ -32,5 +32,5 @@ input.files=[{name:'picked.yml',size:12}];input.onchange();assert.equal(selected
 $(id+'_clear').onclick();assert.equal(selectedYaml.has(id),false);assert.equal(input.value,'');
 assert.equal($(id+'_clear').disabled,true);assert.ok(prevented>=5);
 '''
-        result=subprocess.run(['node','-e',setup+code+checks],capture_output=True,text=True)
+        result=subprocess.run(['node','-e',"global.egoI18n={t:x=>x,english:()=>false};\n"+setup+code+checks],capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stderr)

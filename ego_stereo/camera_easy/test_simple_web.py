@@ -7,7 +7,7 @@ import unittest
 @unittest.skipUnless(shutil.which('node'),'Node required for UI event checks')
 class SimpleWebTests(unittest.TestCase):
     def run_node(self,code):
-        result=subprocess.run(['node','-e',code],capture_output=True,text=True)
+        result=subprocess.run(['node','-e',"global.egoI18n={t:x=>x,english:()=>false};\n"+code],capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stderr)
 
     def test_joint_can_record_without_parameters_and_calculation_requires_both(self):

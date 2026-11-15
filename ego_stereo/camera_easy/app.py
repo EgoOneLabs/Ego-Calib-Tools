@@ -406,8 +406,10 @@ class Handler(BaseHTTPRequestHandler):
         path = unquote(urlparse(self.path).path)
         try:
             if path == '/':
-                html = (ROOT / 'web.html').read_text().replace('<!--OFFLINE_PANEL-->', (ROOT/'offline.html').read_text()).replace('__TOKEN__', self.server.token)
+                html = (ROOT / 'web.html').read_text().replace('<!--OFFLINE_PANEL-->', (ROOT/'offline.html').read_text()).replace('__TOKEN__', self.server.token).replace('__I18N__', (ROOT/'i18n.json').read_text())
                 return self.send_bytes(200, html.encode(), 'text/html; charset=utf-8')
+            if path == '/i18n.js':
+                return self.send_bytes(200,(ROOT/'i18n.js').read_bytes(),'application/javascript; charset=utf-8')
             if path == '/offline.js':
                 return self.send_bytes(200,(ROOT/'offline.js').read_bytes(),'application/javascript; charset=utf-8')
             if path == '/existing.js':
