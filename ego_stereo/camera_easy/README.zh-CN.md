@@ -1,3 +1,5 @@
+> 历史版本记录。当前双语版安装与使用请从[最新下载与教程](https://github.com/EgoOneLabs/Ego-Capture/blob/feat/english-default-code20/docs/releases/README.zh-CN.md)开始。以下版本和发布状态保留作历史参考。
+
 # 统一头环标定 App README
 
 [English](README.md) · [仓库总览](../../README.zh-CN.md)

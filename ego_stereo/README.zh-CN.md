@@ -1,3 +1,5 @@
+> 历史版本记录。当前双语版安装与使用请从[最新下载与教程](https://github.com/EgoOneLabs/Ego-Capture/blob/feat/english-default-code20/docs/releases/README.zh-CN.md)开始。以下版本和发布状态保留作历史参考。
+
 # 2UQ2 Ego 双目标定工具
 
 [English](README.en.md) · [采集App](https://github.com/EgoOneLabs/Ego-Capture/tree/feat/android-capture-code16) · [本轮同步与验证](STATUS-20261106.md)

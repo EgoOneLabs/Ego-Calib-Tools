@@ -6,12 +6,14 @@ Linux acquisition, input preparation and Kalibr orchestration for headband calib
 
 ## Start here
 
-Ordinary users should use the complete installer and the separate English/Chinese user guides delivered with the project. Source checkout is for development. The local `20261115-PROCESS-WAIT` candidate defaults to English and offers a Chinese switch. All three existing-data calculation workflows have completed on the reference workstation. This is not yet a public release or a clean-machine installation pass.
+The complete installer and Kalibr image have been uploaded to the `camera-easy-v1.9-bilingual` draft release by Blue88ight. Follow [downloads and installation](docs/user-guide/releases/README.md). Source changes are awaiting review in [PR #1](https://github.com/EgoOneLabs/Ego-Calib-Tools/pull/1).
+
+Ordinary users should use the complete installer and the separate English/Chinese user guides delivered with the project. Source checkout is for development. The `20261115-PROCESS-WAIT` candidate defaults to English and offers a Chinese switch. All three existing-data calculation workflows have completed on the reference workstation. This is not yet a public release or a clean-machine installation pass.
 
 1. Secure the mainboard and both cameras. Use a data-capable USB cable and connect directly to Linux.
 2. Use Ubuntu 22.04/24.04 desktop on x86_64, internet access and sudo. Allow at least 30 GiB plus recording/import space.
 3. Print a flat 6×6 AprilGrid at actual size and measure it. Camera/Camera–IMU need the target; stationary IMU does not.
-4. Follow the packaged English `START_HERE.md` or Chinese `START_HERE.zh-CN.md` for installation, recording, import and result paths.
+4. Follow the [English calibration tutorial](docs/user-guide/calibration/README.md) or [Chinese tutorial](docs/user-guide/calibration/README.zh-CN.md) for recording, imports and output paths.
 
 For a source installation, open a terminal at this repository root:
 
@@ -39,3 +41,5 @@ Camera and IMU can be done in either order. Joint motion can be recorded before 
 The proposed language work passed eight targeted UI/catalog checks and syntax checks. Full regression is blocked here by missing OpenCV; browser launch is blocked by socket restrictions. New-package Docker/hardware and fresh-Ubuntu tests remain pending. See the project review bundle for the exact test record and source commits.
 
 Contributions use independent branches and PRs for human approval. Do not merge automatically or commit large images. Retain third-party licenses; project-wide licensing and redistribution scope still need maintainer confirmation.
+
+[2026-11-15 release audit / 发布检查记录](docs/user-guide/guides/RELEASE_AUDIT.md)
