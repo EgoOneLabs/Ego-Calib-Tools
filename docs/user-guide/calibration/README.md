@@ -2,7 +2,7 @@
 
 [简体中文](README.zh-CN.md) · [Project overview](../../../README.md) · [Phone capture](../capture/README.md)
 
-One Linux app handles **Camera**, **stationary IMU analysis** and **Camera–IMU calibration**. Connect the headband directly to Linux, not through the phone app. The current local candidate is `20261115-PROCESS-WAIT`, with English as the default and a Chinese switch. It has passed all three existing-data calculation workflows on the reference workstation; it is not yet a public release.
+One Linux app handles **Camera**, **stationary IMU analysis** and **Camera–IMU calibration**. Connect the headband directly to Linux, not through the phone app. The current pre-release is `20261115-PROCESS-WAIT`, with English as the default and a Chinese switch. It has passed all three existing-data calculation workflows on the reference workstation; the complete installer is available as a public pre-release.
 
 The immediate goal is to demonstrate recording, calculation and result-file generation. Optional joint-result review stays collapsed. It is not a prerequisite for normal use.
 

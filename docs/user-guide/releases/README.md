@@ -6,18 +6,18 @@ The phone app supports **Android 12+, arm64-v8a and USB Host / OTG**. The Linux 
 
 ## Availability
 
-As of 2026-11-15, both installation packages have been uploaded as **draft releases by Blue88ight**. Drafts require repository access and become public downloads after publication. The source changes are awaiting review in [Ego-Capture PR #2](https://github.com/EgoOneLabs/Ego-Capture/pull/2) and [Ego-Calib-Tools PR #1](https://github.com/EgoOneLabs/Ego-Calib-Tools/pull/1).
+As of 2026-11-15, both installation packages are **public pre-releases published by Blue88ight**. Their release pages and all five asset URLs were checked without authentication. The source changes are awaiting review in [Ego-Capture PR #2](https://github.com/EgoOneLabs/Ego-Capture/pull/2) and [Ego-Calib-Tools PR #1](https://github.com/EgoOneLabs/Ego-Calib-Tools/pull/1).
 
-| Application | Release page after publication | Required assets |
+| Application | Public release page | Required assets |
 |---|---|---|
 | Android capture | [v0.3.9-code20](https://github.com/EgoOneLabs/Ego-Capture/releases/tag/v0.3.9-code20) | `Ego-Capture-code20-debug.apk`, `SHA256SUMS` |
 | Linux calibration | [camera-easy-v1.9-bilingual](https://github.com/EgoOneLabs/Ego-Calib-Tools/releases/tag/camera-easy-v1.9-bilingual) | `camera.zip`, `camera.zip.sha256`; `environment_manifest.json` records environment provenance |
 
-These version links can return 404 while the releases are drafts. Check the [Android Releases page](https://github.com/EgoOneLabs/Ego-Capture/releases) or [Linux Releases page](https://github.com/EgoOneLabs/Ego-Calib-Tools/releases). The older code19 APK and historical Linux packages are separate versions.
+Both version pages and their asset URLs are publicly accessible. Check the [Android Releases page](https://github.com/EgoOneLabs/Ego-Capture/releases) or [Linux Releases page](https://github.com/EgoOneLabs/Ego-Calib-Tools/releases). The older code19 APK and historical Linux packages are separate versions.
 
 ## Android installation
 
-1. After publication, download the APK and `SHA256SUMS` from the Android release above into one directory. On Linux, run `sha256sum -c SHA256SUMS` there.
+1. Download the APK and `SHA256SUMS` from the Android release above into one directory. On Linux, run `sha256sum -c SHA256SUMS` there.
 2. Transfer the APK to a compatible Android phone and open it. Allow the installation source and requested permissions. The APK is debug-signed and uses the same certificate as code19. Back up sessions before uninstalling or changing signing certificates.
 3. Connect the headband and follow the [Data Capture App README](../capture/README.md). English is the initial default; the language switch offers Chinese and retains saved choices.
 
@@ -53,4 +53,4 @@ Download the [original target PDF/YAML pairs](../calibration-targets/README.md) 
 
 ## Maintainer checks
 
-Both source PRs have been submitted. Before publishing the drafts, compare the GitHub asset sizes/digests with the local files, review the bilingual installation instructions and confirm redistribution permissions. After publication, test the public download links and checksums without repository authentication. Production signing, fresh-machine installation and calibration accuracy acceptance remain pending. Keep raw recordings and temporary test/build outputs on the workstation. The optional local project review bundle is separate from the two release installers.
+Both source PRs have been submitted. The published asset sizes and available server digests matched the workstation checks. The public APK was downloaded and verified against SHA256SUMS. The public Linux checksum matched the server digest; the 1.8 GB ZIP was not downloaded again during the public-access check. Maintainers retain responsibility for redistribution permissions. Production signing, fresh-machine installation and calibration accuracy acceptance remain pending. Keep raw recordings and temporary test/build outputs on the workstation. The optional local project review bundle is separate from the two release installers.

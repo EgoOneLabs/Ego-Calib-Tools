@@ -9,7 +9,7 @@ Linux 上的 2UQ2 双目头环标定工具，统一提供 Camera、静止 IMU �
 1. 固定主板和左右相机，连接配套排线与 USB 数据线。联合采集时部件保持刚性连接。
 2. 准备 Ubuntu 22.04/24.04 x86_64 桌面环境、联网和 sudo 权限，预留至少 30 GiB 加录制空间。最终完整包的全新系统安装仍待验证。
 3. 按[硬件准备](docs/user-guide/hardware/README.zh-CN.md)和[标定板打印说明](docs/user-guide/calibration-targets/README.zh-CN.md)准备平整、实测的 AprilGrid。
-4. 按[下载安装说明](docs/user-guide/releases/README.zh-CN.md)取得 camera.zip 与校验文件。新版完整包含 Kalibr 镜像，已由 Blue88ight 上传至 camera-easy-v1.9-bilingual 发布草稿。
+4. 按[下载安装说明](docs/user-guide/releases/README.zh-CN.md)取得 camera.zip 与校验文件。新版完整包含 Kalibr 镜像，已由 Blue88ight 上传至 camera-easy-v1.9-bilingual 公开预发布版。
 5. 按[标定 App 教程](docs/user-guide/calibration/README.zh-CN.md)录制或导入已有数据、查看实时计算日志、取得输出文件与保存路径。首次默认英文，可切换中文。
 
 ## 输入与输出

@@ -1,6 +1,6 @@
 [English](README.md)
 
-> **本地候选版本：** Android code20 已构建；Linux `20261115-PROCESS-WAIT` 已完成三项已有数据计算测试。两款 App 均以英文为首次使用默认语言，并保留中英切换及已保存偏好。新版尚未公开发布，安装文件和状态见[项目下载说明](../releases/README.zh-CN.md)。
+> **当前预发布版本：** Android code20 已构建；Linux `20261115-PROCESS-WAIT` 已完成三项已有数据计算测试。两款 App 均以英文为首次使用默认语言，并保留中英切换及已保存偏好。新版已由 Blue88ight 公开为预发布版，安装文件和状态见[项目下载说明](../releases/README.zh-CN.md)。
 
 # 数据采集 App 使用教程（Data Capture App README）
 
@@ -8,7 +8,7 @@
 
 本文只介绍手机采集：安装、连接、录制、保存和导出。普通采集无需先完成标定。Linux 标定请看[相机与 IMU 标定 App README（Camera & IMU Calibration App）](../calibration/README.zh-CN.md)。
 
-本教程面向第一次使用 2UQ2 双目头环的用户。完成后应能在手机上看到左右连续画面，保存一次包含视频、头环 IMU 及可用音频的会话，并把完整数据复制到电脑。本地候选版本：code20 / 0.3.9-english-default，包名 `com.egouvc.phone`。
+本教程面向第一次使用 2UQ2 双目头环的用户。完成后应能在手机上看到左右连续画面，保存一次包含视频、头环 IMU 及可用音频的会话，并把完整数据复制到电脑。当前预发布版本：code20 / 0.3.9-english-default，包名 `com.egouvc.phone`。
 
 装配和线缆选择可先看 [硬件准备 README（Hardware Setup）](../hardware/README.zh-CN.md)。本教程按“准备 → 安装 → 认识界面 → 短录制 → 导出 → 检查”执行。
 
@@ -22,7 +22,7 @@
 
 ## 2 下载和安装 APK
 
-1. 发布后从 code20 Release 取得 `Ego-Capture-code20-debug.apk`；公开附件状态看[下载说明](../releases/README.zh-CN.md)。旧公开 code19 与本次版本不同。Source code ZIP 不是安装包。
+1. 从公开 code20 Release 取得 `Ego-Capture-code20-debug.apk`；公开附件状态看[下载说明](../releases/README.zh-CN.md)。旧公开 code19 与本次版本不同。Source code ZIP 不是安装包。
 2. 在手机“下载”中点击 APK。按系统提示允许此次来源安装；完成后打开 Ego Capture。
 3. 按采集需要允许相机、录音和 USB 访问。拒绝权限后不会不断重复弹窗，可按系统设置调整，或轻触预览区域重试。
 4. 将头环通过 USB 数据线接到手机。连接已授权设备后自动打开相机；出现左右连续画面后再设置任务。

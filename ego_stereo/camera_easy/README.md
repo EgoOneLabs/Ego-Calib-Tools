@@ -2,7 +2,7 @@
 
 [简体中文](README.zh-CN.md) · [Repository overview](../../README.md)
 
-This is the source directory for one Linux app with Camera, stationary IMU and Camera–IMU modules. Complete operating tutorials are available in [English](../../docs/user-guide/calibration/README.md) and [Chinese](../../docs/user-guide/calibration/README.zh-CN.md). Installation assets and draft availability are listed in [Release Downloads](../../docs/user-guide/releases/README.md).
+This is the source directory for one Linux app with Camera, stationary IMU and Camera–IMU modules. Complete operating tutorials are available in [English](../../docs/user-guide/calibration/README.md) and [Chinese](../../docs/user-guide/calibration/README.zh-CN.md). Installation assets and public availability are listed in [Release Downloads](../../docs/user-guide/releases/README.md).
 
 ## Source setup
 

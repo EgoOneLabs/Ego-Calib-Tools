@@ -1,6 +1,6 @@
 [English](README.md)
 
-> **本地候选版本：** Android code20 已构建；Linux `20261115-PROCESS-WAIT` 已完成三项已有数据计算测试。两款 App 均以英文为首次使用默认语言，并保留中英切换及已保存偏好。新版尚未公开发布，安装文件和状态见[项目下载说明](../releases/README.zh-CN.md)。
+> **当前预发布版本：** Android code20 已构建；Linux `20261115-PROCESS-WAIT` 已完成三项已有数据计算测试。两款 App 均以英文为首次使用默认语言，并保留中英切换及已保存偏好。新版已由 Blue88ight 公开为预发布版，安装文件和状态见[项目下载说明](../releases/README.zh-CN.md)。
 
 # 相机与 IMU 标定 App 使用教程（Camera & IMU Calibration App README）
 
@@ -23,7 +23,7 @@
 
 普通用户从 GitHub Release 下载 **Linux 完整安装包 `camera.zip`**。包内已包含统一 App 与 Kalibr 镜像；README 教程及标定板在仓库中提供，无需先克隆源码，也不用逐个安装历史补丁。
 
-1. 打开[完整包下载与安装（Release Downloads）](../releases/README.zh-CN.md)，确认新版本已公开且附件齐全。若该版本仍为草稿，需等待公开，不能用旧版包替代。
+1. 打开[完整包下载与安装（Release Downloads）](../releases/README.zh-CN.md)，确认新版本已公开且附件齐全。核对版本号和附件名称。
 2. 下载 camera.zip 和 camera.zip.sha256。
 3. 按下载页核对 SHA-256，安装 unzip 并解压到新目录。
 4. 在含 `camera.run` 的文件夹空白处右键“在终端打开”，普通用户运行：

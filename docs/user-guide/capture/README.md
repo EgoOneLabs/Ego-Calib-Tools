@@ -4,7 +4,7 @@
 
 > **Android phones only:** Android 12 or later, arm64-v8a (64-bit), and USB Host / OTG. The APK does not run on iPhone, iOS or HarmonyOS NEXT.
 
-This guide covers phone installation, connection, recording and backup. Ordinary recording does not require calibration or a Linux computer. The published baseline is code19 (`0.3.8-glass-page`), package `com.egouvc.phone`. Code20 (`0.3.9-english-default`) has been built and tested on the reference phone as a local candidate; it is not yet public. The code20 APK has been uploaded as a draft; see Release Downloads for availability.
+This guide covers phone installation, connection, recording and backup. Ordinary recording does not require calibration or a Linux computer. The current public pre-release is code20 (`0.3.9-english-default`), package `com.egouvc.phone`. Its build and reference-phone evidence are recorded in Validation. Obtain the APK from Release Downloads.
 
 ## 1. Prepare the hardware
 
@@ -14,7 +14,7 @@ Huawei STG-AL00 is the tested reference phone. Other models require a short comp
 
 ## 2. Install the APK
 
-1. Obtain `Ego-Capture-code20-debug.apk` from the code20 release after publication, or check [published download availability](../releases/README.md). The older public code19 is a different version. A Source code ZIP is not an APK.
+1. Obtain `Ego-Capture-code20-debug.apk` from the public code20 pre-release, or check [published download availability](../releases/README.md). The older public code19 is a different version. A Source code ZIP is not an APK.
 2. Open the APK from Downloads and allow installation from that source when prompted.
 3. Open the app and grant camera, microphone and USB permissions as needed. If access was denied, review system permissions or tap the preview to retry.
 4. Connect the headband. Wait for continuous left and right previews before recording.

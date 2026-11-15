@@ -26,3 +26,7 @@ The workstation built its uploaded complete ZIP from the BILINGUAL installer wit
 ## Remaining checks
 
 Replace and verify the Linux draft asset, submit these documentation corrections to the two existing PR branches under Blue88ight, and review the changes. Fresh-machine installation of the final installer, full device language-persistence acceptance, production signing and calibration accuracy acceptance remain pending. The short IMU run generated reports without a complete noise YAML; joint functional testing used experimental noise weights. Keep private recordings, temporary test logs and build outputs on the workstation.
+
+## Publication check completed
+
+Both releases are public pre-releases authored by Blue88ight. All seven release-page/asset URLs returned HTTP 200 without authentication. The downloaded APK and its checksum agree. The public Linux checksum agrees with GitHub’s asset digest. The old Linux draft was replaced with the fixed complete package, size 1,806,624,824 bytes. Public Linux SHA-256: `2dac03ce782d2882784e3a9e704ef4c63707fcabb4ac17d54f4439870360046c`. The full Linux ZIP was not downloaded again during this public-access check. Source PRs remain under review.

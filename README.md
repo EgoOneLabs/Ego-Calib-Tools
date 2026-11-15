@@ -6,9 +6,9 @@ Linux acquisition, input preparation and Kalibr orchestration for headband calib
 
 ## Start here
 
-The complete installer and Kalibr image have been uploaded to the `camera-easy-v1.9-bilingual` draft release by Blue88ight. Follow [downloads and installation](docs/user-guide/releases/README.md). Source changes are awaiting review in [PR #1](https://github.com/EgoOneLabs/Ego-Calib-Tools/pull/1).
+The complete installer and Kalibr image are publicly available in the `camera-easy-v1.9-bilingual` pre-release published by Blue88ight. Follow [downloads and installation](docs/user-guide/releases/README.md). Source changes are awaiting review in [PR #1](https://github.com/EgoOneLabs/Ego-Calib-Tools/pull/1).
 
-Ordinary users should use the complete installer and the separate English/Chinese user guides delivered with the project. Source checkout is for development. The `20261115-PROCESS-WAIT` candidate defaults to English and offers a Chinese switch. All three existing-data calculation workflows have completed on the reference workstation. This is not yet a public release or a clean-machine installation pass.
+Ordinary users should use the complete installer and the separate English/Chinese user guides delivered with the project. Source checkout is for development. The `20261115-PROCESS-WAIT` candidate defaults to English and offers a Chinese switch. All three existing-data calculation workflows have completed on the reference workstation. The installer is a public pre-release; clean-machine installation of this final package remains pending.
 
 1. Secure the mainboard and both cameras. Use a data-capable USB cable and connect directly to Linux.
 2. Use Ubuntu 22.04/24.04 desktop on x86_64, internet access and sudo. Allow at least 30 GiB plus recording/import space.
