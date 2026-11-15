@@ -142,7 +142,7 @@ git -c safe.directory=/catkin_ws/src/kalibr -C /catkin_ws/src/kalibr rev-parse H
 { time -p rosrun kalibr kalibr_calibrate_imu_camera --bag "$1/camera_imu.bag" --cam "$1/input-camera.yaml" --imu "$1/input-imu.yaml" --target "$1/aprilgrid.yaml" --imu-models calibrated --dont-show-report; } 2>&1
 '''
         (root/'joint_command.sh').write_text(shell)
-        logged_run(docker.prefix+['exec',container,'setsid','bash','-c',shell,'_',inner],root,'joint_calibration.log',stop,notify)
+        logged_run(docker.prefix+['exec',container,'setsid','--wait','bash','-c',shell,'_',inner],root,'joint_calibration.log',stop,notify)
         chain=root/'camera_imu-camchain-imucam.yaml'
         for name in ('camera_imu-camchain-imucam.yaml','camera_imu-report-imucam.pdf','camera_imu-results-imucam.txt'):
             require((root/name).is_file() and (root/name).stat().st_size>0,'联合求解缺少输出：'+name)

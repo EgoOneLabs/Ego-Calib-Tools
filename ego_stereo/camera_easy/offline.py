@@ -230,7 +230,7 @@ echo "$$" > .kalibr.pid
 trap 'rm -f .kalibr.pid' EXIT
 '''+shell
         (self.out/'command.sh').write_text(script)
-        logged_run(self.app.docker.prefix+['exec',self.app.container,'setsid','bash','-c',script,'_',self.inner],
+        logged_run(self.app.docker.prefix+['exec',self.app.container,'setsid','--wait','bash','-c',script,'_',self.inner],
                    self.out,filename,self.stop,self.log)
 
     def worker(self,source,kind,action,camera,imu,board=None):

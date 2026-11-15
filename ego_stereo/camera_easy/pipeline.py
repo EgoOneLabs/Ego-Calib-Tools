@@ -20,6 +20,7 @@ def review(root):
 
 
 def logged_run(command, root, filename, stop, notify):
+    started = time.monotonic()
     (root / (filename + '.command.json')).write_text(json.dumps(command, indent=2))
     with (root / filename).open('w') as log:
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
@@ -43,6 +44,11 @@ def logged_run(command, root, filename, stop, notify):
                 except subprocess.TimeoutExpired: process.kill(); process.wait()
             reader.join(timeout=5)
             process.stdout.close()
+            (root / (filename + '.process.json')).write_text(json.dumps({
+                'returncode': process.returncode,
+                'wall_seconds': time.monotonic() - started,
+                'session_wait_requested': '--wait' in command,
+            }, indent=2) + '\n')
 
 
 def calculate(root, docker, container, data_root, info, stop, update, notify, existing=False):
@@ -88,7 +94,7 @@ rosbag info camera.bag > bag_info.txt
 '''
         (root / 'kalibr_command.sh').write_text(shell)
         # A unique session lets shutdown address only this calibration's subprocesses.
-        logged_run(docker.prefix + ['exec', container, 'setsid', 'bash', '-c', shell, '_', inner],
+        logged_run(docker.prefix + ['exec', container, 'setsid', '--wait', 'bash', '-c', shell, '_', inner],
                    root, 'calibration.log', stop, notify)
         status.update(inspect_outputs(root))
         timing = re.findall(r'^(real|user|sys)\s+([0-9.]+)\s*$', (root / 'calibration.log').read_text(), re.M)
