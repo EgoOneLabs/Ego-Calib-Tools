@@ -364,7 +364,7 @@ class App:
             require(self.joint_frames_done.wait(10),'图像采集未正常结束，原始数据保留')
             result=inspect_capture(run)
             with self.lock:self.state['result']=result
-            self.update('DONE','联合运动数据已保存。当前是采集检查结果；请先复核参数和时间轴，再运行联合求解。')
+            self.update('DONE','联合运动数据已保存，无需重复录制。选择“已有录制，直接计算”，补齐 Camera 相机参数 YAML 和 IMU 噪声参数 YAML 后即可计算。')
             if auto_calculate and not self.stop.is_set():
                 from offline import identity
                 self.offline.start(dict(dataset=identity(self.data_root,run),action='calibrate',experimental_ack=True,

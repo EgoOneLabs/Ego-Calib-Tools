@@ -186,5 +186,10 @@
       }
     ],
     "caveat": "Host packet completion and complete-frame timestamps are not exposure/sample hardware timestamps. These diagnostics cannot verify synchronization or manufacturer scaling."
+  },
+  "current_scope_20261115": {
+    "goal": "Verify capture, computation and output generation for all three modules",
+    "mount_clarification": "User reports mainboard re-taping can change relative placement; do not require cross-mount extrinsics equality for the current flow verification",
+    "additional_precision_diagnostics": "Paused, not a prerequisite for recording or using the existing calculation pipelines"
   }
 }

@@ -10,7 +10,7 @@ class SimpleWebTests(unittest.TestCase):
         result=subprocess.run(['node','-e',code],capture_output=True,text=True)
         self.assertEqual(result.returncode,0,result.stderr)
 
-    def test_joint_start_requires_two_files_and_requests_automatic_calculation(self):
+    def test_joint_can_record_without_parameters_and_calculation_requires_both(self):
         html=Path(__file__).with_name('web.html').read_text()
         callback=html.split("$('start').onclick=",1)[1].split('\nfunction durationFields',1)[0]
         setup=r'''
@@ -21,7 +21,10 @@ const post=async(path,value)=>{submitted={path,value};};
 '''
         checks=r'''
 (async()=>{
- await $('start').onclick();assert.equal(submitted,null);assert.ok($('error').textContent.includes('两个文件'));
+ await $('start').onclick();assert.equal(submitted.path,'/start');assert.equal(submitted.value.auto_calculate,false);
+ assert.equal(submitted.value.experimental_ack,false);
+ $('workflow').value='existing';$('existing_dataset').value='record-id';submitted=null;await $('start').onclick();
+ assert.equal(submitted,null);assert.ok($('error').textContent.includes('两个文件'));$('workflow').value='record';
  selectedYaml.set('joint_camera_file',{size:10,text:async()=>'camera-input'});
  selectedYaml.set('joint_imu_file',{size:10,text:async()=>'imu-input'});
  await $('start').onclick();assert.equal(submitted.path,'/start');
@@ -39,6 +42,33 @@ const post=async(path,value)=>{submitted={path,value};};
 })().catch(e=>{console.error(e);process.exitCode=1});
 '''
         self.run_node(setup+"$('start').onclick="+callback+checks)
+
+    def test_ready_joint_record_button_is_enabled_without_parameters(self):
+        html=Path(__file__).with_name('web.html').read_text()
+        body=html.split('async function update()',1)[1].split('\nupdate();setInterval',1)[0]
+        setup=r'''
+const assert=require('node:assert/strict'),nodes=new Map();
+const $=id=>{if(!nodes.has(id))nodes.set(id,{value:'',textContent:'',dataset:{},style:{},setAttribute(){},replaceChildren(){},scrollHeight:0,scrollTop:0,clientHeight:0});return nodes.get(id);};
+let initialized=true,wasCalculating=false;const names={READY:'准备就绪'};
+const selectedYaml=new Map(),window={egoOfflineBusy:false,egoImportBusy:false};
+const document={createElement:()=>({style:{},append(){}})};const formatTime=String;
+const state={stage:'READY',mode:'camera',message:'左右已连接',duration:60,elapsed:0,pairs:0,result:null,output:'',log_tail:[],files:[]};
+const fetch=async()=>({json:async()=>state});
+$('mode').value='camera_imu';$('workflow').value='record';$('mode_hint').textContent='固定标定板，移动头环';
+'''
+        checks=r'''
+(async()=>{
+ await update();assert.equal($('error').textContent,'');assert.equal($('start').disabled,false);
+ assert.equal($('start').textContent,'开始联合录制');assert.ok($('message').textContent.includes('可以开始录制'));
+ $('workflow').value='existing';$('existing_dataset').value='saved-record';await update();
+ assert.equal($('start').disabled,true);assert.ok($('start').title.includes('联合计算需要'));
+ selectedYaml.set('joint_camera_file',{});selectedYaml.set('joint_imu_file',{});await update();
+ assert.equal($('start').disabled,false);assert.equal($('start').textContent,'开始计算');
+ $('workflow').value='record';await update();assert.equal($('start').textContent,'开始录制并计算');
+ window.egoOfflineBusy=true;await update();assert.equal($('start').disabled,true);assert.ok($('start').title.includes('计算正在运行'));
+})().catch(e=>{console.error(e);process.exitCode=1});
+'''
+        self.run_node(setup+'async function update()'+body+checks)
 
     def test_delayed_previous_device_defaults_cannot_replace_current_device(self):
         setup=r'''
