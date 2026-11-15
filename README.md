@@ -6,12 +6,12 @@ Linux acquisition, input preparation and Kalibr orchestration for headband calib
 
 ## Start here
 
-Ordinary users should use the complete installer and the separate English/Chinese user guides delivered with the project. Source checkout is for development. The proposed `20261115-BILINGUAL` app starts in English and offers a Chinese switch; it is under review, not a published release. The previous source baseline is `6b5ebcb` / RECORD-FIX.
+Ordinary users should use the complete installer and the separate English/Chinese user guides delivered with the project. Source checkout is for development. The local `20261115-PROCESS-WAIT` candidate defaults to English and offers a Chinese switch. All three existing-data calculation workflows have completed on the reference workstation. This is not yet a public release or a clean-machine installation pass.
 
 1. Secure the mainboard and both cameras. Use a data-capable USB cable and connect directly to Linux.
 2. Use Ubuntu 22.04/24.04 desktop on x86_64, internet access and sudo. Allow at least 30 GiB plus recording/import space.
 3. Print a flat 6×6 AprilGrid at actual size and measure it. Camera/Camera–IMU need the target; stationary IMU does not.
-4. Follow the packaged English `README.md` or Chinese `README.zh-CN.md` for installation, recording, import and result paths.
+4. Follow the packaged English `START_HERE.md` or Chinese `START_HERE.zh-CN.md` for installation, recording, import and result paths.
 
 For a source installation, open a terminal at this repository root:
 

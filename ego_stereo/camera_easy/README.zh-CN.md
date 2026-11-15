@@ -2,7 +2,7 @@
 
 [English](README.md) · [仓库总览](../../README.zh-CN.md)
 
-本目录为 Linux Camera、IMU、Camera–IMU 统一工具源码。完整英中使用教程位于本次项目检查包 `01-documentation/Ego-Capture/docs/calibration/`，包含下载安装、测量板、现场录制、已有文件导入、两份 YAML 来源、日志、输出与排障。
+本目录为 Linux Camera、IMU、Camera–IMU 统一工具源码。完整英中使用教程位于本次项目检查包 `01-documentation/docs/calibration/`，包含下载安装、测量板、现场录制、已有文件导入、两份 YAML 来源、日志、输出与排障。
 
 普通用户优先运行检查包根目录的 Linux 安装入口。源码安装在仓库根目录执行：
 

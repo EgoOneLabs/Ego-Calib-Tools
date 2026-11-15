@@ -2,7 +2,7 @@
 
 [简体中文](README.zh-CN.md) · [Repository overview](../../README.md)
 
-This is the source directory for one Linux app with Camera, stationary IMU and Camera–IMU modules. The project review bundle contains full English and Chinese operating tutorials under `01-documentation/Ego-Capture/docs/calibration/`. That is the complete user guide; the old Chinese notes in this source tree are retained as historical references.
+This is the source directory for one Linux app with Camera, stationary IMU and Camera–IMU modules. The project review bundle contains full English and Chinese operating tutorials under `01-documentation/docs/calibration/`. That is the complete user guide; the old Chinese notes in this source tree are retained as historical references.
 
 ## Source setup
 
@@ -13,7 +13,7 @@ bash ego_stereo/camera_easy/install.sh /actual/path/to/kalibr-environment.tar.gz
 bash ego_stereo/camera_easy/start.sh
 ```
 
-Installation uses sudo and network access for dependencies. The separate verified image is included in the project review bundle. Normal users should use its root Linux installer instead of configuring ROS on the host.
+Installation uses sudo and network access for dependencies. The verified image is embedded in the complete camera.zip installer included in the project review bundle. Normal users should use its root Linux installer instead of configuring ROS on the host.
 
 ## Basic use
 
