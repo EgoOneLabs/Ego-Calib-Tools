@@ -1,0 +1,102 @@
+{
+  "status": "JOINT_RAW_CAPTURE_SOFTWARE_CHECKS_PASS_HARDWARE_PENDING",
+  "tests_passed": 53,
+  "test_command": "python3 -m unittest discover -s ego_stereo/camera_easy -p 'test_*.py' -v",
+  "real_ros1_bag_io_tested": true,
+  "real_full_3840x1080_pixel_split_tested": true,
+  "kalibr_execution_test": "fixture/stub only; not actual optimization",
+  "uvc_camera_hardware_tested": false,
+  "real_docker_kalibr_executed_here": false,
+  "fresh_ubuntu_install_tested": false,
+  "graphical_browser_render_tested": false,
+  "host_syntax_checks": [
+    "Python compile",
+    "bash -n",
+    "node --check"
+  ],
+  "algorithm_modifications": false,
+  "next_required_test": "Run three-minute 10ms/0ms/10ms polling comparison on real 2UQ2; then validate selected policy under normal preview load.",
+  "reported_first_install_failure": "ENTRYPOINT, runtime ROS cache and exact-path Git audit fixes incorporated; actual user machine optimization completed after manual repair.",
+  "runtime_ros_cache_fix": "Copy baked root rosdep cache offline to runtime ROS_HOME; preflight imports actual Kalibr modules and verifies ds-none instead of testing help exit status.",
+  "git_audit_fix": "Use command-scoped safe.directory for exact Kalibr source path; actual Git ownership rejection and success tested without global config changes.",
+  "user_reported_ubuntu_2204_trial": {
+    "input_pairs": 170,
+    "used_pairs": 74,
+    "outputs": [
+      "YAML",
+      "PDF",
+      "TXT"
+    ],
+    "manual_retry": true,
+    "color_preview_tested": false,
+    "board_dimensions_confirmed": false
+  },
+  "imu_hardware_tested": false,
+  "imu_software_tests": [
+    "packet parser endian/sign/wrap",
+    "ioctl structure x86_64 ABI layout",
+    "duplicates/gaps/counter reset",
+    "capture stop/error preservation",
+    "Allan exact contiguous-segment formula",
+    "white noise recovery and random walk fitting",
+    "synthetic 60 second CSV/PDF pipeline",
+    "mode validation and joint rejection"
+  ],
+  "graphical_browser_test_limitation": "Headless Chromium blocked by runtime socket permissions; HTML/JS syntax checked.",
+  "automatic_warmup_removed": true,
+  "user_reported_imu_short_trial": {
+    "duration_seconds": 60.01153019099729,
+    "samples": 48580,
+    "read_errors": 0,
+    "duplicates": 0,
+    "counter_gaps": 2,
+    "missing_estimated": 28,
+    "sample_rate_estimate_hz": 809.8401502557471
+  },
+  "custom_duration_supported": true,
+  "custom_duration_range_seconds": [
+    60,
+    86400
+  ],
+  "minimum_two_hour_quality_gate": false,
+  "joint_capture_implemented": true,
+  "joint_hardware_tested": false,
+  "joint_official_solver_wrapper_implemented": true,
+  "joint_official_solver_executed": false,
+  "joint_bag_generation_implemented": false,
+  "joint_solver_ui_enabled": false,
+  "joint_time_axis_verified": false,
+  "counter_u24_rollover_supported": true,
+  "existing_raw_reanalysis_implemented": true,
+  "existing_raw_reanalysis_real_result_pending": true,
+  "raw_reanalysis_completed_on_user_machine": true,
+  "full_imu_noise_profile_verified": false,
+  "noise_fit_search": "Measured branches around Allan minimum; long time scales selected by complete-cluster support, with explicit heuristic disclosure. Refit on real two-hour raw data pending.",
+  "polling_comparison_hardware_tested": false,
+  "polling_diagnostic_v1_real_machine_failure": "EPIPE before any valid sample; v1 omitted the video stream active in normal GUI",
+  "polling_diagnostic_v2_hardware_tested": false,
+  "unified_build": "20261114-YAML-DROP",
+  "per_axis_noise_status_implemented": true,
+  "updated_unified_build_installed_on_hardware": false,
+  "legacy_mixed_model_reproduced": true,
+  "legacy_model_max_relative_difference": 0,
+  "experimental_weights_dynamic_validation_passed": false,
+  "yaml_drop_node_event_tests_passed": true,
+  "yaml_drop_real_browser_tested": false,
+  "joint_fullframe_official_detector_user_machine": {
+    "input_pairs": 490,
+    "detected": [
+      488,
+      483
+    ],
+    "common_pairs": 483
+  },
+  "experimental_joint_bag_uploaded_subset_tested": {
+    "image_pairs": 6,
+    "imu_samples": 48160,
+    "backend": "rosbags",
+    "full_490_pair_bag_verified": false
+  },
+  "joint_full_490_pair_rosbag_readback_on_user_machine": true,
+  "current_joint_optimization_on_user_machine": false
+}

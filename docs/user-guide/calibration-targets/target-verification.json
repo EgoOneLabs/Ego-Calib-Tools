@@ -1,0 +1,24 @@
+{
+  "april_6x6_25mm_A4.pdf": {
+    "page_mm": [
+      210.0,
+      297.0
+    ],
+    "tags": 36,
+    "tag_edge_mm": 25,
+    "gap_mm": 7.5,
+    "family_code_match": "tag36h11 IDs 0-35; exact cell bits compared with Kalibr generator, allowing rotation",
+    "sha256": "caceae58e339c67edd1a90f22bdbeefc707657dcba8ee39d7baeeaa90ece9ef9"
+  },
+  "april_6x6_88mm_full.pdf": {
+    "page_mm": [
+      700.0,
+      700.0
+    ],
+    "tags": 36,
+    "tag_edge_mm": 88,
+    "gap_mm": 26.4,
+    "family_code_match": "tag36h11 IDs 0-35; exact cell bits compared with Kalibr generator, allowing rotation",
+    "sha256": "6bcc672b7b064e60b91e74d7300395e4d5686a98c7c0abf2ded2907c7109c9a6"
+  }
+}

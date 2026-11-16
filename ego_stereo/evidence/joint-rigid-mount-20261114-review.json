@@ -1,0 +1,144 @@
+{
+  "device": "2UQ2",
+  "record": "camera_imu_20261114T072623Z_dd4dca05",
+  "mount": "User confirmed mainboard rigidly secured before recording",
+  "camera_pairs": 686,
+  "common_target_pose_pairs": 572,
+  "imu_samples": 60410,
+  "imu_missing_samples": 1890,
+  "joint_trial": {
+    "output": "joint_experimental_trial_u2c1sf9c",
+    "exit_code": 0,
+    "mean_residuals": {
+      "cam0_px": 2.873948350933582,
+      "cam1_px": 3.2080515470431132,
+      "gyro_rad_s": 0.014644058418611255,
+      "accel_m_s2": 0.07023484152411211
+    },
+    "timeshift_seconds": [
+      -0.047858302774539035,
+      -0.05111513577365975
+    ],
+    "quality_accepted": false
+  },
+  "camera_recheck": {
+    "output": "camera_recheck_qo1Ycf3T",
+    "processed_images": 572,
+    "used_images": 83,
+    "axis_residual_std_px": [
+      [
+        0.757742,
+        0.704216
+      ],
+      [
+        0.723057,
+        0.743662
+      ]
+    ],
+    "baseline_mm": 89.15903673671518,
+    "camchain_sha256": "ff8dbe19a6ed4895cc2bb035ca98958941d7ad4bcb865345f2ad22be3d4a91c0",
+    "wall_seconds": 176.95,
+    "independent_validation": false
+  },
+  "interpretation": "Old fixed camera parameters are a plausible contributor to structured joint reprojection residuals. Same-record camera refit is diagnostic, not held-out validation or proof of mechanical lens motion. Next repeat joint optimization with refitted camera parameters and unchanged BAG/IMU weights. Hardware timing remains unverified.",
+  "updated_camera_joint_trial": {
+    "output": "joint_camera_updated_hDPklVhP",
+    "mean_residuals": {
+      "cam0_px": 0.8881337623793244,
+      "cam1_px": 0.9191711336065034,
+      "gyro_rad_s": 0.009586714009274555,
+      "accel_m_s2": 0.06966698539591051
+    },
+    "timeshift_seconds": [
+      -0.048845406342843234,
+      -0.048820495783934076
+    ],
+    "wall_seconds": 132.36,
+    "user_seconds": 931.53,
+    "sys_seconds": 108.88,
+    "optimization_iterations": 8,
+    "same_record_refit": true,
+    "independent_validation": false,
+    "hardware_sync_verified": false,
+    "quality_accepted": false,
+    "sha256": {
+      "camera_imu-camchain-imucam.yaml": "69a75e55cf1648614e345689114c466895ba3fb3522066434dda71b8840c465c",
+      "camera_imu-report-imucam.pdf": "316612acb34b37e24a75d490a4fb40e5b4bcfa4385128d8b7fc6167eb2b82d4b",
+      "camera_imu-results-imucam.txt": "0ed2a14b3de10f7128d4287b3860fa89e030abf4f32109b7b293f0d3ffb745df"
+    },
+    "interpretation": "Replacing the fixed old camera model reduces structured reprojection residuals on the same record. This supports camera-model mismatch as a contributor. New parameters remain candidates pending independent motion recording and timing review. Near-equal fitted time shifts are not exposure synchronization proof."
+  },
+  "independent_record_repeat": {
+    "record": "camera_imu_20261114T075600Z_269e962d",
+    "output": "joint_repeat_ik9mmEUn",
+    "common_target_pairs": 759,
+    "camera_pairs": 765,
+    "imu_samples": 72394,
+    "mean_residuals": {
+      "cam0_px": 0.9453191058967322,
+      "cam1_px": 0.8940447002440375,
+      "gyro_rad_s": 0.009109796501725624,
+      "accel_m_s2": 0.05956616181469241
+    },
+    "comparison": {
+      "cam0": {
+        "rotation_difference_deg": 0.32308635773398353,
+        "translation_column_difference_mm": 11.832056813150508,
+        "timeshift_change_ms": 0.2835824606446033
+      },
+      "cam1": {
+        "rotation_difference_deg": 0.32308635774300815,
+        "translation_column_difference_mm": 11.832056813150508,
+        "timeshift_change_ms": 0.2919257679967202
+      }
+    },
+    "wall_seconds": 184.87,
+    "user_seconds": 1220.52,
+    "sys_seconds": 110.56,
+    "fixed_extrinsics_validation": false,
+    "quality_accepted": false,
+    "interpretation": "Low refitted residuals repeat, but translation differs by about 11.8 mm. Do not infer hardware movement or acceptance from these two estimates alone. Preserve both records; next evaluate independent data with candidate extrinsics fixed."
+  },
+  "fixed_candidate_independent_check": {
+    "output": "/home/key/文档/kalibr/data/camera_imu/2UQ2/joint_fixed_check_45b8s7du",
+    "container_exit_code": 0,
+    "status": "FIXED_CANDIDATE_CONDITIONAL_CHECK_COMPLETE",
+    "extrinsics_fixed": true,
+    "time_offsets_fixed": true,
+    "nuisance_variables_fitted": [
+      "trajectory",
+      "gravity_direction",
+      "imu_bias_splines"
+    ],
+    "hardware_sync_verified": false,
+    "quality_accepted": false,
+    "candidate_sha256": "69a75e55cf1648614e345689114c466895ba3fb3522066434dda71b8840c465c",
+    "residuals": {
+      "cam0_px": {
+        "count": 97157,
+        "mean": 0.9453741199116581,
+        "rms": 1.0625238286988719,
+        "p95": 1.7908983270548153
+      },
+      "cam1_px": {
+        "count": 85573,
+        "mean": 0.8941025116968473,
+        "rms": 1.0133764758093664,
+        "p95": 1.7661186483972475
+      },
+      "gyro_rad_s": {
+        "count": 72394,
+        "mean": 0.009183661681870499,
+        "rms": 0.012122027637064632,
+        "p95": 0.024816072173314743
+      },
+      "accel_m_s2": {
+        "count": 72394,
+        "mean": 0.0596380890881581,
+        "rms": 0.08313205644252525,
+        "p95": 0.13238284598806505
+      }
+    },
+    "interpretation": "Extrinsics and time offsets verified inactive and numerically unchanged. Fixed-candidate residuals closely match independently refitted residuals. This is conditional consistency with trajectory, gravity and bias fitted, not final sync/noise acceptance or proof of translation precision. GUI verification entry not yet integrated."
+  }
+}

@@ -1,0 +1,25 @@
+<style>
+#offline_panel{background:#ffffffc9;border:1px solid white;border-radius:22px;padding:18px 22px;margin-bottom:18px}#offline_panel>summary{font-size:19px;font-weight:650;cursor:pointer}#offline_panel .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:14px}#offline_panel .grid>div{min-width:0}#offline_panel p,#off_results p{overflow-wrap:anywhere}#off_files{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}#offline_panel select{max-width:100%;text-overflow:ellipsis}@media(max-width:700px){#offline_panel .grid{grid-template-columns:1fr}}
+</style>
+<section id="off_results" hidden>
+<h2>Processing results</h2><p id="off_status">Waiting to start.</p><progress id="off_progress" hidden></progress>
+<p id="off_output"></p>
+<div class="actions"><button id="off_open" class="secondary" disabled>Open result folder</button><button id="off_stop" class="secondary" disabled hidden>Stop this calculation</button></div>
+<div id="off_files"></div><details><summary>View residual details</summary><div id="off_metrics"></div></details><details id="off_log_panel"><summary>Live calculation log (collapsible)</summary><pre id="off_logs" role="log" aria-live="off" style="max-height:320px;overflow:auto;background:#182332;color:#def1df;padding:14px"></pre></details>
+</section>
+<details id="offline_panel" hidden>
+<summary>Optional: review an existing joint result</summary>
+<p>Use the parameters from step 3 to check consistency against a separate motion recording. This is optional; it is not required for Camera recording, IMU recording or joint calculation. To review a result, select another recording and provide the two files below.</p>
+<label for="off_dataset">Select an independent recording for review<select id="off_dataset"><option value="">Searching local recordings…</option></select></label>
+<p id="off_source" class="hint"></p>
+<div class="grid">
+<div id="off_camera_group" hidden><label>Camera parameters</label><details><summary>Or select local parameters</summary><select id="off_camera_recent"><option value="">Select local parameters or drop a file</option></select></details><div id="off_camera_drop" class="drop-zone" tabindex="0" role="button"><strong>Drop Camera YAML here or click to browse</strong></div><input id="off_camera" type="file" accept=".yaml,.yml" hidden><p id="off_camera_name" class="hint">Not selected</p></div>
+<div id="off_candidate_group"><label>Step 3 output: joint-camchain-imucam.yaml</label><details><summary>Or select local parameters</summary><select id="off_candidate_recent"><option value="">Select an existing joint result or drop a file</option></select></details><div id="off_candidate_drop" class="drop-zone" tabindex="0" role="button"><strong>Drop joint extrinsics here or click to browse</strong><p class="hint">Current name: joint-camchain-imucam.yaml. Older camera_imu-camchain-imucam.yaml files are also supported.</p></div><input id="off_candidate" type="file" accept=".yaml,.yml" hidden><p id="off_candidate_name" class="hint">Not selected</p></div>
+<div><label>Step 2 output: IMU-noise parameter YAML</label><details><summary>Or select local parameters</summary><select id="off_imu_recent"><option value="">Select local parameters or drop a file</option></select></details><div id="off_imu_drop" class="drop-zone" tabindex="0" role="button"><strong>Drop IMU parameters here or click to browse</strong><p class="hint">You can use the applicable imu-experimental.yaml</p></div><input id="off_imu" type="file" accept=".yaml,.yml" hidden><p id="off_imu_name" class="hint">Not selected</p></div>
+</div>
+<p class="hint">Files must belong to the same headband and fixed assembly. Experimental time mapping and noise parameters require review.</p>
+<input id="off_ack" type="checkbox" checked hidden>
+<div class="actions"><button id="off_start" disabled>Start review</button><button id="off_refresh" type="button" class="secondary">Refresh list</button></div>
+<p id="off_error" class="failed" role="alert"></p>
+<details><summary>Advanced: process an existing recording</summary><label for="off_action">Operation<select id="off_action"><option value="validate" selected>Review existing joint parameters</option><option value="calibrate">Recalculate joint parameters</option></select></label><p id="off_explanation" class="hint"></p></details>
+</details>

@@ -1,0 +1,135 @@
+{
+  "status": "PARTIAL_NOISE_REVIEW_PENDING",
+  "source_allan_csv_sha256": "4cf0545a8f45456d48e63dd9f77dbd230b361feeaa182594a8e665abc7593a0f",
+  "input_samples": 5824210,
+  "estimated_rate_hz": 809.5909892196505,
+  "segments_used": 262,
+  "longest_segment_s": 445.5978448422728,
+  "clock_fit_residual_std_ms": 11.950798117306555,
+  "axis_fits_from_measured_branches": {
+    "ax": {
+      "white_noise": {
+        "coefficient": 0.00159584863455408,
+        "slope": -0.47053549046559906,
+        "tau_range_s": [
+          0.35079441814655354,
+          0.7868170576033613
+        ],
+        "log_residual": 0.020221289213143995
+      },
+      "bias_random_walk": {
+        "coefficient": 0.002245365749607089,
+        "slope": 0.4847138489448388,
+        "tau_range_s": [
+          5.176688050888049,
+          11.605860397552878
+        ],
+        "log_residual": 0.004949633049115128
+      },
+      "allan_minimum_tau_s": 1.030149805402203,
+      "allan_minimum_deviation": 0.0018093422485550561
+    },
+    "ay": {
+      "white_noise": {
+        "coefficient": 0.0017228504004857133,
+        "slope": -0.49605658575299827,
+        "tau_range_s": [
+          0.2680365800626835,
+          0.6015383156245478
+        ],
+        "log_residual": 0.030092976424155832
+      },
+      "bias_random_walk": {
+        "coefficient": 0.003319879510468114,
+        "slope": 0.5049090936250206,
+        "tau_range_s": [
+          3.0225138774810443,
+          6.775025998358613
+        ],
+        "log_residual": 0.0023335836389395516
+      },
+      "allan_minimum_tau_s": 0.7868170576033613,
+      "allan_minimum_deviation": 0.0021963879903535545
+    },
+    "az": {
+      "white_noise": {
+        "coefficient": 0.003694358786985333,
+        "slope": -0.45564225934213165,
+        "tau_range_s": [
+          0.11857839486644063,
+          0.2680365800626835
+        ],
+        "log_residual": 0.002731801894160201
+      },
+      "bias_random_walk": {
+        "coefficient": 0.006212784343404893,
+        "slope": 0.49349834579239615,
+        "tau_range_s": [
+          5.176688050888049,
+          11.605860397552878
+        ],
+        "log_residual": 0.004725799311761413
+      },
+      "allan_minimum_tau_s": 1.030149805402203,
+      "allan_minimum_deviation": 0.005246615580366601
+    },
+    "gx": {
+      "white_noise": {
+        "coefficient": 0.0007667507302176054,
+        "slope": -0.49556916360914294,
+        "tau_range_s": [
+          0.45949128010745743,
+          1.030149805402203
+        ],
+        "log_residual": 0.0004964174913121809
+      },
+      "bias_random_walk": null,
+      "allan_minimum_tau_s": 34.04682162602677,
+      "allan_minimum_deviation": 0.0001846229699657307
+    },
+    "gy": {
+      "white_noise": {
+        "coefficient": 0.00020707660022640896,
+        "slope": -0.46062102536189004,
+        "tau_range_s": [
+          2.308573125056016,
+          5.176688050888049
+        ],
+        "log_residual": 0.01616911052882531
+      },
+      "bias_random_walk": {
+        "coefficient": 4.229414688262089e-05,
+        "slope": 0.4270736447475466,
+        "tau_range_s": [
+          19.877938631100303,
+          44.559537445904645
+        ],
+        "log_residual": 0.0033237061936631
+      },
+      "allan_minimum_tau_s": 8.867440591106014,
+      "allan_minimum_deviation": 9.02971395696818e-05
+    },
+    "gz": {
+      "white_noise": {
+        "coefficient": 0.00035616384313525774,
+        "slope": -0.5052637657745003,
+        "tau_range_s": [
+          3.0225138774810443,
+          6.775025998358613
+        ],
+        "log_residual": 0.002246176155339845
+      },
+      "bias_random_walk": null,
+      "allan_minimum_tau_s": 19.877938631100303,
+      "allan_minimum_deviation": 9.9670089859653e-05
+    }
+  },
+  "unobserved_terms": [
+    "gx: bias_random_walk",
+    "gz: bias_random_walk"
+  ],
+  "full_yaml_generated": false,
+  "ready_for_camera_imu": false,
+  "quality_accepted": false,
+  "note": "Post-review uses existing Allan CSV, not a new raw-data or temporal calibration; local slope matches are candidate interpretations."
+}

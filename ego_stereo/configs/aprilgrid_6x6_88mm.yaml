@@ -1,0 +1,7 @@
+# Example from the historical 2UQ2 experiment. Measure the actual printed board.
+# tagSpacing is the gap/tagSize ratio, not a distance in metres.
+target_type: aprilgrid
+tagCols: 6
+tagRows: 6
+tagSize: 0.088
+tagSpacing: 0.3

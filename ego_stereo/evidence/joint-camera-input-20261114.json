@@ -1,0 +1,18 @@
+{
+  "status": "CAMERA_INPUT_REFERENCE_MATCH",
+  "camera_yaml_sha256": "153ab87359e8efd07be55a3d5c4734911bfbd7b7277452eb91087c4976c97aaf",
+  "matches_saved_reference_bytes": true,
+  "stereo_baseline_mm": 89.2711855761498,
+  "image_resolution": [
+    1920,
+    1080
+  ],
+  "topics": [
+    "/cam0/image_raw",
+    "/cam1/image_raw"
+  ],
+  "paired_imu_yaml_sha256": "94869a9b8473658829caae888865cf89bdaad4f92ba949d892d06c92e6a49762",
+  "quality_accepted": false,
+  "device_still_same_rigid_assembly_independently_verified": false,
+  "next": "All-frame official Kalibr detector check on user workstation; no re-recording requested."
+}

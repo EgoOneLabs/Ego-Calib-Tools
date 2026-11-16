@@ -1,0 +1,10 @@
+{
+  "core_tests_passed": 4,
+  "python_syntax_passed": true,
+  "actual_ros_kalibr_ds_bindings_executed": false,
+  "original_230_pair_bag_executed": false,
+  "intrinsics_optimized": false,
+  "stereo_extrinsics_optimized": false,
+  "calibration_quality_accepted": false,
+  "source_method": "Official Kalibr camera validator; custom offline adapter"
+}

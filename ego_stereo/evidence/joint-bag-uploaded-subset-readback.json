@@ -1,0 +1,15 @@
+{
+  "status": "EXPERIMENTAL_JOINT_BAG_READBACK_VERIFIED",
+  "counts": {
+    "/imu0": 48160,
+    "/cam0/image_raw": 6,
+    "/cam1/image_raw": 6
+  },
+  "bag_sha256": "0af4487f4ca70b3a11408528c48af6930852cdffe7b038e045e1ad073110c420",
+  "all_image_pixels_verified": true,
+  "all_imu_values_verified": true,
+  "all_header_and_bag_times_verified": true,
+  "hardware_sync_verified": false,
+  "quality_accepted": false,
+  "joint_optimization_executed": false
+}

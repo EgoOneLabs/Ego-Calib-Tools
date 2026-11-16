@@ -1,0 +1,195 @@
+{
+  "fixed_vs_free": [
+    {
+      "metric": "Reprojection error (cam0) [px]",
+      "free_mean": 0.9453191058967322,
+      "fixed_mean": 0.9453741199116581,
+      "increase_pct": 0.0058196237209928725
+    },
+    {
+      "metric": "Reprojection error (cam1) [px]",
+      "free_mean": 0.8940447002440375,
+      "fixed_mean": 0.8941025116968473,
+      "increase_pct": 0.006466282143846591
+    },
+    {
+      "metric": "Gyroscope error (imu0) [rad/s]",
+      "free_mean": 0.009109796501725624,
+      "fixed_mean": 0.009183661681870499,
+      "increase_pct": 0.8108323839163933
+    },
+    {
+      "metric": "Accelerometer error (imu0) [m/s^2]",
+      "free_mean": 0.05956616181469241,
+      "fixed_mean": 0.0596380890881581,
+      "increase_pct": 0.12075190221161325
+    }
+  ],
+  "static_imu": {
+    "samples": 5824210,
+    "longest_segment_seconds": 445.5978448422728,
+    "white_noise_candidates": 6,
+    "random_walk_candidates": 5,
+    "missing_random_walk_axes": [
+      5
+    ]
+  },
+  "interpretation": "The fixed/free means are close although candidates differ in translation. This is consistent with weak effective translation discrimination under fitted trajectory/gravity/bias; it does not prove poor observability, cause, or final quality. Next read existing IMU motion and packet/frame timing; no new recording requested.",
+  "record_a_existing_attachment_diagnosis": {
+    "record": "camera_imu_20261114T072623Z_dd4dca05",
+    "input_sha256": {
+      "imu_samples.csv": "c79496c0e96f549ded33b0a2f19a2791fc69d35eabab2db8e11b42f8ed80fb61",
+      "imu_capture.json": "dac84e694a18a2cd17a354790a74dd0d69327fa581b1ef0079a70829bfd687cd",
+      "camera_manifest.json": "78124bb3757f17607c16eea85061279662ff892f93a076e0eaf5331bc9ae48d0",
+      "joint_clock.json": "20688b4f23983e2cb61e753f3f0c6bfb1196f89563f9dd313bc189e765747db1"
+    },
+    "samples": 60410,
+    "capture": {
+      "status": "CAPTURE_STOPPED_EARLY",
+      "quality_accepted": false,
+      "requested_seconds": 95.0,
+      "poll_wait_seconds": 0.01,
+      "timestamp_semantics": "Host request interval is packet timing only; raw counter unit and exposure relation are not vendor-confirmed. No per-sample timestamps invented.",
+      "nominal_scale": {
+        "accel_counts_per_g": 4096,
+        "gyro_counts_per_deg_s": 16.4,
+        "per_unit_calibrated": false
+      },
+      "requests": 4315,
+      "samples": 60410,
+      "packets": 4315,
+      "errors": 0,
+      "elapsed_seconds": 76.96990168100456,
+      "duplicates": 0,
+      "gaps": 129,
+      "missing_estimated": 1890,
+      "counter_discontinuities": 0,
+      "counter_wraps_24bit": 0,
+      "counter_rollover_basis": "Observed 2UQ2 u24 boundary inside a u32 field; tick time not vendor-confirmed",
+      "error": null
+    },
+    "empirical_rate_hz": 809.4190238911815,
+    "packet_clock_fit_residual_ms": {
+      "std": 3.187294875969338,
+      "p95_abs": 2.048786293115957,
+      "max_abs": 25.058722690231598
+    },
+    "clock_windows": [
+      {
+        "host_start_s": 0.0,
+        "observed_span_s": 19.991713872,
+        "rate_hz": 809.4485472905048,
+        "relative_to_full_fit_ppm": 36.4748028547357
+      },
+      {
+        "host_start_s": 20.0,
+        "observed_span_s": 19.976988251,
+        "rate_hz": 809.4702190981769,
+        "relative_to_full_fit_ppm": 63.249325113812205
+      },
+      {
+        "host_start_s": 40.0,
+        "observed_span_s": 19.993291350999996,
+        "rate_hz": 809.4459735785742,
+        "relative_to_full_fit_ppm": 33.29510006233605
+      },
+      {
+        "host_start_s": 60.0,
+        "observed_span_s": 16.932628788000002,
+        "rate_hz": 809.440038455961,
+        "relative_to_full_fit_ppm": 25.9625288747678
+      }
+    ],
+    "camera_interval_ms": {
+      "median": 102.048604,
+      "p95": 196.41734079999998,
+      "max": 209.253577
+    },
+    "kinematic_sensitivity": [
+      {
+        "window_seconds": 0.04,
+        "block_samples": 32,
+        "usable_centers": 1733,
+        "rms_sensitivity_per_m_s2": [
+          2.7202356916714963,
+          2.8938438664783446,
+          2.9701717810783705
+        ],
+        "weakest_direction_in_imu_axes": [
+          0.9785561718854963,
+          0.19593000394676738,
+          0.06355511008741072
+        ],
+        "sensitivity_ratio_min_over_max": 0.9158513015984109,
+        "delta_r_only_acceleration_change_m_s2": {
+          "mean": 0.023789461551782642,
+          "rms": 0.034456633000924865,
+          "p95": 0.06925883890300265
+        },
+        "angular_speed_rad_s": {
+          "mean": 0.33199256922533793,
+          "p95": 1.0147797398300946
+        },
+        "interpretation": "Block-averaged measured gyro and central differences within contiguous segments only. Does not include camera reprojection, trajectory, gravity/bias compensation, rotation differences, or time-offset refit. Not a Fisher-information/covariance result or pass/fail threshold."
+      },
+      {
+        "window_seconds": 0.1,
+        "block_samples": 81,
+        "usable_centers": 652,
+        "rms_sensitivity_per_m_s2": [
+          1.2942112850422947,
+          1.4057265919254665,
+          1.541774752062833
+        ],
+        "weakest_direction_in_imu_axes": [
+          -0.08812415380637101,
+          0.8606831221707857,
+          0.5014565751151933
+        ],
+        "sensitivity_ratio_min_over_max": 0.8394295491677314,
+        "delta_r_only_acceleration_change_m_s2": {
+          "mean": 0.011123302376978495,
+          "rms": 0.015551082024880843,
+          "p95": 0.030732479278761927
+        },
+        "angular_speed_rad_s": {
+          "mean": 0.3015486583691425,
+          "p95": 0.9713901897848395
+        },
+        "interpretation": "Block-averaged measured gyro and central differences within contiguous segments only. Does not include camera reprojection, trajectory, gravity/bias compensation, rotation differences, or time-offset refit. Not a Fisher-information/covariance result or pass/fail threshold."
+      },
+      {
+        "window_seconds": 0.2,
+        "block_samples": 162,
+        "usable_centers": 303,
+        "rms_sensitivity_per_m_s2": [
+          0.7416089866664883,
+          0.7467149680712514,
+          0.9391777788837118
+        ],
+        "weakest_direction_in_imu_axes": [
+          0.03563343661063863,
+          -0.6747429523130892,
+          0.737192109628916
+        ],
+        "sensitivity_ratio_min_over_max": 0.7896364280977242,
+        "delta_r_only_acceleration_change_m_s2": {
+          "mean": 0.006372316130420216,
+          "rms": 0.008904413678246096,
+          "p95": 0.017094777667604574
+        },
+        "angular_speed_rad_s": {
+          "mean": 0.26562870510403547,
+          "p95": 0.94268532334167
+        },
+        "interpretation": "Block-averaged measured gyro and central differences within contiguous segments only. Does not include camera reprojection, trajectory, gravity/bias compensation, rotation differences, or time-offset refit. Not a Fisher-information/covariance result or pass/fail threshold."
+      }
+    ],
+    "caveat": "Host packet completion and complete-frame timestamps are not exposure/sample hardware timestamps. These diagnostics cannot verify synchronization or manufacturer scaling."
+  },
+  "current_scope_20261115": {
+    "goal": "Verify capture, computation and output generation for all three modules",
+    "mount_clarification": "User reports mainboard re-taping can change relative placement; do not require cross-mount extrinsics equality for the current flow verification",
+    "additional_precision_diagnostics": "Paused, not a prerequisite for recording or using the existing calculation pipelines"
+  }
+}
